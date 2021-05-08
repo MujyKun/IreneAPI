@@ -1,0 +1,10 @@
+.env
+*.log
+*__pycache__/
+*node_modules/
+module/Funtimes.py
+venv/
+.idea/
+*token.json
+*credentials.json
+*.pickle
