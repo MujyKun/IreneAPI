@@ -149,9 +149,9 @@ def get_idol_photo(idol_id, redirect_user=True, auth=True, guessing_game=False):
     """
 
     try:
-        check_redirect = request.args.get('redirect_user')
-        if check_redirect is not None:  # do not simplify
-            redirect_user = True if check_redirect else False  # we do not want invalid input, so we force it.
+        check_redirect = request.args.get('redirect')
+        if check_redirect is not None and check_redirect == "0":  # do not simplify
+            redirect_user = False
 
         allow_group_photos = request.args.get('allow_group_photos')
         # must be None. 0 is an alternative of allow_group_photos, so do not simplify.
