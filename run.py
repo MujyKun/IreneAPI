@@ -80,9 +80,26 @@ def get_member(idol_id):
 def get_groups():
     """Get all group ids to group names."""
     c.execute("SELECT groupid, groupname FROM groupmembers.groups")
+    groups = c.fetchall()
+    c.execute("SELECT idolid, groupid FROM groupmembers.idoltogroup")
     all_groups = {}
-    for group_id, group_name in c.fetchall():
-        all_groups[group_id] = group_name
+    members_in_groups = {}
+
+    for idol_id, group_id in c.fetchall():
+        members = members_in_groups.get(group_id)
+        if not members:
+            members_in_groups[group_id] = [idol_id]
+        else:
+            members_in_groups[group_id].append(idol_id)
+
+    for group_id, group_name in groups:
+        members = members_in_groups.get(group_id) or []
+
+        all_groups[group_id] = {
+            "name": group_name,
+            "members": members
+        }
+
     return all_groups
 
 
