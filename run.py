@@ -35,6 +35,7 @@ def log_info():
                                                                                                    index, 1))
         db_conn.commit()
     except Exception as e:
+        db_conn.commit()  # will cause a transaction rollback / abort the current transaction.
         print(f"{e} - log_info")
 
 
