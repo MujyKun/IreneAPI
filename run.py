@@ -125,7 +125,7 @@ def get_image_ids(idol_id):
 
 # noinspection PyBroadException
 @app.route('/photos/<idol_id>/', methods=['POST'])
-def get_idol_photo(idol_id, redirect_user=True, auth=True, guessing_game=False):
+def get_idol_photo(idol_id, redirect_user=True, auth=True, guessing_game=False, looped=0):
     """Download an idol's photo and redirect the user to the image link."""
     # check authorization
     if not check_auth_key(request.headers.get('Authorization')) and auth:
@@ -147,6 +147,13 @@ def get_idol_photo(idol_id, redirect_user=True, auth=True, guessing_game=False):
         except Exception as e:
             print(f"{e} - get_idol_photo")
     """
+    # defining the args and kwargs for this method to use recursive strategies.
+    args = {idol_id}
+    kwargs = {
+        "redirect_user": redirect_user,
+        "auth": auth,
+        "guessing_game": guessing_game
+    }
 
     try:
         check_redirect = request.args.get('redirect')
@@ -176,7 +183,11 @@ def get_idol_photo(idol_id, redirect_user=True, auth=True, guessing_game=False):
         return process_image(random_link, redirect_user=redirect_user)
 
     except Exception as e:
-        print(f"{e} - get_idol_photo 2")
+        if "current transaction is aborted" in f"{e}".lower() and looped < 5:
+            # we will attempt this 5 times.
+            kwargs['looped'] = looped + 1
+            return get_idol_photo(*args, **kwargs)
+        print(f"{e} (Looped {looped} times) - get_idol_photo 2 ")
         return Response(status=500)
 
 
