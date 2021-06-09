@@ -166,12 +166,16 @@ def get_idol_photo(idol_id, redirect_user=True, auth=True, guessing_game=False, 
         if allow_group_photos is None:
             allow_group_photos = 1
 
+        # only allow images where the face count is greater than 0 OR that have not been scanned yet.
+        face_sql_add_on = "(facecount is NULL OR facecount > 0)"
         if allow_group_photos:
             # get all types of photos from the idol.
-            c.execute("SELECT id, link FROM groupmembers.imagelinks WHERE memberid=%s", (idol_id,))
+            c.execute(f"SELECT id, link FROM groupmembers.imagelinks WHERE memberid=%s AND {face_sql_add_on}",
+                      (idol_id,))
         else:
             # only get photos that are not a group photo
-            c.execute("SELECT id, link FROM groupmembers.imagelinks WHERE memberid=%s AND groupphoto=%s", (idol_id, 0))
+            c.execute(f"SELECT id, link FROM groupmembers.imagelinks WHERE memberid=%s AND groupphoto=%s AND "
+                      f"{face_sql_add_on}", (idol_id, 0))
         all_links = c.fetchall()
         if not all_links:
             # idol has no photos
