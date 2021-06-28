@@ -124,6 +124,11 @@ def get_image_ids(idol_id):
     return all_ids
 
 
+def get_param(key: str):
+    """Get the form data or param of sent data"""
+    return request.args.get(key) or request.form.get(key)
+
+
 # noinspection PyBroadException
 @app.route('/photos/<idol_id>/', methods=['POST'])
 def get_idol_photo(idol_id, redirect_user=True, auth=True, guessing_game=False, looped=0):
@@ -133,21 +138,6 @@ def get_idol_photo(idol_id, redirect_user=True, auth=True, guessing_game=False, 
         # Invalid API Key
         return Response(status=403)
 
-    """
-    should not be deleting files in the endpoint. several workers may end up trying to remove the same file
-    and this request would take forever to get executed.
-    
-
-    # delete files after a certain amount exist in the directory.
-    currently_existing_photos = os.listdir(idol_folder)
-    if len(currently_existing_photos) > 150000:
-        # noinspection PyPep8
-        try:
-            for file in currently_existing_photos:
-                os.remove(f"{idol_folder}{file}")
-        except Exception as e:
-            print(f"{e} - get_idol_photo")
-    """
     # defining the args and kwargs for this method to use recursive strategies.
     args = {idol_id}
     kwargs = {
@@ -156,26 +146,37 @@ def get_idol_photo(idol_id, redirect_user=True, auth=True, guessing_game=False, 
         "guessing_game": guessing_game
     }
 
+
     try:
-        check_redirect = request.args.get('redirect')
-        if check_redirect is not None and check_redirect == "0":  # do not simplify
-            redirect_user = False
+        check_redirect = get_param("redirect") or 1  # should redirect by default
+        allow_video = get_param('video_allowed') or 1  # video allowed by default
+        min_faces = get_param('min_faces') or 1
+        max_faces = get_param('max_faces') or 999
 
-        allow_group_photos = request.args.get('allow_group_photos')
-        # must be None. 0 is an alternative of allow_group_photos, so do not simplify.
-        if allow_group_photos is None:
-            allow_group_photos = 1
+        # confirm the input is not a string
+        check_redirect = int(check_redirect)
+        allow_video = int(allow_video)
+        min_faces = int(min_faces)
+        max_faces = int(max_faces)
+    except:
+        return Response(status=422)
 
-        # only allow images where the face count is greater than 0 OR that have not been scanned yet.
-        face_sql_add_on = "(facecount is NULL OR facecount > 0)"
-        if allow_group_photos:
-            # get all types of photos from the idol.
-            c.execute(f"SELECT id, link FROM groupmembers.imagelinks WHERE memberid=%s AND {face_sql_add_on}",
-                      (idol_id,))
-        else:
-            # only get photos that are not a group photo
-            c.execute(f"SELECT id, link FROM groupmembers.imagelinks WHERE memberid=%s AND groupphoto=%s AND "
-                      f"{face_sql_add_on}", (idol_id, 0))
+    if not check_redirect:
+        redirect_user = False
+
+    if min_faces < -1:
+        min_faces = 1
+
+    if max_faces > 10000:
+        max_faces = 999
+
+    try:
+        add_sql_query = "" if not allow_video else "OR facecount = -1"
+
+        sql_query = f"""SELECT id, link FROM groupmembers.imagelinks 
+            WHERE memberid=%s AND ( (facecount > %s AND facecount < %s) {add_sql_query})"""
+
+        c.execute(sql_query, (idol_id, min_faces, max_faces))
         all_links = c.fetchall()
         if not all_links:
             # idol has no photos
