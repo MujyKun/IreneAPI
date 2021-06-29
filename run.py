@@ -164,17 +164,20 @@ def get_idol_photo(idol_id, redirect_user=True, auth=True, guessing_game=False, 
     if not check_redirect:
         redirect_user = False
 
-    if min_faces < -1:
+    if 999 < min_faces < -1:
         min_faces = 1
 
     if max_faces > 10000:
         max_faces = 999
 
+    if max_faces < min_faces:
+        max_faces = min_faces
+
     try:
         add_sql_query = "" if not allow_video else "OR facecount = -1"
 
         sql_query = f"""SELECT id, link FROM groupmembers.imagelinks 
-            WHERE memberid=%s AND ( (facecount > %s AND facecount < %s) {add_sql_query})"""
+            WHERE memberid=%s AND ( (facecount >= %s AND facecount <= %s) {add_sql_query})"""
 
         c.execute(sql_query, (idol_id, min_faces, max_faces))
         all_links = c.fetchall()
