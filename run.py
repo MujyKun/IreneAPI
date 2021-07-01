@@ -1,4 +1,4 @@
-from flask import Flask, request, Response, redirect, jsonify
+from flask import Flask, request, Response, redirect
 
 # expected import error. API is run as a standalone from server.py
 # noinspection PyUnresolvedReferences, PyPackageRequirements
@@ -6,6 +6,7 @@ from resources.keys import c, private_keys, idol_folder, top_gg_webhook_key, db_
 # noinspection PyUnresolvedReferences, PyPackageRequirements
 from resources.drive import get_file_type, download_media
 
+import json
 import random
 import os.path
 
@@ -102,6 +103,12 @@ def get_groups():
         }
 
     return all_groups
+
+
+@app.route('/commands/', methods=['GET'])
+def get_commands():
+    with open("commands.json", "r") as file:
+        return json.loads(file.read()), 200
 
 
 # noinspection PyBroadException,PyPep8
