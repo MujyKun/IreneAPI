@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS groupmembers."position"
 (
     positionid serial,
-    name text,
+    name text UNIQUE,
     PRIMARY KEY (positionid)
 );
 

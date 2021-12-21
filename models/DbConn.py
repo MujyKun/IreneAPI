@@ -50,7 +50,11 @@ class DbConnection:
                     return data
 
                 for query in data.split(";"):
-                    await self.execute(query)
+                    try:
+                        await self.execute(query)
+                    except asyncpg.exceptions.UniqueViolationError:
+                        print("Failed to insert metadata as it already exists. "
+                              f"If a relation has changed, update it manually. - {query}")
         except FileNotFoundError:
             print(f"Could not find {file_name} for SQL execution.")
         return ""
@@ -85,7 +89,7 @@ class DbConnection:
         create_file_name = "create.sql"
         inexecutable_queries = ""
         for file in listdir(sql_folder_name):
-            if file == "metadata":
+            if file in ["metadata", "constraints"]:
                 # process metadata at the end
                 continue
 
@@ -102,10 +106,8 @@ class DbConnection:
                 if file != create_file_name:
                     inexecutable_queries += await self.execute_sql_file(f"{sql_folder_name}/{file}")
 
-        try:
-            await self.execute_sql_file(f"{sql_folder_name}/metadata/{create_file_name}")
-        except asyncpg.exceptions.UniqueViolationError:
-            print("Failed to insert metadata as it already exists. If a relation has changed, update it manually.")
+        await self.execute_sql_file(f"{sql_folder_name}/metadata/{create_file_name}")
+        await self.execute_sql_file(f"{sql_folder_name}/constraints/{create_file_name}")
 
         async with aiofiles.open(f"{sql_folder_name}/functions/{create_file_name}", "w") as manual_file:
             await manual_file.write(inexecutable_queries)

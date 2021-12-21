@@ -21,10 +21,10 @@ class PgConnection(DbConnection):
         ...
 
     async def execute(self, query: str):
+        query = query.replace("\n", "")
+
         if not query:
             return
-
-        query = query.replace("\n", "")
 
         async with self._pool.acquire() as conn:
             await conn.execute(query)

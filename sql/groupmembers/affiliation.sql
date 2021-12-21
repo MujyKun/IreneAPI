@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS groupmembers.affiliation
 (
-    affiliationid serial,
+    affiliationid serial UNIQUE,
     personid integer,
     groupid integer,
     positionids integer[],

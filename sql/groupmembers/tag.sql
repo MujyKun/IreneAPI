@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS groupmembers.tag
 (
     tagid serial,
-    name text,
+    name text UNIQUE,
     PRIMARY KEY (tagid)
 );
 

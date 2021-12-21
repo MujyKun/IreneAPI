@@ -128,6 +128,19 @@ begin
     VALUES(t_link, t_faces, t_filetype, t_affiliationid, t_enabled) returning mediaid INTO t_media_id;
     return t_media_id;
 end;
+$$;create or replace function groupmembers.addname(t_firstname text, t_lastname text)
+    returns integer
+    language plpgsql
+as
+$$
+declare
+    t_name_id integer;
+begin
+
+    INSERT INTO groupmembers.name(firstname, lastname)
+    VALUES(t_firstname, t_lastname) returning nameid INTO t_name_id;
+    return t_name_id;
+end;
 $$;create or replace function groupmembers.addperson(t_dateid integer, t_nameid integer, t_formernameid integer,
                                                   t_gender character(1), t_description text, t_height integer, t_displayid integer, t_socialid integer,
                                                   t_locationid integer, t_tagids integer[], t_bloodid integer, t_callcount integer)
@@ -159,7 +172,20 @@ begin
     return t_alias_id;
 end;
 $$;
-create or replace function groupmembers.addsocials(t_twitter text, t_youtube text, t_melon text, t_instagram text,
+create or replace function groupmembers.addposition(t_name text)
+    returns integer
+    language plpgsql
+as
+$$
+declare
+    t_position_id integer;
+begin
+
+    INSERT INTO groupmembers.position(name)
+    VALUES(t_name) returning positionid INTO t_position_id;
+    return t_position_id;
+end;
+$$;create or replace function groupmembers.addsocials(t_twitter text, t_youtube text, t_melon text, t_instagram text,
     t_vlive text, t_spotify text, t_fancafe text, t_facebook text, t_tiktok text)
     returns integer
     language plpgsql
@@ -172,5 +198,348 @@ begin
     INSERT INTO groupmembers.socialmedia(twitter, youtube, melon, instagram, vlive, spotify, fancafe, facebook, tiktok)
     VALUES(t_twitter, t_youtube, t_melon, t_instagram, t_vlive, t_spotify, t_fancafe, t_facebook, t_tiktok) returning socialid INTO t_social_id;
     return t_social_id;
+end;
+$$;create or replace function groupmembers.addtag(t_name text)
+    returns integer
+    language plpgsql
+as
+$$
+declare
+    t_tag_id integer;
+begin
+
+    INSERT INTO groupmembers.tag(name)
+    VALUES(t_name) returning tagid INTO t_tag_id;
+    return t_tag_id;
+end;
+$$;
+create or replace function groupmembers.getaffiliation(t_affiliation_id integer)
+    returns table
+            (
+                t_personid integer,
+                t_groupid integer,
+                t_positionids integer[],
+                t_stagename text
+            )
+    language plpgsql
+as
+$$
+
+begin
+    RETURN QUERY SELECT personid, groupid, positionids, stagename
+                 FROM groupmembers.affiliation
+                 WHERE affiliationid = t_affiliation_id;
+end;
+$$;create or replace function groupmembers.getbloodtype(t_blood_id integer)
+    returns table
+            (
+                t_name text
+            )
+    language plpgsql
+as
+$$
+
+begin
+    RETURN QUERY SELECT name
+                 FROM groupmembers.bloodtypes
+                 WHERE t_blood_id = bloodid;
+end;
+$$;create or replace function groupmembers.getcompany(t_company_id integer)
+    returns table
+            (
+                t_name text,
+                t_description text,
+                t_dateid integer
+            )
+    language plpgsql
+as
+$$
+
+begin
+    RETURN QUERY SELECT name, description, dateid
+                 FROM groupmembers.company
+                 WHERE companyid = t_company_id;
+end;
+$$;create or replace function groupmembers.getdate(t_dateid integer)
+    returns table
+            (
+                t_startdate timestamp,
+                t_enddate timestamp
+            )
+    language plpgsql
+as
+$$
+
+begin
+    RETURN QUERY SELECT startdate, enddate
+                 FROM groupmembers.dates
+                 WHERE dateid = t_dateid;
+end;
+$$;
+create or replace function groupmembers.getdisplay(t_displayid integer)
+    returns table
+            (
+                t_avatar text,
+                t_banner text
+            )
+    language plpgsql
+as
+$$
+
+begin
+    RETURN QUERY SELECT avatar, banner
+                 FROM groupmembers.display
+                 WHERE displayid = t_displayid;
+end;
+$$;create or replace function groupmembers.getfandom(t_groupid integer)
+    returns table
+            (
+                t_name text
+            )
+    language plpgsql
+as
+$$
+
+begin
+    RETURN QUERY SELECT name
+                 FROM groupmembers.fandom
+                 WHERE t_groupid = groupid;
+end;
+$$;create or replace function groupmembers.getgroup(t_group_id integer)
+    returns table
+            (
+                t_name        text,
+                t_dateid      integer,
+                t_description text,
+                t_companyid   integer,
+                t_displayid   integer,
+                t_website     text,
+                t_socialid    integer,
+                t_tagids      integer[]
+            )
+    language plpgsql
+as
+$$
+
+begin
+    RETURN QUERY SELECT name, dateid, description, companyid, displayid, website, socialid, tagids
+                 FROM groupmembers.groups
+                 WHERE groupid = t_group_id;
+end;
+$$;create or replace function groupmembers.getgroupalias(t_aliasid integer)
+    returns table
+            (
+                t_alias text,
+                t_groupid integer,
+                t_guildid bigint
+            )
+    language plpgsql
+as
+$$
+
+begin
+    RETURN QUERY SELECT alias, groupid, guildid
+                 FROM groupmembers.groupaliases
+                 WHERE aliasid = t_aliasid;
+end;
+$$;create or replace function groupmembers.getgroupaliases(t_groupid integer)
+    returns table
+            (
+                t_aliasid integer,
+                t_alias text,
+                t_guildid bigint
+            )
+    language plpgsql
+as
+$$
+
+begin
+    RETURN QUERY SELECT aliasid, alias, guildid
+                 FROM groupmembers.groupaliases
+                 WHERE groupid = t_groupid;
+end;
+$$;create or replace function groupmembers.getlocation(t_locationid integer)
+    returns table
+            (
+                t_country text,
+                t_city integer
+            )
+    language plpgsql
+as
+$$
+
+begin
+    RETURN QUERY SELECT country, city
+                 FROM groupmembers.location
+                 WHERE locationid = t_locationid;
+end;
+$$;
+create or replace function groupmembers.getmedia(t_mediaid integer)
+    returns table
+            (
+                t_link text,
+                t_faces integer,
+                t_filetype text,
+                t_affiliationid integer,
+                t_enabled boolean
+            )
+    language plpgsql
+as
+$$
+
+begin
+    RETURN QUERY SELECT link, faces, filetype, affiliationid, enabled
+                 FROM groupmembers.media
+                 WHERE mediaid = t_mediaid;
+end;
+$$;create or replace function groupmembers.getname(t_nameid integer)
+    returns table
+            (
+                t_firstname text,
+                t_lastname text
+            )
+    language plpgsql
+as
+$$
+
+begin
+    RETURN QUERY SELECT firstname, lastname
+                 FROM groupmembers.name
+                 WHERE t_nameid = nameid;
+end;
+$$;create or replace function groupmembers.getperson(t_person_id integer)
+    returns table (
+                      t_dateid integer,
+                      t_nameid integer,
+                      t_formernameid integer,
+                      t_gender char,
+                      t_description text,
+                      t_height integer,
+                      t_displayid integer,
+                      t_socialid integer,
+                      t_locationid integer,
+                      t_tagids integer[],
+                      t_bloodid integer,
+                      t_callcount integer)
+    language plpgsql
+as
+$$
+
+begin
+    RETURN QUERY SELECT person.dateid, nameid, formernameid, gender, description, height, displayid, socialid,
+                        locationid, tagids, bloodid, callcount
+                 FROM groupmembers.person
+                 WHERE personid = t_person_id;
+end;
+$$;create or replace function groupmembers.getpersonalias(t_aliasid integer)
+    returns table
+            (
+                t_alias text,
+                t_personid integer,
+                t_guildid bigint
+            )
+    language plpgsql
+as
+$$
+
+begin
+    RETURN QUERY SELECT alias, personid, guildid
+                 FROM groupmembers.personaliases
+                 WHERE aliasid = t_aliasid;
+end;
+$$;create or replace function groupmembers.getpersonaliases(t_personid integer)
+    returns table
+            (
+                t_aliasid integer,
+                t_alias text,
+                t_guildid bigint
+            )
+    language plpgsql
+as
+$$
+
+begin
+    RETURN QUERY SELECT aliasid, alias, guildid
+                 FROM groupmembers.personaliases
+                 WHERE personid = t_personid;
+end;
+$$;create or replace function groupmembers.getposition(t_positionid integer)
+    returns table
+            (
+                t_name text
+            )
+    language plpgsql
+as
+$$
+
+begin
+    RETURN QUERY SELECT name
+                 FROM groupmembers.position
+                 WHERE positionid = t_positionid;
+end;
+$$;create or replace function groupmembers.getpositionid(t_positionname text)
+    returns table
+            (
+                t_positionid integer
+            )
+    language plpgsql
+as
+$$
+
+begin
+    RETURN QUERY SELECT positionid
+                 FROM groupmembers.position
+                 WHERE name = t_positionname;
+end;
+$$;create or replace function groupmembers.getsocials(t_socialid integer)
+    returns table
+            (
+                t_twitter text,
+                t_youtube text,
+                t_melon text,
+                t_instagram text,
+                t_vlive text,
+                t_spotify text,
+                t_fancafe text,
+                t_facebook text,
+                t_tiktok text
+            )
+    language plpgsql
+as
+$$
+
+begin
+    RETURN QUERY SELECT twitter, youtube, melon, instagram, vlive, spotify, fancafe, facebook, tiktok
+                 FROM groupmembers.socialmedia
+                 WHERE socialid = t_socialid;
+end;
+$$;
+create or replace function groupmembers.gettag(t_tagid integer)
+    returns table
+            (
+                t_name text
+            )
+    language plpgsql
+as
+$$
+
+begin
+    RETURN QUERY SELECT name
+                 FROM groupmembers.tag
+                 WHERE tagid = t_tagid;
+end;
+$$;create or replace function groupmembers.gettagid(t_tagname text)
+    returns table
+            (
+                t_tagid integer
+            )
+    language plpgsql
+as
+$$
+
+begin
+    RETURN QUERY SELECT tagid
+                 FROM groupmembers.tag
+                 WHERE name = t_tagname;
 end;
 $$;
