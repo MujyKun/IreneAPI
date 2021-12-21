@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS groupmembers.dates
 (
     dateid serial,
-    startdate date,
-    enddate date,
+    startdate timestamp,
+    enddate timestamp,
     PRIMARY KEY (dateid)
 );
 

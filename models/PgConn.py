@@ -24,18 +24,43 @@ class PgConnection(DbConnection):
         if not query:
             return
 
-        async with self._pool.acquire() as connection:
-            await connection.execute(query)
+        query = query.replace("\n", "")
 
-    async def fetch_row(self, query: str):
-        ...
+        async with self._pool.acquire() as conn:
+            await conn.execute(query)
 
-    async def fetch(self, query: str):
-        ...
+    async def fetch_row(self, query: str, *args, **kwargs):
+        if not query:
+            return
 
-    async def generate(self):
-        ...
+        async with self._pool.acquire() as conn:
+            await conn.fetchrow(query, *args, **kwargs)
+
+    async def fetch(self, query: str, *args, **kwargs):
+        if not query:
+            return
+
+        async with self._pool.acquire() as conn:
+            await conn.fetch(query, *args, **kwargs)
 
     async def _create_pool(self, **login_payload):
         self._pool = await asyncpg.create_pool(command_timeout=60, **login_payload)
+
+    async def _connect_to_other_database(self, **login_payload):
+        self.old_pool = await asyncpg.create_pool(command_timeout=60, **login_payload)
+
+        async with self.old_pool.acquire() as conn:
+            # groupmembers
+            all_aliases = await conn.fetch("SELECT * FROM groupmembers.aliases")
+            data_mods = await conn.fetch("SELECT * FROM groupmembers.datamods")
+            groups = await conn.fetch("SELECT * FROM groupmembers.groups")
+            idols = await conn.fetch("SELECT * FROM groupmembers.member")
+            idol_to_groups = await conn.fetch("SELECT * FROM groupmembers.idoltogroup")
+            restricted = await conn.fetch("SELECT * FROM groupmembers.restricted")
+            image_links = await conn.fetch("SELECT * FROM groupmembers.imagelinks")
+
+
+
+
+        ...
 

@@ -3,6 +3,8 @@ from os.path import isdir
 import aiofiles
 import asyncio
 
+import asyncpg.exceptions
+
 
 class DbConnection:
     def __init__(self, db_host: str, db_name: str, db_user: str, db_pass: str, db_port: int):
@@ -19,8 +21,6 @@ class DbConnection:
         self._db_user = db_user
         self._db_port = db_port
         self.__db_pass = db_pass
-        self.__pool = None
-        ...
 
     async def connect(self):
         """Connect to the PostgreSQL Database."""
@@ -34,19 +34,26 @@ class DbConnection:
         })
         await self.update_db_structure()
         print(f"Connected to Database {self._db_name} as {self._db_user}.")
-        ...
+        await self.migration()
 
-    async def execute_sql_file(self, file_name: str):
+    async def execute_sql_file(self, file_name: str) -> str:
         """Read and execute the queries in a SQL file.
 
         :param file_name: str File name to read and execute.
+        :returns str: Code that cannot be executed.
         """
-        async with aiofiles.open(file_name, mode='r') as file:
-            data = await file.read()
-            queries = data.split(';')
-            for query in queries:
-                await self.execute(query)
-        ...
+        try:
+
+            async with aiofiles.open(file_name, mode='r') as file:
+                data = await file.read()
+                if "functions" in file_name.lower():
+                    return data
+
+                for query in data.split(";"):
+                    await self.execute(query)
+        except FileNotFoundError:
+            print(f"Could not find {file_name} for SQL execution.")
+        return ""
 
     async def execute(self, query: str):
         """Execute a SQL query.
@@ -54,45 +61,67 @@ class DbConnection:
         :param query: (str) SQL Query to execute.
         """
 
-        ...
-
     async def fetch_row(self, query: str):
         """Fetch a row from a SQL query.
 
         :param query: (str) SQL Query to execute.
         """
-        ...
 
     async def fetch(self, query: str):
         """Fetch rows from a SQL query.
 
         :param query: (str) SQL Query to execute.
         """
-        ...
-
-    async def generate(self):
-        """Generate the database."""
-        ...
 
     async def _create_pool(self, **login_payload):
         """Create and set the connection pool.
 
         :param login_payload: The login payload to pass into the concrete class.
         """
-        ...
 
     async def update_db_structure(self):
         """Attempt to create the DB structure."""
         sql_folder_name = "sql"
         create_file_name = "create.sql"
+        inexecutable_queries = ""
         for file in listdir(sql_folder_name):
+            if file == "metadata":
+                # process metadata at the end
+                continue
+
             if isdir(f"{sql_folder_name}/{file}"):
-                create_file = f"{sql_folder_name}/{file}/{create_file_name}"
-                await self.execute_sql_file(create_file)
+                # run the create files first.
+                if file != "functions":
+                    create_file = f"{sql_folder_name}/{file}/{create_file_name}"
+                    inexecutable_queries += await self.execute_sql_file(create_file)
 
                 for t_file in listdir(f"{sql_folder_name}/{file}"):
                     if t_file != create_file_name:
-                        await self.execute_sql_file(f"{sql_folder_name}/{file}/{t_file}")
+                        inexecutable_queries += await self.execute_sql_file(f"{sql_folder_name}/{file}/{t_file}")
             else:
                 if file != create_file_name:
-                    await self.execute_sql_file(f"{sql_folder_name}/{file}")
+                    inexecutable_queries += await self.execute_sql_file(f"{sql_folder_name}/{file}")
+
+        try:
+            await self.execute_sql_file(f"{sql_folder_name}/metadata/{create_file_name}")
+        except asyncpg.exceptions.UniqueViolationError:
+            print("Failed to insert metadata as it already exists. If a relation has changed, update it manually.")
+
+        async with aiofiles.open(f"{sql_folder_name}/functions/{create_file_name}", "w") as manual_file:
+            await manual_file.write(inexecutable_queries)
+
+    async def migration(self):
+        """Migrate old data to the new database."""
+        await self._connect_to_other_database(**{
+            "host": self._db_host,
+            "database": "postgres",
+            "user": self._db_user,
+            "password": self.__db_pass,
+            "port": self._db_port
+        })
+
+        ...
+
+    async def _connect_to_other_database(self, **kwargs):
+        """Create a db connection to another database using the same credentials."""
+        ...

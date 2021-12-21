@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS groupmembers.fandom
 (
     groupid integer,
-    name text,
+    name text UNIQUE,
     PRIMARY KEY (groupid)
 );
 

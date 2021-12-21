@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS groupmembers.bloodtypes
 (
     bloodid serial,
-    name character(2)[],
+    name character(2) UNIQUE,
     PRIMARY KEY (bloodid)
 );
 
