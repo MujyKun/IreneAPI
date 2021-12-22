@@ -1,4 +1,17 @@
-create or replace function groupmembers.addaffiliation(t_personid integer, t_groupid integer, t_position_ids integer[],
+create or replace function public.addaccess(t_name text)
+    returns integer
+    language plpgsql
+as
+$$
+declare
+    t_id integer;
+begin
+
+    INSERT INTO public.apiaccess(name)
+    VALUES(t_name) returning accessid INTO t_id;
+    return t_id;
+end;
+$$;create or replace function groupmembers.addaffiliation(t_personid integer, t_groupid integer, t_position_ids integer[],
                                                        t_stagename text)
     returns integer
     language plpgsql
@@ -24,6 +37,40 @@ begin
     INSERT INTO groupmembers.automedia(channelid, personids)
     VALUES(t_channel_id, t_personids);
 end;
+$$;create or replace function public.addchannel(t_channelid bigint)
+    returns void
+    language plpgsql
+as
+$$
+declare
+    t_channel_exists integer;
+begin
+    SELECT COUNT(*) INTO t_channel_exists FROM public.channels WHERE t_channelid = channelid;
+
+    IF t_channel_exists = 0 THEN
+        INSERT INTO public.channels(channelid)
+        VALUES(t_channelid);
+    END IF;
+end;
+$$;create or replace function public.addcommandusage(t_sessionid integer, t_commandname text)
+    returns integer
+    language plpgsql
+as
+$$
+declare
+    t_old_count integer;
+begin
+    SELECT count INTO t_old_count FROM public.commandusage WHERE sessionid = t_sessionid AND commandname = t_commandname;
+
+    IF t_old_count is null THEN
+        INSERT INTO public.commandusage(sessionid, commandname, count)
+        VALUES(t_sessionid, t_commandname, 1);
+        return 1;
+    ELSE
+        UPDATE public.commandusage SET count = t_old_count + 1 WHERE sessionid = t_sessionid AND commandname = t_commandname;
+        return t_old_count + 1;
+    END IF;
+end;
 $$;create or replace function groupmembers.addcompany(t_name text, t_description text, t_dateid integer)
     returns integer
     language plpgsql
@@ -38,7 +85,19 @@ begin
     return t_company_id;
 end;
 $$;
-create or replace function groupmembers.adddate(t_startdate timestamp, t_enddate timestamp)
+create or replace function public.addcustomcommand(t_guildid bigint, t_name text, t_content text)
+    returns integer
+    language plpgsql
+as
+$$
+declare
+    t_commandid integer;
+begin
+    INSERT INTO public.customcommands(guildid, name, content)
+    VALUES (t_guildid, t_name, t_content) RETURNING commandid INTO t_commandid;
+    return t_commandid;
+end;
+$$;create or replace function groupmembers.adddate(t_startdate timestamp, t_enddate timestamp)
     returns integer
     language plpgsql
 as
@@ -102,7 +161,23 @@ begin
     return t_alias_id;
 end;
 $$;
-create or replace function groupmembers.addlocation(t_country text, t_city text)
+create or replace function public.addguildprefix(t_guildid bigint, t_prefix text)
+    returns void
+    language plpgsql
+as
+$$
+declare
+    t_already_exists integer;
+begin
+    SELECT COUNT(*) INTO t_already_exists FROM public.guildprefixes WHERE guildid = t_guildid;
+    IF t_already_exists = 0 THEN
+        INSERT INTO public.guildprefixes(guildid, prefix)
+        VALUES(t_guildid, t_prefix);
+    ELSE
+        UPDATE public.guildprefixes SET prefix = t_prefix WHERE guildid = t_guildid;
+    END IF;
+end;
+$$;create or replace function groupmembers.addlocation(t_country text, t_city text)
     returns integer
     language plpgsql
 as
@@ -140,6 +215,21 @@ begin
     INSERT INTO groupmembers.name(firstname, lastname)
     VALUES(t_firstname, t_lastname) returning nameid INTO t_name_id;
     return t_name_id;
+end;
+$$;create or replace function public.addpatron(t_userid bigint)
+    returns void
+    language plpgsql
+as
+$$
+declare
+    t_already_exists integer;
+begin
+    SELECT COUNT(*) INTO t_already_exists FROM public.patron WHERE userid = t_userid;
+
+    IF t_already_exists = 0 THEN
+        INSERT INTO public.patron(userid)
+        VALUES(t_userid);
+    END IF;
 end;
 $$;create or replace function groupmembers.addperson(t_dateid integer, t_nameid integer, t_formernameid integer,
                                                   t_gender character(1), t_description text, t_height integer, t_displayid integer, t_socialid integer,
@@ -185,6 +275,21 @@ begin
     VALUES(t_name) returning positionid INTO t_position_id;
     return t_position_id;
 end;
+$$;create or replace function public.addproofreader(t_userid bigint)
+    returns void
+    language plpgsql
+as
+$$
+declare
+    t_already_exists integer;
+begin
+    SELECT COUNT(*) INTO t_already_exists FROM public.proofreader WHERE userid = t_userid;
+
+    IF t_already_exists = 0 THEN
+        INSERT INTO public.proofreader(userid)
+        VALUES(t_userid);
+    END IF;
+end;
 $$;create or replace function groupmembers.addsocials(t_twitter text, t_youtube text, t_melon text, t_instagram text,
     t_vlive text, t_spotify text, t_fancafe text, t_facebook text, t_tiktok text)
     returns integer
@@ -198,6 +303,21 @@ begin
     INSERT INTO groupmembers.socialmedia(twitter, youtube, melon, instagram, vlive, spotify, fancafe, facebook, tiktok)
     VALUES(t_twitter, t_youtube, t_melon, t_instagram, t_vlive, t_spotify, t_fancafe, t_facebook, t_tiktok) returning socialid INTO t_social_id;
     return t_social_id;
+end;
+$$;create or replace function public.addsuperpatron(t_userid bigint)
+    returns void
+    language plpgsql
+as
+$$
+declare
+    t_already_exists integer;
+begin
+    SELECT COUNT(*) INTO t_already_exists FROM public.superpatron WHERE userid = t_userid;
+
+    IF t_already_exists = 0 THEN
+        INSERT INTO public.superpatron(userid)
+        VALUES(t_userid);
+    END IF;
 end;
 $$;create or replace function groupmembers.addtag(t_name text)
     returns integer
@@ -213,7 +333,140 @@ begin
     return t_tag_id;
 end;
 $$;
-create or replace function groupmembers.getaffiliation(t_affiliation_id integer)
+create or replace function public.addtoken(t_userid bigint, t_hashed text, t_accessid integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    INSERT INTO public.apitokens(userid, hashed, accessid)
+    VALUES(t_userid, t_hashed, t_accessid);
+end;
+$$;create or replace function public.addtranslator(t_userid bigint)
+    returns void
+    language plpgsql
+as
+$$
+declare
+    t_already_exists integer;
+begin
+    SELECT COUNT(*) INTO t_already_exists FROM public.translator WHERE userid = t_userid;
+
+    IF t_already_exists = 0 THEN
+        INSERT INTO public.translator(userid)
+        VALUES(t_userid);
+    END IF;
+end;
+$$;create or replace function public.addusage(t_userid bigint, t_endpoint text)
+    returns integer
+    language plpgsql
+as
+$$
+declare
+    t_old_count integer;
+begin
+    SELECT count INTO t_old_count FROM public.apiusage WHERE userid = t_userid AND endpoint = t_endpoint;
+
+    IF t_old_count is null THEN
+        INSERT INTO public.apiusage(userid, endpoint, count)
+        VALUES(t_userid, t_endpoint, 1);
+        return 1;
+    ELSE
+        UPDATE public.apiusage SET count = t_old_count + 1 WHERE userid = t_userid AND endpoint = t_endpoint;
+        return t_old_count + 1;
+    END IF;
+end;
+$$;create or replace function public.botban(t_userid bigint)
+    returns void
+    language plpgsql
+as
+$$
+declare
+    t_user_banned integer;
+begin
+    SELECT COUNT(*) INTO t_user_banned FROM public.botbanned WHERE userid = t_userid;
+
+    IF t_user_banned = 1 THEN
+        INSERT INTO public.botbanned(userid)
+        VALUES(t_userid);
+    END IF;
+end;
+$$;
+create or replace function public.botunban(t_userid bigint)
+    returns void
+    language plpgsql
+as
+$$
+declare
+    t_user_banned integer;
+begin
+    SELECT COUNT(*) INTO t_user_banned FROM public.botbanned WHERE userid = t_userid;
+
+    IF t_user_banned = 1 THEN
+        DELETE FROM public.botbanned WHERE user = t_userid;
+    END IF;
+end;
+$$;create or replace function public.deletecustomcommand(t_guildid bigint, t_name text)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM public.customcommands WHERE guildid = t_guildid AND name = t_name;
+end;
+$$;create or replace function public.deletecustomcommandbyid(t_commandid integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM public.customcommands WHERE commandid = t_commandid;
+end;
+$$;create or replace function public.deletepatron(t_userid bigint)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM public.patron WHERE userid = t_userid;
+end;
+$$;
+create or replace function public.deleteproofreader(t_userid bigint)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM public.proofreader WHERE userid = t_userid;
+end;
+$$;create or replace function public.deletesuperpatron(t_userid bigint)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM public.superpatron WHERE userid = t_userid;
+end;
+$$;create or replace function public.deletetranslator(t_userid bigint)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM public.translator WHERE userid = t_userid;
+end;
+$$;create or replace function public.getaccess(t_userid bigint)
+    returns text
+    language plpgsql
+as
+$$
+declare
+    t_access text;
+begin
+    SELECT name INTO t_access FROM public.apiaccess aa, public.apitokens at WHERE userid = t_userid AND aa.accessid = at.accessid;
+    return t_access;
+end;
+$$create or replace function groupmembers.getaffiliation(t_affiliation_id integer)
     returns table
             (
                 t_personid integer,
@@ -243,6 +496,17 @@ begin
     RETURN QUERY SELECT name
                  FROM groupmembers.bloodtypes
                  WHERE t_blood_id = bloodid;
+end;
+$$;create or replace function public.getcommandusage(t_sessionid integer, t_commandname text)
+    returns integer
+    language plpgsql
+as
+$$
+declare
+    t_count integer;
+begin
+    SELECT count into t_count FROM public.commandusage WHERE sessionid = t_sessionid AND commandname = t_commandname;
+    return t_count;
 end;
 $$;create or replace function groupmembers.getcompany(t_company_id integer)
     returns table
@@ -541,5 +805,27 @@ begin
     RETURN QUERY SELECT tagid
                  FROM groupmembers.tag
                  WHERE name = t_tagname;
+end;
+$$;create or replace function public.gettoken(t_userid bigint)
+    returns text
+    language plpgsql
+as
+$$
+declare
+    t_hashed text;
+begin
+    SELECT hashed into t_hashed FROM public.apitokens WHERE userid = t_userid;
+    return t_hashed;
+end;
+$$;create or replace function public.getusage(t_userid bigint, t_endpoint text)
+    returns integer
+    language plpgsql
+as
+$$
+declare
+    t_count integer;
+begin
+    SELECT count into t_count FROM public.apiusage WHERE userid = t_userid AND endpoint = t_endpoint;
+    return t_count;
 end;
 $$;

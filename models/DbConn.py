@@ -2,6 +2,7 @@ from os import listdir
 from os.path import isdir
 import aiofiles
 import asyncio
+from . import hash_token
 
 import asyncpg.exceptions
 
@@ -34,7 +35,18 @@ class DbConnection:
         })
         await self.update_db_structure()
         print(f"Connected to Database {self._db_name} as {self._db_user}.")
-        await self.migration()
+        # await self.add_token(169401247374376960, hash_token("Bearer test"), 1)
+        # print("Added Token.")
+        # await self.migration()
+
+    async def add_token(self, user_id: int, unhashed_token: str, access_id: int):
+        ...
+
+    async def get_token(self, user_id):
+        ...
+
+    async def get_permission_level(self, user_id: int):
+        ...
 
     async def execute_sql_file(self, file_name: str) -> str:
         """Read and execute the queries in a SQL file.
@@ -88,8 +100,9 @@ class DbConnection:
         sql_folder_name = "sql"
         create_file_name = "create.sql"
         inexecutable_queries = ""
+        execute_later = ["metadata", "constraints", "views"]
         for file in listdir(sql_folder_name):
-            if file in ["metadata", "constraints"]:
+            if file in execute_later:
                 # process metadata at the end
                 continue
 
@@ -108,6 +121,7 @@ class DbConnection:
 
         await self.execute_sql_file(f"{sql_folder_name}/metadata/{create_file_name}")
         await self.execute_sql_file(f"{sql_folder_name}/constraints/{create_file_name}")
+        await self.execute_sql_file(f"{sql_folder_name}/views/{create_file_name}")
 
         async with aiofiles.open(f"{sql_folder_name}/functions/{create_file_name}", "w") as manual_file:
             await manual_file.write(inexecutable_queries)

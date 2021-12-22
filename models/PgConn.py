@@ -34,14 +34,14 @@ class PgConnection(DbConnection):
             return
 
         async with self._pool.acquire() as conn:
-            await conn.fetchrow(query, *args, **kwargs)
+            return await conn.fetchrow(query, *args, **kwargs)
 
     async def fetch(self, query: str, *args, **kwargs):
         if not query:
             return
 
         async with self._pool.acquire() as conn:
-            await conn.fetch(query, *args, **kwargs)
+            return await conn.fetch(query, *args, **kwargs)
 
     async def _create_pool(self, **login_payload):
         self._pool = await asyncpg.create_pool(command_timeout=60, **login_payload)
@@ -59,5 +59,13 @@ class PgConnection(DbConnection):
             restricted = await conn.fetch("SELECT * FROM groupmembers.restricted")
             image_links = await conn.fetch("SELECT * FROM groupmembers.imagelinks")
 
+    async def add_token(self, user_id: int, unhashed_token: str, access_id: int):
+        await self.execute(f"SELECT public.addtoken({user_id}, '{unhashed_token}', {access_id})")
+
     async def get_token(self, user_id):
-        ...
+        token = await self.fetch_row(f"SELECT public.gettoken({user_id})")
+        return None if not token else token[0]
+
+    async def get_permission_level(self, user_id: int):
+        return await self.fetch_row(f"SELECT public.getaccess({user_id})")
+

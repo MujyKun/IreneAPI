@@ -3,7 +3,7 @@ from resources.keys import private_keys, idol_folder, top_gg_webhook_key, bot_in
     postgres_options, api_port
 # noinspection PyUnresolvedReferences, PyPackageRequirements
 from resources.drive import get_file_type, download_media
-from models import PgConnection, check_hashed_token
+from models import PgConnection, check_hashed_token, WebSocketSession
 from functools import partial, wraps
 from quart import Quart, render_template, websocket
 from asyncio import get_event_loop, Queue
@@ -18,23 +18,39 @@ db = PgConnection(**postgres_options)
 
 connected_websockets = set()
 
-
 @app.route('/')
 async def index():
     return await render_template('index.html')
 
 
-async def login(login_headers):
+async def login(login_headers, handle_websocket=True):
+    error_reason = "Failed to Authenticate."
+    error_code = 401
     try:
         token = login_headers['Authorization']
-        user_id = login_headers['user_id']
-        # expected_token =
+        user_id = int(login_headers['user_id'])
+        expected_token = await db.get_token(user_id)
+
+        if not expected_token:
+            raise Exception("Bad Request")
+
+        login_success = check_hashed_token(token, expected_token)
+
+        if not login_success:
+            error_reason += "Token does not match the user."
+        else:
+            if handle_websocket:
+                permission_level = await db.get_permission_level(user_id)
+                connected_websockets.add(WebSocketSession(user_id, permission_level))
+            return True
     except KeyError:
-        try:
-            await websocket.close(code=401, reason=f"You are missing headers from your request."
-                                                   f"Please follow the documentation for login at {'...'}")
-        except:
-            ...
+        error_reason += f"You are missing headers from your request. Please follow the documentation for login at {'...'}"
+    except Exception as e:
+        error_code = 400
+        error_reason = "Bad Request"
+
+    if handle_websocket:
+        await websocket.close(code=error_code, reason=error_reason)
     return False
 
 

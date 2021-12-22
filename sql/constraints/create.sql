@@ -94,6 +94,10 @@ ALTER TABLE public.levels DROP CONSTRAINT IF EXISTS levels_userid;
 ALTER TABLE public.mods DROP CONSTRAINT IF EXISTS mods_userid;
 ALTER TABLE public.reminders DROP CONSTRAINT IF EXISTS reminders_userid;
 ALTER TABLE public.votes DROP CONSTRAINT IF EXISTS votes_userid;
+ALTER TABLE public.patron DROP CONSTRAINT IF EXISTS patron_userid;
+ALTER TABLE public.superpatron DROP CONSTRAINT IF EXISTS super_userid;
+ALTER TABLE public.translator DROP CONSTRAINT IF EXISTS translator_userid;
+ALTER TABLE public.proofreader DROP CONSTRAINT IF EXISTS proofreader_userid;
 ALTER TABLE blackjack.userstatus ADD CONSTRAINT bj_userstatus_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE guessinggame.filteredgroups ADD CONSTRAINT filteredgroups_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE guessinggame.userstatus ADD CONSTRAINT gg_userstatus_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -108,6 +112,10 @@ ALTER TABLE public.levels ADD CONSTRAINT levels_userid FOREIGN KEY (userid) REFE
 ALTER TABLE public.mods ADD CONSTRAINT mods_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE public.reminders ADD CONSTRAINT reminders_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE public.votes ADD CONSTRAINT votes_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE public.patron ADD CONSTRAINT patron_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE public.superpatron ADD CONSTRAINT super_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE public.translator ADD CONSTRAINT translator_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE public.proofreader ADD CONSTRAINT proofreader_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE guessinggame.games DROP CONSTRAINT IF EXISTS gg_games_modeid;
 ALTER TABLE guessinggame.stats DROP CONSTRAINT IF EXISTS gg_stats_modeid;
