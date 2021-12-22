@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS public.apiusage
 (
-    key text,
-    endpoint text,
+    userid bigint,
+    endpoint text NOT NULL,
     count integer,
-    PRIMARY KEY (key, endpoint)
+    PRIMARY KEY (endpoint, userid)
 );
 
 ALTER TABLE public.apiusage
     OWNER to postgres;
 COMMENT ON TABLE public.apiusage
-    IS 'The usage for the bot''s API.';
+    IS 'The usage a user has to each api endpoint.';

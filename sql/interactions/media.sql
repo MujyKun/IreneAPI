@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS interactions.media
 (
     url text,
-    interactionid integer,
+    typeid integer,
     PRIMARY KEY (url)
 );
 

@@ -59,8 +59,5 @@ class PgConnection(DbConnection):
             restricted = await conn.fetch("SELECT * FROM groupmembers.restricted")
             image_links = await conn.fetch("SELECT * FROM groupmembers.imagelinks")
 
-
-
-
+    async def get_token(self, user_id):
         ...
-

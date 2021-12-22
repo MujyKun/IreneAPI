@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS public.tempchannels
 (
-    chanellid bigint,
+    channelid bigint,
     delay integer,
-    PRIMARY KEY (chanellid)
+    PRIMARY KEY (channelid)
 );
 
 ALTER TABLE public.tempchannels

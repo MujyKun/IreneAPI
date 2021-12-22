@@ -3,7 +3,7 @@ from resources.keys import private_keys, idol_folder, top_gg_webhook_key, bot_in
     postgres_options, api_port
 # noinspection PyUnresolvedReferences, PyPackageRequirements
 from resources.drive import get_file_type, download_media
-from models import PgConnection
+from models import PgConnection, check_hashed_token
 from functools import partial, wraps
 from quart import Quart, render_template, websocket
 from asyncio import get_event_loop, Queue
@@ -28,7 +28,7 @@ async def login(login_headers):
     try:
         token = login_headers['Authorization']
         user_id = login_headers['user_id']
-        return True
+        # expected_token =
     except KeyError:
         try:
             await websocket.close(code=401, reason=f"You are missing headers from your request."

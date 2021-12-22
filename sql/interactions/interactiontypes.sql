@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS interactions.interactiontypes
 (
     typeid serial,
-    name text,
+    name text UNIQUE,
     PRIMARY KEY (typeid)
 );
 

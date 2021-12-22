@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS public.timezones
 (
     id serial,
     shortname text,
-    name text,
+    name text UNIQUE,
     PRIMARY KEY (id)
 );
 
