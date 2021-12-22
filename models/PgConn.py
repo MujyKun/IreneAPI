@@ -16,10 +16,6 @@ class PgConnection(DbConnection):
         self._pool: Optional[asyncpg.pool.Pool] = None
         super(PgConnection, self).__init__(*args, **kwargs)
 
-    async def read_sql_file(self, file_name: str):
-
-        ...
-
     async def execute(self, query: str):
         query = query.replace("\n", "")
 
@@ -59,13 +55,5 @@ class PgConnection(DbConnection):
             restricted = await conn.fetch("SELECT * FROM groupmembers.restricted")
             image_links = await conn.fetch("SELECT * FROM groupmembers.imagelinks")
 
-    async def add_token(self, user_id: int, unhashed_token: str, access_id: int):
-        await self.execute(f"SELECT public.addtoken({user_id}, '{unhashed_token}', {access_id})")
 
-    async def get_token(self, user_id):
-        token = await self.fetch_row(f"SELECT public.gettoken({user_id})")
-        return None if not token else token[0]
-
-    async def get_permission_level(self, user_id: int):
-        return await self.fetch_row(f"SELECT public.getaccess({user_id})")
 

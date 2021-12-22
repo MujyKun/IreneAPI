@@ -2,8 +2,6 @@ from os import listdir
 from os.path import isdir
 import aiofiles
 import asyncio
-from . import hash_token
-
 import asyncpg.exceptions
 
 
@@ -35,18 +33,6 @@ class DbConnection:
         })
         await self.update_db_structure()
         print(f"Connected to Database {self._db_name} as {self._db_user}.")
-        # await self.add_token(169401247374376960, hash_token("Bearer test"), 1)
-        # print("Added Token.")
-        # await self.migration()
-
-    async def add_token(self, user_id: int, unhashed_token: str, access_id: int):
-        ...
-
-    async def get_token(self, user_id):
-        ...
-
-    async def get_permission_level(self, user_id: int):
-        ...
 
     async def execute_sql_file(self, file_name: str) -> str:
         """Read and execute the queries in a SQL file.

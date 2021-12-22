@@ -14,7 +14,7 @@ the `requirements.txt`.
 CREATE DATABASE bot WITH OWNER = postgres ENCODING = 'UTF8' CONNECTION LIMIT = -1;
 ```
 6) Rename ``.env.example`` to `.env` and fill out the environment variables with your information.  
-7) After the first run, all tables should have been created. Unfortunately due to parsing issues, 
+7) After the first run, all tables should have been created. Unfortunately due to parsing issues and since ORM is not being used,  
 functions must be created manually and a file ``/sql/functions/create.sql`` will be created 
 after the first run which you may execute.
 

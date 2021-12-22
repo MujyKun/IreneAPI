@@ -515,4 +515,4 @@ INSERT INTO public.languages(shortname, name) VALUES ('af', 'Afrikaans'),
                                                      ('vi', 'Vietnamese'),
                                                      ('zh-CN', 'Chinese');
 
-INSERT INTO public.apiaccess(name) VALUES ('Developer'), ('Super Patron'), ('Friend'), ('Owner');
+INSERT INTO public.apiaccess(accessid, name) VALUES (1, 'Owner'), (2, 'Developer'), (3, 'Super Patron'), (4, 'Friend');
