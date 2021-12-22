@@ -3,6 +3,8 @@ from typing import Union, Dict
 from models import WebSocketSession, Requestor
 from passlib.context import CryptContext
 from quart import websocket
+from functools import wraps
+from .helpers.errors import InvalidLogin, BadRequest
 
 
 # PASS WITH CAUTION. Should only be used in functions not directly returned to a user
@@ -30,14 +32,12 @@ def check_hashed_token(token, hashed):
 connected_websockets: Dict[int, Dict[int, WebSocketSession]] = dict()  # A user may have many web socket connections.
 
 
-async def login(login_headers, handle_websocket=False) -> Union[bool, WebSocketSession]:
+async def login(login_headers, handle_websocket=False) -> Union[WebSocketSession, Requestor]:
     """Log in.
 
     :param login_headers: Contains the Bearer Auth token and user id.
     :param handle_websocket: Whether a websocket connection needs to be handled.
     """
-    error_reason = "Failed to Authenticate."
-    error_code = 401
     try:
         token = login_headers['Authorization']
         user_id = int(login_headers['user_id'])
@@ -48,11 +48,9 @@ async def login(login_headers, handle_websocket=False) -> Union[bool, WebSocketS
 
         login_success = check_hashed_token(token, expected_token)
 
-        if not login_success:
-            error_reason += "Token does not match the user."
-        else:
+        if login_success:
+            permission_level = await get_permission_level(god_access_requestor, user_id)
             if handle_websocket:
-                permission_level = await get_permission_level(god_access_requestor, user_id)
                 wss = WebSocketSession(user_id, permission_level)
                 existing_ws = connected_websockets.get(user_id)
                 if not existing_ws:
@@ -60,14 +58,12 @@ async def login(login_headers, handle_websocket=False) -> Union[bool, WebSocketS
                 else:
                     existing_ws[wss.wss_id] = wss
                 return wss
-            return True
+            return Requestor(user_id, permission_level)
     except KeyError:
-        error_reason += f"You are missing headers from your request. Please follow the documentation " \
-                        f"for login at {'...'}"
+        raise BadRequest
     except Exception as e:
-        error_code = 400
-        error_reason = "Bad Request"
+        raise BadRequest
 
-    if handle_websocket:
-        await websocket.close(code=error_code, reason=error_reason)
-    return False
+    # if handle_websocket:
+        # await websocket.close(code=error_code, reason=error_reason)
+    raise InvalidLogin

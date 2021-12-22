@@ -1,6 +1,8 @@
 from typing import Optional
 from models import Requestor, DbConnection
 from functools import wraps
+from .errors import LackingPermissions
+
 
 permission_levels = {
     -1: 'God',
@@ -21,7 +23,7 @@ def check_permission(permission_level):
                 if requestor.permission_level <= permission_level:
                     # approved access
                     return await func(*args, **kwargs)
-            return False
+            raise LackingPermissions
         return wrapper
     return decorator
 

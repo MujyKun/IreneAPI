@@ -97,6 +97,21 @@ begin
     VALUES (t_guildid, t_name, t_content) RETURNING commandid INTO t_commandid;
     return t_commandid;
 end;
+$$;create or replace function public.adddatamod(t_userid bigint)
+    returns void
+    language plpgsql
+as
+$$
+declare
+    t_already_exists integer;
+begin
+    SELECT COUNT(*) INTO t_already_exists FROM public.datamods WHERE userid = t_userid;
+
+    IF t_already_exists = 0 THEN
+        INSERT INTO public.datamods(userid)
+        VALUES(t_userid);
+    END IF;
+end;
 $$;create or replace function groupmembers.adddate(t_startdate timestamp, t_enddate timestamp)
     returns integer
     language plpgsql
@@ -202,6 +217,21 @@ begin
     INSERT INTO groupmembers.media(link, faces, filetype, affiliationid, enabled)
     VALUES(t_link, t_faces, t_filetype, t_affiliationid, t_enabled) returning mediaid INTO t_media_id;
     return t_media_id;
+end;
+$$;create or replace function public.addmod(t_userid bigint)
+    returns void
+    language plpgsql
+as
+$$
+declare
+    t_already_exists integer;
+begin
+    SELECT COUNT(*) INTO t_already_exists FROM public.mods WHERE userid = t_userid;
+
+    IF t_already_exists = 0 THEN
+        INSERT INTO public.mods(userid)
+        VALUES(t_userid);
+    END IF;
 end;
 $$;create or replace function groupmembers.addname(t_firstname text, t_lastname text)
     returns integer
@@ -422,7 +452,25 @@ $$
 begin
     DELETE FROM public.customcommands WHERE commandid = t_commandid;
 end;
-$$;create or replace function public.deletepatron(t_userid bigint)
+$$;create or replace function public.deletedatamod(t_userid bigint)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM public.datamods WHERE userid = t_userid;
+end;
+$$;
+create or replace function public.deletemod(t_userid bigint)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM public.mods WHERE userid = t_userid;
+end;
+$$;
+create or replace function public.deletepatron(t_userid bigint)
     returns void
     language plpgsql
 as
