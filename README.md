@@ -19,5 +19,4 @@ functions must be created manually and a file ``/sql/functions/create.sql`` will
 after the first run which you may execute.
 
 
-
 ## Contribute

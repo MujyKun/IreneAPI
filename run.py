@@ -9,9 +9,18 @@ from routes.groupmembers import groupmembers
 from routes.user import user
 from ws import websocket_blueprint
 from routes.helpers.errors import BaseError
+from quart_openapi import Pint, Resource
+from quart_openapi import Swagger
 
-app = Quart(__name__)
 
+app = Pint(__name__,
+           title="IreneAPI",
+           contact_email="mujy@irenebot.com",
+           version='2.0')
+swagger = Swagger(app)
+
+print(app.config['SERVER_NAME'])
+# app.config['SERVER_NAME'] = "api.irenebot.com"
 app.register_blueprint(groupmembers)
 app.register_blueprint(websocket_blueprint)
 app.register_blueprint(user)
@@ -26,7 +35,8 @@ async def handle_custom(error):
 
 @app.route('/')
 async def index():
-    return await render_template('index.html')
+    return swagger.as_dict()
+    # return await render_template('index.html')
 
 
 if __name__ == "__main__":
@@ -40,6 +50,7 @@ if __name__ == "__main__":
         self.db = db
 
         loop.run_until_complete(app.run_task(port=api_port))
+
     except KeyboardInterrupt:
         # cancel all tasks lingering
         ...
