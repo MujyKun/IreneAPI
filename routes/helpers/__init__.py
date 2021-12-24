@@ -5,11 +5,11 @@ from .errors import LackingPermissions
 
 
 permission_levels = {
-    -1: 'God',
-    0: 'Owner',
-    1: 'Developer',
-    2: 'Super Patron',
-    3: 'Friend',
+    -1: "God",
+    0: "Owner",
+    1: "Developer",
+    2: "Super Patron",
+    3: "Friend",
 }
 
 
@@ -18,13 +18,15 @@ def check_permission(permission_level):
         @wraps(func)
         async def wrapper(*args, **kwargs):
             # Check permission level matches the requirement.
-            requestor = kwargs.get('requestor') or args[0]
+            requestor = kwargs.get("requestor") or args[0]
             if isinstance(requestor, Requestor):
                 if requestor.permission_level <= permission_level:
                     # approved access
                     return await func(*args, **kwargs)
             raise LackingPermissions
+
         return wrapper
+
     return decorator
 
 
@@ -39,5 +41,3 @@ class DB:
 self = DB()
 
 from .api import add_token, get_token, get_permission_level
-
-

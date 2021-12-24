@@ -514,7 +514,7 @@ begin
     SELECT name INTO t_access FROM public.apiaccess aa, public.apitokens at WHERE userid = t_userid AND aa.accessid = at.accessid;
     return t_access;
 end;
-$$create or replace function groupmembers.getaffiliation(t_affiliation_id integer)
+$$;create or replace function groupmembers.getaffiliation(t_affiliation_id integer)
     returns table
             (
                 t_personid integer,

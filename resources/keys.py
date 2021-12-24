@@ -10,8 +10,8 @@ postgres_options = {
     "db_name": os.getenv("POSTGRES_DATABASE"),
     "db_user": os.getenv("POSTGRES_USER"),
     "db_pass": os.getenv("POSTGRES_PASSWORD"),
-    "db_port": os.getenv("POSTGRES_PORT")
-    }
+    "db_port": os.getenv("POSTGRES_PORT"),
+}
 
 # Idol Avatar Location (include / at the end)
 # IDOL_AVATAR_LOCATION="/var/www/images.irenebot/public_html/avatar/"
@@ -35,7 +35,7 @@ card_location = os.getenv("CARD_LOCATION")
 api_port = os.getenv("API_PORT")
 
 # Private Keys are separated by commas
-private_keys: list = ((os.getenv("PRIVATE_KEYS")).split(','))
+private_keys: list = (os.getenv("PRIVATE_KEYS")).split(",")
 
 idol_folder = os.getenv("FOLDER_LOCATION")
 
@@ -55,4 +55,3 @@ patreon_url = os.getenv("PATREON_LINK")
 
 # db_conn = psycopg2.connect(**postgres_options)
 # c = db_conn.cursor()
-

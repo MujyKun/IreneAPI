@@ -2,10 +2,10 @@ from quart import Blueprint, websocket
 
 from routes import connected_websockets, login
 
-websocket_blueprint = Blueprint('ws', __name__)
+websocket_blueprint = Blueprint("ws", __name__)
 
 
-@websocket_blueprint.websocket('/ws')
+@websocket_blueprint.websocket("/ws")
 async def ws():
     """Create a WebSocket connection."""
     wss = await login(websocket.headers, handle_websocket=True)
@@ -34,4 +34,4 @@ async def ws():
 
 
 async def process_ws_data(data) -> dict:
-    return dict({'test': 'test'})
+    return dict({"test": "test"})

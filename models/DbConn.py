@@ -6,7 +6,9 @@ import asyncpg.exceptions
 
 
 class DbConnection:
-    def __init__(self, db_host: str, db_name: str, db_user: str, db_pass: str, db_port: int):
+    def __init__(
+        self, db_host: str, db_name: str, db_user: str, db_pass: str, db_port: int
+    ):
         """
         Abstract version for a database connection.
 
@@ -24,13 +26,15 @@ class DbConnection:
     async def connect(self):
         """Connect to the PostgreSQL Database."""
 
-        await self._create_pool(**{
-            "host": self._db_host,
-            "database": self._db_name,
-            "user": self._db_user,
-            "password": self.__db_pass,
-            "port": self._db_port
-        })
+        await self._create_pool(
+            **{
+                "host": self._db_host,
+                "database": self._db_name,
+                "user": self._db_user,
+                "password": self.__db_pass,
+                "port": self._db_port,
+            }
+        )
         await self.update_db_structure()
         print(f"Connected to Database {self._db_name} as {self._db_user}.")
 
@@ -42,7 +46,7 @@ class DbConnection:
         """
         try:
 
-            async with aiofiles.open(file_name, mode='r') as file:
+            async with aiofiles.open(file_name, mode="r") as file:
                 data = await file.read()
                 if "functions" in file_name.lower():
                     return data
@@ -51,8 +55,10 @@ class DbConnection:
                     try:
                         await self.execute(query)
                     except asyncpg.exceptions.UniqueViolationError:
-                        print("Failed to insert metadata as it already exists. "
-                              f"If a relation has changed, update it manually. - {query}")
+                        print(
+                            "Failed to insert metadata as it already exists. "
+                            f"If a relation has changed, update it manually. - {query}"
+                        )
         except FileNotFoundError:
             print(f"Could not find {file_name} for SQL execution.")
         return ""
@@ -100,27 +106,35 @@ class DbConnection:
 
                 for t_file in listdir(f"{sql_folder_name}/{file}"):
                     if t_file != create_file_name:
-                        inexecutable_queries += await self.execute_sql_file(f"{sql_folder_name}/{file}/{t_file}")
+                        inexecutable_queries += await self.execute_sql_file(
+                            f"{sql_folder_name}/{file}/{t_file}"
+                        )
             else:
                 if file != create_file_name:
-                    inexecutable_queries += await self.execute_sql_file(f"{sql_folder_name}/{file}")
+                    inexecutable_queries += await self.execute_sql_file(
+                        f"{sql_folder_name}/{file}"
+                    )
 
         await self.execute_sql_file(f"{sql_folder_name}/metadata/{create_file_name}")
         await self.execute_sql_file(f"{sql_folder_name}/constraints/{create_file_name}")
         await self.execute_sql_file(f"{sql_folder_name}/views/{create_file_name}")
 
-        async with aiofiles.open(f"{sql_folder_name}/functions/{create_file_name}", "w") as manual_file:
+        async with aiofiles.open(
+            f"{sql_folder_name}/functions/{create_file_name}", "w"
+        ) as manual_file:
             await manual_file.write(inexecutable_queries)
 
     async def migration(self):
         """Migrate old data to the new database."""
-        await self._connect_to_other_database(**{
-            "host": self._db_host,
-            "database": "postgres",
-            "user": self._db_user,
-            "password": self.__db_pass,
-            "port": self._db_port
-        })
+        await self._connect_to_other_database(
+            **{
+                "host": self._db_host,
+                "database": "postgres",
+                "user": self._db_user,
+                "password": self.__db_pass,
+                "port": self._db_port,
+            }
+        )
 
         ...
 

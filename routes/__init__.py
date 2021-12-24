@@ -16,7 +16,7 @@ god_access_requestor = Requestor(-1, 0)
 token_context = CryptContext(
     schemes=["pbkdf2_sha256"],
     default="pbkdf2_sha256",
-    pbkdf2_sha256__default_rounds=30000
+    pbkdf2_sha256__default_rounds=30000,
 )
 
 
@@ -29,19 +29,25 @@ def check_hashed_token(token, hashed):
 
 
 # connected_websockets defined as { user_id: [WebSocketSessions] }
-connected_websockets: Dict[int, Dict[int, WebSocketSession]] = dict()  # A user may have many web socket connections.
+connected_websockets: Dict[
+    int, Dict[int, WebSocketSession]
+] = dict()  # A user may have many web socket connections.
 
 
-async def login(login_headers, handle_websocket=False) -> Union[WebSocketSession, Requestor]:
+async def login(
+    login_headers, handle_websocket=False
+) -> Union[WebSocketSession, Requestor]:
     """Log in.
 
     :param login_headers: Contains the Bearer Auth token and user id.
     :param handle_websocket: Whether a websocket connection needs to be handled.
     """
     try:
-        token = login_headers['Authorization']
-        user_id = int(login_headers['user_id'])
-        expected_token = await get_token(requestor=god_access_requestor, user_id=user_id)
+        token = login_headers["Authorization"]
+        user_id = int(login_headers["user_id"])
+        expected_token = await get_token(
+            requestor=god_access_requestor, user_id=user_id
+        )
 
         if not expected_token:
             raise Exception("Bad Request")
@@ -65,5 +71,5 @@ async def login(login_headers, handle_websocket=False) -> Union[WebSocketSession
         raise BadRequest
 
     # if handle_websocket:
-        # await websocket.close(code=error_code, reason=error_reason)
+    # await websocket.close(code=error_code, reason=error_reason)
     raise InvalidLogin

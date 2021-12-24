@@ -12,4 +12,3 @@ async def add_channel(requestor: Requestor, channel_id: int):
 async def delete_channel(requestor: Requestor, channel_id: int):
     """Delete a channel."""
     await self.db.execute(f"SELECT public.deletechannel({channel_id})")
-

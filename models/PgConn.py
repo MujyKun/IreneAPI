@@ -54,6 +54,3 @@ class PgConnection(DbConnection):
             idol_to_groups = await conn.fetch("SELECT * FROM groupmembers.idoltogroup")
             restricted = await conn.fetch("SELECT * FROM groupmembers.restricted")
             image_links = await conn.fetch("SELECT * FROM groupmembers.imagelinks")
-
-
-
