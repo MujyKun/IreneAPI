@@ -35,11 +35,27 @@ class PgConnection(DbConnection):
 
         async with self._pool.acquire() as conn:
             response = await conn.fetchrow(query, *args, **kwargs)
-            response_as_dict = dict(response)
-            return {"results": response_as_dict}
+            return self.records_to_dict(response)
 
-    async def record_to_dict(self):
+    def records_to_dict(self, records) -> dict:
+        """Convert records to a dict."""
+        if not records:
+            return {"results": None}
+
+        if isinstance(records, asyncpg.Record):
+            return {"results": self.record_to_dict(records)}
+
+        final_dict = {"results": {}}
+        for count, record in enumerate(records):
+            final_dict["results"][count] = self.record_to_dict(record)
+        return final_dict
+
+    def record_to_dict(self, record: asyncpg.Record) -> dict:
         """Convert a record to a dict."""
+        final_dict = {}
+        for key, value in record.items():
+            final_dict[key] = value
+        return final_dict
 
     async def fetch(self, query: str, *args, **kwargs) -> dict:
         if not query:
@@ -47,8 +63,7 @@ class PgConnection(DbConnection):
 
         async with self._pool.acquire() as conn:
             response = await conn.fetch(query, *args, **kwargs)
-            response_as_dict = dict(response)
-            return {"results": response_as_dict}
+            return self.records_to_dict(response)
 
     async def _create_pool(self, **login_payload):
         self._pool = await asyncpg.create_pool(command_timeout=60, **login_payload)

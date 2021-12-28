@@ -12,6 +12,7 @@ websocket_blueprint = Blueprint("ws", __name__)
 async def ws():
     """Create a WebSocket connection."""
     wss = await login(websocket.headers, data=websocket.args, handle_websocket=True)
+
     if not wss:
         # failed to log in.
         return
@@ -61,10 +62,11 @@ async def process_ws_data(socket: WebSocketSession, data: dict) -> dict:
         if len(helper["params"]) != len(helper_function_args):
             raise BadRequest
 
+        # breakpoint()
         result = await helper["function"](**helper_function_args)
-        if result is None:  # we expect False (boolean) results.
-            result = ""
-        response["result"] = result
+
+        result["callback_id"] = response["callback_id"]
+        return result
     except Exception as e:
         print(e)
         response["error"] = f"{e}"

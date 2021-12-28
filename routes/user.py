@@ -15,6 +15,7 @@ class UserStatus(Resource):
         """Get the information about a user.
 
         Use this route to get a user's information. A login is still needed.
+        Pass in a user id of -1 to get all users.
         """
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.get_user(requestor, user_id)

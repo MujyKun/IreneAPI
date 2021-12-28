@@ -5,19 +5,25 @@ from models import Requestor
 @check_permission(permission_level=1)
 async def get_user(requestor: Requestor, user_id: int) -> dict:
     """Get a user's information if they exist."""
-    return await self.db.fetch_row("SELECT public.getuser($1)", user_id)
+    query = "SELECT * FROM public.getusers"
+    args = {}
+    if user_id != -1:
+        query += " WHERE userid = $1"
+        args = {user_id}
+
+    return await self.db.fetch(query, *args)
 
 
 @check_permission(permission_level=1)
 async def add_user(requestor: Requestor, user_id: int) -> dict:
     """Add a user."""
-    return await self.db.fetch_row("SELECT public.adduser($1)", user_id)
+    return await self.db.execute("SELECT public.adduser($1)", user_id)
 
 
 @check_permission(permission_level=1)
 async def delete_user(requestor: Requestor, user_id: int) -> dict:
     """Delete a user."""
-    return await self.db.fetch_row("SELECT public.deleteuser($1)", user_id)
+    return await self.db.execute("SELECT public.deleteuser($1)", user_id)
 
 
 @check_permission(permission_level=1)

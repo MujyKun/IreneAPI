@@ -1,11 +1,11 @@
 CREATE TABLE IF NOT EXISTS public.users
 (
     userid bigint,
-    balance text,
-    timezoneid integer,
-    ggfilteractive boolean,
-    languageid integer,
-    xp integer,
+    balance text DEFAULT '0',
+    timezoneid integer DEFAULT NULL,
+    ggfilteractive boolean DEFAULT false,
+    languageid integer DEFAULT 8,
+    xp integer DEFAULT 0,
     PRIMARY KEY (userid)
 );
 

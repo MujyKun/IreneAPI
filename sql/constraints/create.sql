@@ -117,6 +117,7 @@ ALTER TABLE public.superpatron ADD CONSTRAINT super_userid FOREIGN KEY (userid) 
 ALTER TABLE public.translator ADD CONSTRAINT translator_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE public.proofreader ADD CONSTRAINT proofreader_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
 
+
 ALTER TABLE guessinggame.games DROP CONSTRAINT IF EXISTS gg_games_modeid;
 ALTER TABLE guessinggame.stats DROP CONSTRAINT IF EXISTS gg_stats_modeid;
 ALTER TABLE unscramblegame.games DROP CONSTRAINT IF EXISTS us_games_modeid;
