@@ -16,28 +16,39 @@ class PgConnection(DbConnection):
         self._pool: Optional[asyncpg.pool.Pool] = None
         super(PgConnection, self).__init__(*args, **kwargs)
 
-    async def execute(self, query: str):
+    async def execute(self, query: str, *args, **kwargs):
         query = query.replace("\n", "")
 
         if not query:
-            return
+            return {"results": {"success": False, "error": "No Query Found."}}
 
         async with self._pool.acquire() as conn:
-            await conn.execute(query)
+            try:
+                await conn.execute(query, *args, **kwargs)
+                return {"results": {"success": True}}
+            except Exception as e:
+                return {"results": {"success": False, "error": f"{e}"}}
 
-    async def fetch_row(self, query: str, *args, **kwargs):
+    async def fetch_row(self, query: str, *args, **kwargs) -> dict:
         if not query:
-            return
+            return {"results": None}
 
         async with self._pool.acquire() as conn:
-            return await conn.fetchrow(query, *args, **kwargs)
+            response = await conn.fetchrow(query, *args, **kwargs)
+            response_as_dict = dict(response)
+            return {"results": response_as_dict}
 
-    async def fetch(self, query: str, *args, **kwargs):
+    async def record_to_dict(self):
+        """Convert a record to a dict."""
+
+    async def fetch(self, query: str, *args, **kwargs) -> dict:
         if not query:
-            return
+            return {"results": None}
 
         async with self._pool.acquire() as conn:
-            return await conn.fetch(query, *args, **kwargs)
+            response = await conn.fetch(query, *args, **kwargs)
+            response_as_dict = dict(response)
+            return {"results": response_as_dict}
 
     async def _create_pool(self, **login_payload):
         self._pool = await asyncpg.create_pool(command_timeout=60, **login_payload)

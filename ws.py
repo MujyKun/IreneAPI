@@ -1,6 +1,9 @@
 from quart import Blueprint, websocket
 
 from routes import connected_websockets, login
+from routes.helpers import helper_routes
+from models import WebSocketSession
+from routes.helpers.errors import BadRequest
 
 websocket_blueprint = Blueprint("ws", __name__)
 
@@ -8,7 +11,7 @@ websocket_blueprint = Blueprint("ws", __name__)
 @websocket_blueprint.websocket("/ws")
 async def ws():
     """Create a WebSocket connection."""
-    wss = await login(websocket.headers, handle_websocket=True)
+    wss = await login(websocket.headers, data=websocket.args, handle_websocket=True)
     if not wss:
         # failed to log in.
         return
@@ -18,9 +21,8 @@ async def ws():
     try:
         while True:
             # client must send in their requests.
-            data = await websocket.receive()
-
-            result = await process_ws_data(data)
+            data = await websocket.receive_json()
+            result = await process_ws_data(socket=wss, data=data)
             await websocket.send_json(result)
     except Exception as e:
         print(e)
@@ -33,5 +35,38 @@ async def ws():
         connected_websockets.pop(wss.user_id)
 
 
-async def process_ws_data(data) -> dict:
-    return dict({"test": "test"})
+async def process_ws_data(socket: WebSocketSession, data: dict) -> dict:
+    """Process the data coming from a websocket."""
+    route = data["route"]
+    method: str = (data["method"]).upper()
+    search_method = f"{route}.{method}"
+    helper = helper_routes[search_method]
+
+    response = dict()
+
+    # do stuff with callback id
+    callback_id = data.get("callback_id")
+    if callback_id:
+        response["callback_id"] = callback_id
+        data.pop("callback_id")
+
+    helper_function_args = dict()
+    for param in helper["params"]:
+        if param == "requestor":
+            helper_function_args["requestor"] = socket
+            continue
+        helper_function_args[param] = data[param]
+
+    try:
+        if len(helper["params"]) != len(helper_function_args):
+            raise BadRequest
+
+        result = await helper["function"](**helper_function_args)
+        if result is None:  # we expect False (boolean) results.
+            result = ""
+        response["result"] = result
+    except Exception as e:
+        print(e)
+        response["error"] = f"{e}"
+
+    return response

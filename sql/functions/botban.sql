@@ -8,7 +8,7 @@ declare
 begin
     SELECT COUNT(*) INTO t_user_banned FROM public.botbanned WHERE userid = t_userid;
 
-    IF t_user_banned = 1 THEN
+    IF t_user_banned = 0 THEN
         INSERT INTO public.botbanned(userid)
         VALUES(t_userid);
     END IF;

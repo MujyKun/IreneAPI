@@ -416,7 +416,7 @@ declare
 begin
     SELECT COUNT(*) INTO t_user_banned FROM public.botbanned WHERE userid = t_userid;
 
-    IF t_user_banned = 1 THEN
+    IF t_user_banned = 0 THEN
         INSERT INTO public.botbanned(userid)
         VALUES(t_userid);
     END IF;
@@ -433,7 +433,8 @@ begin
     SELECT COUNT(*) INTO t_user_banned FROM public.botbanned WHERE userid = t_userid;
 
     IF t_user_banned = 1 THEN
-        DELETE FROM public.botbanned WHERE user = t_userid;
+        DELETE FROM public.botbanned
+        WHERE userid = t_userid;
     END IF;
 end;
 $$;create or replace function public.deletecustomcommand(t_guildid bigint, t_name text)
@@ -495,6 +496,14 @@ $$
 begin
     DELETE FROM public.superpatron WHERE userid = t_userid;
 end;
+$$;create or replace function public.deletetoken(t_userid bigint)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM public.apitokens WHERE userid = t_userid;
+end;
 $$;create or replace function public.deletetranslator(t_userid bigint)
     returns void
     language plpgsql
@@ -513,6 +522,17 @@ declare
 begin
     SELECT name INTO t_access FROM public.apiaccess aa, public.apitokens at WHERE userid = t_userid AND aa.accessid = at.accessid;
     return t_access;
+end;
+$$;create or replace function public.getaccessid(t_userid bigint)
+    returns integer
+    language plpgsql
+as
+$$
+declare
+    t_access_id integer;
+begin
+    SELECT accessid INTO t_access_id FROM public.apitokens WHERE userid = t_userid;
+    return t_access_id;
 end;
 $$;create or replace function groupmembers.getaffiliation(t_affiliation_id integer)
     returns table
@@ -545,7 +565,19 @@ begin
                  FROM groupmembers.bloodtypes
                  WHERE t_blood_id = bloodid;
 end;
-$$;create or replace function public.getcommandusage(t_sessionid integer, t_commandname text)
+$$;create or replace function public.getbotban(t_userid bigint)
+    returns integer
+    language plpgsql
+as
+$$
+declare
+    t_user_banned integer;
+begin
+    SELECT COUNT(*) INTO t_user_banned FROM public.botbanned WHERE userid = t_userid;
+    return t_user_banned;
+end;
+$$;
+create or replace function public.getcommandusage(t_sessionid integer, t_commandname text)
     returns integer
     language plpgsql
 as
@@ -719,7 +751,19 @@ begin
                  FROM groupmembers.name
                  WHERE t_nameid = nameid;
 end;
-$$;create or replace function groupmembers.getperson(t_person_id integer)
+$$;create or replace function public.getpatronstatus(t_userid bigint)
+    returns boolean
+    language plpgsql
+as
+$$
+declare
+    t_user_is_patron boolean;
+begin
+    SELECT COUNT(*) INTO t_user_is_patron FROM public.getpatrons WHERE userid = t_userid;
+    return t_user_is_patron;
+end;
+$$;
+create or replace function groupmembers.getperson(t_person_id integer)
     returns table (
                       t_dateid integer,
                       t_nameid integer,

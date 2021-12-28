@@ -35,6 +35,9 @@ async def handle_custom(error):
 
 @app.route("/")
 async def index():
+    # from routes.helpers.api import add_token
+    # from models import Requestor
+    # await add_token(requestor=Requestor(-1, 0), user_id=169401247374376960, unhashed_token="test", access_id=1)
     return swagger.as_dict()
     # return await render_template('index.html')
 

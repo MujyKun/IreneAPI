@@ -9,7 +9,8 @@ begin
     SELECT COUNT(*) INTO t_user_banned FROM public.botbanned WHERE userid = t_userid;
 
     IF t_user_banned = 1 THEN
-        DELETE FROM public.botbanned WHERE user = t_userid;
+        DELETE FROM public.botbanned
+        WHERE userid = t_userid;
     END IF;
 end;
 $$;

@@ -63,19 +63,19 @@ class DbConnection:
             print(f"Could not find {file_name} for SQL execution.")
         return ""
 
-    async def execute(self, query: str):
+    async def execute(self, query: str, *args, **kwargs):
         """Execute a SQL query.
 
         :param query: (str) SQL Query to execute.
         """
 
-    async def fetch_row(self, query: str):
+    async def fetch_row(self, query: str, *args, **kwargs):
         """Fetch a row from a SQL query.
 
         :param query: (str) SQL Query to execute.
         """
 
-    async def fetch(self, query: str):
+    async def fetch(self, query: str, *args, **kwargs):
         """Fetch rows from a SQL query.
 
         :param query: (str) SQL Query to execute.
