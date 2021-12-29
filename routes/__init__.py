@@ -1,13 +1,13 @@
 from .helpers import self, get_token, get_permission_level
 from typing import Union, Dict
-from models import WebSocketSession, Requestor
+from models import WebSocketSession, Requestor, Access
 from .helpers.errors import InvalidLogin, BadRequest
 from .helpers import hash_token, check_hashed_token
 
 
 # PASS WITH CAUTION. Should only be used in functions not directly returned to a user
 # and user authentication is not needed.
-god_access_requestor = Requestor(-1, 0)
+god_access_requestor = Requestor(-1, Access(-1))
 
 # connected_websockets defined as { user_id: [WebSocketSessions] }
 connected_websockets: Dict[
@@ -42,14 +42,14 @@ async def login(
             )["results"]["getaccessid"]
 
             if handle_websocket:
-                wss = WebSocketSession(user_id, permission_level)
+                wss = WebSocketSession(user_id, Access(permission_level))
                 existing_ws = connected_websockets.get(user_id)
                 if not existing_ws:
                     connected_websockets[user_id] = {wss.wss_id: wss}
                 else:
                     existing_ws[wss.wss_id] = wss
                 return wss
-            return Requestor(user_id, permission_level)
+            return Requestor(user_id, Access(permission_level))
     except Exception as e:
         raise BadRequest
 

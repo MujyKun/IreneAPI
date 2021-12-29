@@ -1,4 +1,4 @@
-from . import Requestor
+from . import Requestor, Access
 
 session_identifier = -1
 
@@ -9,7 +9,7 @@ session_identifier = -1
 class WebSocketSession(Requestor):
     """An active WebSocket Session."""
 
-    def __init__(self, user_id, permission_level):
+    def __init__(self, user_id, permission_level: Access):
         super(WebSocketSession, self).__init__(user_id, permission_level)
         global session_identifier
         session_identifier += 1

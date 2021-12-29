@@ -894,6 +894,18 @@ begin
                  WHERE socialid = t_socialid;
 end;
 $$;
+create or replace function public.getsuperpatronstatus(t_userid bigint)
+    returns boolean
+    language plpgsql
+as
+$$
+declare
+    t_user_is_super_patron boolean;
+begin
+    SELECT COUNT(*) INTO t_user_is_super_patron FROM public.getsuperpatrons WHERE userid = t_userid;
+    return t_user_is_super_patron;
+end;
+$$;
 create or replace function groupmembers.gettag(t_tagid integer)
     returns table
             (
@@ -933,7 +945,19 @@ begin
     SELECT hashed into t_hashed FROM public.apitokens WHERE userid = t_userid;
     return t_hashed;
 end;
-$$;create or replace function public.getusage(t_userid bigint, t_endpoint text)
+$$;create or replace function public.gettokenexists(t_userid bigint)
+    returns boolean
+    language plpgsql
+as
+$$
+declare
+    t_token_exists boolean;
+begin
+    SELECT COUNT(*) INTO t_token_exists FROM public.apitokens WHERE userid = t_userid;
+    return t_token_exists;
+end;
+$$;
+create or replace function public.getusage(t_userid bigint, t_endpoint text)
     returns integer
     language plpgsql
 as

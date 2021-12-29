@@ -17,28 +17,36 @@ def check_hashed_token(token, hashed):
 
 
 from typing import Optional
-from models import Requestor, DbConnection
+from models import Requestor, DbConnection, Access
 from functools import wraps
-from .errors import LackingPermissions
+from .errors import LackingPermissions, BadRequest
 
 
-permission_levels = {
-    -1: "God",
-    0: "Owner",
-    1: "Developer",
-    2: "Super Patron",
-    3: "Friend",
-}
+def is_int64(value: int):
+    """Confirm if an integer is in range of int64 to prevent overflow."""
+    if -9223372036854775808 > value or value > 9223372036854775807:
+        raise BadRequest
 
 
-def check_permission(permission_level):
+# PRE DEFINED ACCESS
+GOD = Access(-1)
+OWNER = Access(0)
+DEVELOPER = Access(1)
+SUPER_PATRON = Access(2)
+FRIEND = Access(3)
+USER = Access(4)
+
+
+def check_permission(permission_level: Access):
+    """Decorator to check the permission level of a logged-in user matches the requirement."""
+
     def decorator(func):
         @wraps(func)
         async def wrapper(*args, **kwargs):
             # Check permission level matches the requirement.
             requestor = kwargs.get("requestor") or args[0]
             if isinstance(requestor, Requestor):
-                if requestor.permission_level <= permission_level:
+                if requestor.access.id <= permission_level.id:
                     # approved access
                     return await func(*args, **kwargs)
             raise LackingPermissions
@@ -58,7 +66,13 @@ class DB:
 
 self = DB()
 
-from .api import add_token, get_token, delete_token, get_permission_level
+from .api import (
+    add_token,
+    get_token,
+    check_token_exists,
+    delete_token,
+    get_permission_level,
+)
 
 from .user import (
     get_user_banned,
@@ -80,6 +94,10 @@ from .user import (
     get_user,
     add_user,
     delete_user,
+    get_user_super_patron,
+    get_user_mod,
+    get_user_translator,
+    get_user_proofreader,
 )
 
 # Helper Functions for routes.
@@ -106,6 +124,63 @@ helper_routes = {
     "user/ban_status.POST": {"function": ban_user, "params": ["requestor", "user_id"]},
     "user/ban_status.DELETE": {
         "function": unban_user,
+        "params": ["requestor", "user_id"],
+    },
+    "user/token.GET": {
+        "function": check_token_exists,
+        "params": ["requestor", "user_id"],
+    },
+    "user/token.POST": {
+        "function": add_token,
+        "params": ["requestor", "user_id", "unhashed_token", "access_id"],
+    },
+    "user/token.DELETE": {"function": delete_token, "params": ["requestor", "user_id"]},
+    "user/superpatron_status.GET": {
+        "function": get_user_super_patron,
+        "params": ["requestor", "user_id"],
+    },
+    "user/superpatron_status.POST": {
+        "function": add_super_patron,
+        "params": ["requestor", "user_id"],
+    },
+    "user/superpatron_status.DELETE": {
+        "function": delete_super_patron,
+        "params": ["requestor", "user_id"],
+    },
+    "user/mod_status.GET": {
+        "function": get_user_mod,
+        "params": ["requestor", "user_id"],
+    },
+    "user/mod_status.POST": {
+        "function": add_mod,
+        "params": ["requestor", "user_id"],
+    },
+    "user/mod_status.DELETE": {
+        "function": delete_mod,
+        "params": ["requestor", "user_id"],
+    },
+    "user/translator_status.GET": {
+        "function": get_user_translator,
+        "params": ["requestor", "user_id"],
+    },
+    "user/translator_status.POST": {
+        "function": add_translator,
+        "params": ["requestor", "user_id"],
+    },
+    "user/translator_status.DELETE": {
+        "function": delete_translator,
+        "params": ["requestor", "user_id"],
+    },
+    "user/proofreader_status.GET": {
+        "function": get_user_proofreader,
+        "params": ["requestor", "user_id"],
+    },
+    "user/proofreader_status.POST": {
+        "function": add_proofreader,
+        "params": ["requestor", "user_id"],
+    },
+    "user/proofreader_status.DELETE": {
+        "function": delete_proofreader,
         "params": ["requestor", "user_id"],
     },
 }
