@@ -5,10 +5,12 @@
 ## Self-Hosting
 
 1) Install and create a [Postgres Server](https://www.postgresql.org/download/) 
-2) Install [Python 3.8.8](https://www.python.org/downloads/release/python-388/) 
+2) Install [Python 3.9.9](https://www.python.org/downloads/release/python-399/) 
 3) Install `pip` by typing ``python get-pip.py`` or  ``python -m ensurepip --upgrade`` in a terminal.
-4) Install the requirements by typing ``pip install -r requirements.txt`` in a terminal in the directory with  
-the `requirements.txt`.
+4) Install the requirements by doing one of the below steps.
+   1) Typing ``pip install -r requirements.txt`` in a terminal in the directory with  
+   the `requirements.txt`.
+   2) If you have poetry installed, type ``poetry install`` in a terminal.
 5) Create the Database using the below SQL query: (the rest of the DB will be created on run.)
 ```
 CREATE DATABASE bot WITH OWNER = postgres ENCODING = 'UTF8' CONNECTION LIMIT = -1;
