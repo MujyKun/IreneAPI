@@ -575,7 +575,19 @@ begin
                  FROM groupmembers.affiliation
                  WHERE affiliationid = t_affiliation_id;
 end;
-$$;create or replace function groupmembers.getbloodtype(t_blood_id integer)
+$$;create or replace function public.getbanstatus(t_userid bigint)
+    returns boolean
+    language plpgsql
+as
+$$
+declare
+    t_user_is_banned boolean;
+begin
+    SELECT COUNT(*) INTO t_user_is_banned FROM public.botbanned WHERE userid = t_userid;
+    return t_user_is_banned;
+end;
+$$;
+create or replace function groupmembers.getbloodtype(t_blood_id integer)
     returns table
             (
                 t_name text
@@ -628,7 +640,19 @@ begin
                  FROM groupmembers.company
                  WHERE companyid = t_company_id;
 end;
-$$;create or replace function groupmembers.getdate(t_dateid integer)
+$$;create or replace function public.getdatamodstatus(t_userid bigint)
+    returns boolean
+    language plpgsql
+as
+$$
+declare
+    t_user_is_datamod boolean;
+begin
+    SELECT COUNT(*) INTO t_user_is_datamod FROM public.datamods WHERE userid = t_userid;
+    return t_user_is_datamod;
+end;
+$$;
+create or replace function groupmembers.getdate(t_dateid integer)
     returns table
             (
                 t_startdate timestamp,
@@ -760,7 +784,19 @@ begin
                  FROM groupmembers.media
                  WHERE mediaid = t_mediaid;
 end;
-$$;create or replace function groupmembers.getname(t_nameid integer)
+$$;create or replace function public.getmodstatus(t_userid bigint)
+    returns boolean
+    language plpgsql
+as
+$$
+declare
+    t_user_is_mod boolean;
+begin
+    SELECT COUNT(*) INTO t_user_is_mod FROM public.mods WHERE userid = t_userid;
+    return t_user_is_mod;
+end;
+$$;
+create or replace function groupmembers.getname(t_nameid integer)
     returns table
             (
                 t_firstname text,
@@ -871,7 +907,19 @@ begin
                  FROM groupmembers.position
                  WHERE name = t_positionname;
 end;
-$$;create or replace function groupmembers.getsocials(t_socialid integer)
+$$;create or replace function public.getproofreaderstatus(t_userid bigint)
+    returns boolean
+    language plpgsql
+as
+$$
+declare
+    t_user_is_proofreader boolean;
+begin
+    SELECT COUNT(*) INTO t_user_is_proofreader FROM public.proofreader WHERE userid = t_userid;
+    return t_user_is_proofreader;
+end;
+$$;
+create or replace function groupmembers.getsocials(t_socialid integer)
     returns table
             (
                 t_twitter text,
@@ -955,6 +1003,18 @@ declare
 begin
     SELECT COUNT(*) INTO t_token_exists FROM public.apitokens WHERE userid = t_userid;
     return t_token_exists;
+end;
+$$;
+create or replace function public.gettranslatorstatus(t_userid bigint)
+    returns boolean
+    language plpgsql
+as
+$$
+declare
+    t_user_is_translator boolean;
+begin
+    SELECT COUNT(*) INTO t_user_is_translator FROM public.translator WHERE userid = t_userid;
+    return t_user_is_translator;
 end;
 $$;
 create or replace function public.getusage(t_userid bigint, t_endpoint text)

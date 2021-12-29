@@ -1,7 +1,6 @@
 from os import listdir
 from os.path import isdir
 import aiofiles
-import asyncio
 import asyncpg.exceptions
 
 

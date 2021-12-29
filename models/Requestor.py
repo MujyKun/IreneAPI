@@ -1,4 +1,4 @@
-from routes.helpers import Access
+from . import Access
 
 
 class Requestor:
