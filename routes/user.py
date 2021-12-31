@@ -6,7 +6,7 @@ from . import login
 import routes.helpers.user as helper
 import routes.helpers.api as api_helper
 from models import Requestor
-from .helpers import BadRequest, is_int64, USER
+from .helpers import BadRequest, is_int64, USER, GOD
 
 user = PintBlueprint("user", __name__, url_prefix="/user/")
 
@@ -18,7 +18,7 @@ class UserStatus(Resource):
         """Get the information about a user.
 
         Use this route to get a user's information. A login is still needed.
-        Pass in a user id of -1 to get all users.
+        Pass in a user id of 0 to get all users.
         """
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.get_user(requestor, user_id)

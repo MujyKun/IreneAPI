@@ -27,6 +27,8 @@ psycopg2 = "2.9.2"
 black = "21.12b0"
 pre-commit = "2.16.0"
 quart-openapi = {version = "1.7.2", extras = ["doc"]}
+aiogoogle = "^3.1.1"
+peony-twitter = {extras = ["all"], version = "^2.1.2"}
 
 [tool.poetry.dev-dependencies]
 

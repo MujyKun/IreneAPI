@@ -53,5 +53,12 @@ top_gg_webhook_key = os.getenv("TOP_GG_WEBHOOK")
 patreon_url = os.getenv("PATREON_LINK")
 
 
+twitter_account_id = os.getenv("TWITTER_ACCOUNT_ID")
+twitter_username = os.getenv("TWITTER_USERNAME")
+twitter_consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
+twitter_consumer_secret = os.getenv("TWITTER_CONSUMER_SECRET")
+twitter_access_key = os.getenv("TWITTER_ACCESS_KEY")
+twitter_access_secret = os.getenv("TWITTER_ACCESS_SECRET")
+
 # db_conn = psycopg2.connect(**postgres_options)
 # c = db_conn.cursor()

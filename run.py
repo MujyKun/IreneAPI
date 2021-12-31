@@ -4,15 +4,15 @@ from quart import Quart, render_template, Response
 from models import PgConnection
 
 # noinspection PyUnresolvedReferences, PyPackageRequirements
-from resources.drive import get_file_type, download_media
 from resources.keys import postgres_options, api_port
+from resources import drive
 from routes.groupmembers import groupmembers
 from routes.user import user
 from ws import websocket_blueprint
 from routes.helpers.errors import BaseError
 from quart_openapi import Pint, Resource
 from quart_openapi import Swagger
-
+from resources.twitter import Twitter
 
 app = Pint(__name__, title="IreneAPI", contact_email="mujy@irenebot.com", version="2.0")
 swagger = Swagger(app)
@@ -45,6 +45,18 @@ async def index():
 if __name__ == "__main__":
     loop = get_event_loop()
     try:
+
+        try:
+            """TWITTER TESTS"""
+            twitter = Twitter()
+            # req = twitter.get_user_id("mujykun")
+            # req = twitter.me()
+            req = twitter.get_user_timeline(username="mujykun")
+            tweet = loop.run_until_complete(req)
+            print(tweet)
+        except Exception as e:
+            print(e)
+
         # connect to db.
         loop.run_until_complete(db.connect())
 
@@ -52,6 +64,9 @@ if __name__ == "__main__":
         from routes import self
 
         self.db = db
+
+        # instantiate google drive
+        loop.run_until_complete(drive.create())
 
         loop.run_until_complete(app.run_task(port=api_port))
 

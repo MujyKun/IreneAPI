@@ -1,74 +1,52 @@
-from __future__ import print_function
-import pickle
-import os.path
-import io
-
-# noinspection PyPackageRequirements
-from googleapiclient.http import MediaIoBaseDownload
-
-# noinspection PyPackageRequirements
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-
-# noinspection PyPackageRequirements
-from google.auth.transport.requests import Request
+from typing import Optional
+from aiogoogle import Aiogoogle
+from aiogoogle.auth.creds import UserCreds
+import json
+import aiofiles
 
 
-def get_drive_connection():
-    scopes = ["https://www.googleapis.com/auth/drive"]
-    cred = None
-    if os.path.exists(f"token.pickle"):
-        with open(f"token.pickle", "rb") as token:
-            try:
-                cred = pickle.load(token)
-            except Exception as e:
-                print(e)
-    # If there are no (valid) credentials available, let the user log in.
-    if not cred or not cred.valid:
-        if cred and cred.expired and cred.refresh_token:
-            cred.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", scopes)
-            cred = flow.run_local_server(port=0)
-        # Save the credentials for the next run
-        with open(f"token.pickle", "wb") as token:
-            pickle.dump(cred, token)
+class Drive:
+    def __init__(self):
+        """
+        Controls the downloading, listing, and uploading of Google Drive files.
+        """
+        self.expiry = None
+        self.scopes = None
+        self.__creds: Optional[UserCreds] = None
 
-    drive_service = build("drive", "v3", credentials=cred)
-    return drive_service
+    async def create(self):
+        """Properly initialize this object."""
+        async with aiofiles.open("token.json", "r") as file:
+            service_creds = json.loads(await file.read())
+            self.scopes = service_creds.pop("scope")
+            self.expiry = service_creds.pop("expiry_date")
+        self.__creds = UserCreds(scopes=self.scopes, **service_creds)
 
+    async def list_files(self):
+        """List the files of a Google Drive account."""
+        async with Aiogoogle(user_creds=self.__creds) as aiogoogle:
+            drive_v3 = await aiogoogle.discover("drive", "v3")
+            json_res = await aiogoogle.as_service_account(
+                drive_v3.files.list(),
+            )
+            for file in json_res["files"]:
+                print(file["name"])
 
-drive = get_drive_connection()
+    async def download_file(self, file_id, path):
+        """Download a google drive file."""
+        async with Aiogoogle(user_creds=self.__creds) as aiogoogle:
+            drive_v3 = await aiogoogle.discover("drive", "v3")
+            await aiogoogle.as_service_account(
+                drive_v3.files.get(fileId=file_id, download_file=path, alt="media"),
+            )
 
+    async def upload_file(self, path):
+        """Upload a file to google drive."""
+        async with Aiogoogle(user_creds=self.__creds) as aiogoogle:
+            drive_v3 = await aiogoogle.discover("drive", "v3")
+            await aiogoogle.as_service_account(drive_v3.files.create(upload_file=path))
 
-def get_file_type(file_id):
-    """Get the file type of a drive file.
-    ex: image.jpeg or media.mp4"""
-    file_data = get_file_data(file_id)
-    file_type = file_data.get("mimeType")
-    if file_type:
-        return file_type.replace("/", ".")
-    return file_data.get("mimeType")
-
-
-def get_file_data(file_id):
-    """Get the file data of a drive file."""
-    return drive.files().get(fileId=file_id).execute()
-
-
-def download_media(file_id, file_location):
-    media = drive.files().get_media(fileId=file_id)
-    fh = io.BytesIO()
-    downloader = MediaIoBaseDownload(fh, media)
-    done = False
-    while done is False:
-        status, done = downloader.next_chunk()
-        # print percentage of download
-        print("Download %d%%." % int(status.progress() * 100))
-    with open(file_location, "wb") as f:
-        fh.seek(0)  # go to start of stream
-        f.write(fh.read())
-    try:
-        fh.close()
-    except Exception as e:
-        print(e, "--download")
+    @staticmethod
+    def get_id_from_url(url) -> str:
+        """Get a file id based on the url."""
+        return url.replace("https://drive.google.com/uc?export=view&id=", "")

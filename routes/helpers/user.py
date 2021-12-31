@@ -14,15 +14,14 @@ from models import Requestor
 
 @check_permission(permission_level=DEVELOPER)
 async def get_user(requestor: Requestor, user_id: int) -> dict:
-    """Get a user's information if they exist."""
-    is_int64(user_id)
-    query = "SELECT * FROM public.getusers"
-    args = {}
-    if user_id != -1:
-        query += " WHERE userid = $1"
-        args = {user_id}
+    """Get a user's information if they exist.
 
-    return await self.db.fetch(query, *args)
+    Pass in the user id as 0 to get all users.
+    """
+    is_int64(user_id)
+    if user_id == 0:
+        return await self.db.fetch("SELECT * FROM public.getusers")
+    return await self.db.fetch_row("SELECT * FROM public.getuser($1)", user_id)
 
 
 @check_permission(permission_level=DEVELOPER)

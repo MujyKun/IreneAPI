@@ -37,25 +37,6 @@ FRIEND = Access(3)
 USER = Access(4)
 
 
-def check_permission(permission_level: Access):
-    """Decorator to check the permission level of a logged-in user matches the requirement."""
-
-    def decorator(func):
-        @wraps(func)
-        async def wrapper(*args, **kwargs):
-            # Check permission level matches the requirement.
-            requestor = kwargs.get("requestor") or args[0]
-            if isinstance(requestor, Requestor):
-                if requestor.access.id <= permission_level.id:
-                    # approved access
-                    return await func(*args, **kwargs)
-            raise LackingPermissions
-
-        return wrapper
-
-    return decorator
-
-
 db: Optional[DbConnection] = None
 
 
@@ -65,6 +46,62 @@ class DB:
 
 
 self = DB()
+
+
+async def log(requestor: Requestor, function_name, response, args: str, kwargs: str):
+    """Log a user accessing a helper function."""
+    try:
+        await self.db.execute(
+            "SELECT public.logfunc($1, $2, $3, $4, $5)",
+            requestor.user_id,
+            function_name,
+            f"{response}",
+            args,
+            kwargs,
+        )
+    except Exception as e:
+        print(
+            f"Failed to log:\n{e}\n{requestor.user_id}, {function_name} - {response} - {args} - {kwargs}"
+        )
+
+
+def check_permission(permission_level: Access):
+    """Decorator to check the permission level of a logged-in user matches the requirement."""
+
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            # Check permission level matches the requirement.
+            requestor = kwargs.get("requestor") or args[0]
+
+            if isinstance(requestor, Requestor):
+                if requestor.access.id <= permission_level.id:
+                    # approved access
+                    response = await func(*args, **kwargs)
+                    # log access
+                    try:
+                        # we should not log useless args or kwargs,
+                        # so they will be removed.
+                        if kwargs.get("unhashed_token"):
+                            kwargs.pop("unhashed_token")
+                        if kwargs.get("requestor"):
+                            kwargs.pop("requestor")
+                        await log(
+                            requestor=requestor,
+                            function_name=func.__name__,
+                            response=response,
+                            args=f"{args}",
+                            kwargs=f"{kwargs}",
+                        )
+                    except Exception as e:
+                        print(e)
+                    return response
+            raise LackingPermissions
+
+        return wrapper
+
+    return decorator
+
 
 from .api import (
     add_token,
@@ -98,6 +135,7 @@ from .user import (
     get_user_mod,
     get_user_translator,
     get_user_proofreader,
+    get_user_data_mod,
 )
 
 # Helper Functions for routes.
@@ -157,6 +195,18 @@ helper_routes = {
     },
     "user/mod_status.DELETE": {
         "function": delete_mod,
+        "params": ["requestor", "user_id"],
+    },
+    "user/data_mod_status.GET": {
+        "function": get_user_data_mod,
+        "params": ["requestor", "user_id"],
+    },
+    "user/data_mod_status.POST": {
+        "function": add_data_mod,
+        "params": ["requestor", "user_id"],
+    },
+    "user/data_mod_status.DELETE": {
+        "function": delete_data_mod,
         "params": ["requestor", "user_id"],
     },
     "user/translator_status.GET": {

@@ -38,37 +38,41 @@ async def ws():
 
 async def process_ws_data(socket: WebSocketSession, data: dict) -> dict:
     """Process the data coming from a websocket."""
-    route = data["route"]
-    method: str = (data["method"]).upper()
-    search_method = f"{route}.{method}"
-    helper = helper_routes[search_method]
-
     response = dict()
 
-    # do stuff with callback id
-    callback_id = data.get("callback_id")
-    if callback_id:
-        response["callback_id"] = callback_id
-        data.pop("callback_id")
-
-    helper_function_args = dict()
-    for param in helper["params"]:
-        if param == "requestor":
-            helper_function_args["requestor"] = socket
-            continue
-        helper_function_args[param] = data[param]
-
     try:
+        # mark the callback id
+        callback_id = data.get("callback_id")
+        if callback_id:
+            response["callback_id"] = callback_id
+            data.pop("callback_id")
+
+        route = data["route"]
+        method: str = (data["method"]).upper()
+        search_method = f"{route}.{method}"
+        helper = helper_routes[search_method]
+
+        helper_function_args = dict()
+        for param in helper["params"]:
+            if param == "requestor":
+                helper_function_args["requestor"] = socket
+                continue
+            helper_function_args[param] = data[param]
+
         if len(helper["params"]) != len(helper_function_args):
             raise BadRequest
 
         # breakpoint()
         result = await helper["function"](**helper_function_args)
 
-        result["callback_id"] = response["callback_id"]
+        if not result:
+            result = dict({"results": None})
+
+        result["callback_id"] = callback_id
         return result
     except Exception as e:
         print(e)
         response["error"] = f"{e}"
+        response["results"] = None
 
     return response
