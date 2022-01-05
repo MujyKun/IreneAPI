@@ -387,6 +387,39 @@ begin
         VALUES(t_userid);
     END IF;
 end;
+$$;create or replace function public.addtwitteraccount(t_accountid bigint, t_username text)
+    returns void
+    language plpgsql
+as
+$$
+declare
+    t_already_exists integer;
+begin
+    SELECT COUNT(*) INTO t_already_exists FROM public.twitteraccounts WHERE t_accountid = accountid;
+
+    IF t_already_exists = 0 THEN
+        INSERT INTO public.twitteraccounts(accountid, username)
+        VALUES(t_accountid, t_username);
+    END IF;
+end;
+$$;
+create or replace function public.addtwittersubscription(t_accountid bigint, t_channelid bigint, t_roleid bigint)
+    returns void
+    language plpgsql
+as
+$$
+declare
+    t_already_exists integer;
+begin
+    SELECT COUNT(*) INTO t_already_exists
+        FROM public.twitterfollowage
+        WHERE t_accountid = accountid AND t_channelid = channelid;
+
+    IF t_already_exists = 0 THEN
+        INSERT INTO public.twitterfollowage(accountid, channelid, roleid)
+        VALUES(t_accountid, t_channelid, t_roleid);
+    END IF;
+end;
 $$;create or replace function public.addusage(t_userid bigint, t_endpoint text)
     returns integer
     language plpgsql
@@ -526,6 +559,24 @@ as
 $$
 begin
     DELETE FROM public.translator WHERE userid = t_userid;
+end;
+$$;create or replace function public.deletetwitteraccount(t_accountid bigint)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM public.twitteraccounts WHERE accountid = t_accountid;
+end;
+$$;
+
+create or replace function public.deletetwittersubscription(t_accountid bigint, t_channelid bigint)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM public.twitterfollowage WHERE accountid = t_accountid AND channelid = t_channelid;
 end;
 $$;create or replace function public.deleteuser(t_userid bigint)
     returns void
@@ -1015,6 +1066,33 @@ declare
 begin
     SELECT COUNT(*) INTO t_user_is_translator FROM public.translator WHERE userid = t_userid;
     return t_user_is_translator;
+end;
+$$;
+create or replace function public.gettwitterid(t_username text)
+    returns table
+            (
+                t_accountid bigint
+            )
+    language plpgsql
+as
+$$
+
+begin
+    RETURN QUERY SELECT accountid FROM public.twitteraccounts WHERE t_username = username;
+end;
+$$;create or replace function public.gettwitterstatus(t_account_id bigint, t_channel_id bigint)
+    returns boolean
+    language plpgsql
+as
+$$
+declare
+    t_exists boolean;
+begin
+    SELECT COUNT(*) INTO t_exists
+    FROM public.twitterfollowage
+    WHERE channelid = t_channel_id
+      AND t_account_id = accountid;
+    return t_exists;
 end;
 $$;
 create or replace function public.getusage(t_userid bigint, t_endpoint text)

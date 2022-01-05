@@ -40,8 +40,6 @@ async def add_twitter_subscription(
 ) -> dict:
     """
     Make a channel subscribe to a Twitter account.
-
-    Pass in a role id of 0 for a non-existing role.
     """
     is_int64(account_id)
     is_int64(channel_id)
@@ -78,7 +76,9 @@ async def get_and_add_twitter_id(requestor: Requestor, username: str) -> dict:
     Will search database first and then make an api call.
     """
     username = username.lower()
-    response = await self.db.fetchrow("SELECT * FROM public.gettwitterid($1)", username)
+    response = await self.db.fetch_row(
+        "SELECT * FROM public.gettwitterid($1)", username
+    )
     if response.get("results"):
         return response
 
@@ -87,7 +87,7 @@ async def get_and_add_twitter_id(requestor: Requestor, username: str) -> dict:
 
     if account_id:
         await add_twitter_account(requestor, account_id, username)
-        return account_id
+        return {"results": {"account_id": account_id}}
 
 
 @check_permission(permission_level=DEVELOPER)

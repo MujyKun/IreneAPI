@@ -9,6 +9,7 @@ from resources import drive
 from routes.groupmembers import groupmembers
 from routes.user import user
 from routes.twitter import twitter
+from routes.channel import channel
 from ws import websocket_blueprint
 from routes.helpers.errors import BaseError
 from quart_openapi import Pint, Resource
@@ -23,6 +24,7 @@ swagger = Swagger(app)
 app.register_blueprint(groupmembers)
 app.register_blueprint(websocket_blueprint)
 app.register_blueprint(user)
+app.register_blueprint(channel)
 # app.register_blueprint(twitter)
 
 db = PgConnection(**postgres_options)

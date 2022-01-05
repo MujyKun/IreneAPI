@@ -149,6 +149,8 @@ from .twitter import (
     get_timeline,
 )
 
+from .channel import add_channel
+
 # Helper Functions for routes.
 helper_routes = {
     "user/$user_id.GET": {"function": get_user, "params": ["requestor", "user_id"]},
@@ -289,5 +291,9 @@ helper_routes = {
     "twitter/timeline/$twitter_id.GET": {
         "function": get_timeline,
         "params": ["requestor", "twitter_id"],
+    },
+    "channel/$channel_id.POST": {
+        "function": add_channel,
+        "params": ["requestor", "channel_id"],
     },
 }

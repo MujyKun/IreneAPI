@@ -37,7 +37,7 @@ class Twitter(PeonyClient):
             user_id if user_id else (await self.get_user_id(username))
         ].tweets.get()
 
-    async def get_user_id(self, username) -> Optional[str]:
+    async def get_user_id(self, username) -> Optional[int]:
         """
         Get a Twitter user's id based on their username.
 
@@ -45,7 +45,7 @@ class Twitter(PeonyClient):
         """
         response = await self.api.users.by.username[username].get()
         if response.get("data"):
-            return response["data"]["id"]
+            return int(response["data"]["id"])
 
     async def me(self):
         """
