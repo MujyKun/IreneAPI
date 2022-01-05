@@ -138,99 +138,156 @@ from .user import (
     get_user_data_mod,
 )
 
+from .twitter import (
+    add_twitter_account,
+    delete_twitter_account,
+    add_twitter_subscription,
+    delete_twitter_subscription,
+    get_and_add_twitter_id,
+    get_subscriptions,
+    get_accounts,
+    get_timeline,
+)
+
 # Helper Functions for routes.
 helper_routes = {
-    "user/.GET": {"function": get_user, "params": ["requestor", "user_id"]},
-    "user/.POST": {"function": add_user, "params": ["requestor", "user_id"]},
-    "user/.DELETE": {"function": delete_user, "params": ["requestor", "user_id"]},
-    "user/patron_status.GET": {
+    "user/$user_id.GET": {"function": get_user, "params": ["requestor", "user_id"]},
+    "user/$user_id.POST": {"function": add_user, "params": ["requestor", "user_id"]},
+    "user/$user_id.DELETE": {
+        "function": delete_user,
+        "params": ["requestor", "user_id"],
+    },
+    "user/patron_status/$user_id.GET": {
         "function": get_user_patron,
         "params": ["requestor", "user_id"],
     },
-    "user/patron_status.POST": {
+    "user/patron_status/$user_id.POST": {
         "function": add_patron,
         "params": ["requestor", "user_id"],
     },
-    "user/patron_status.DELETE": {
+    "user/patron_status/$user_id.DELETE": {
         "function": delete_patron,
         "params": ["requestor", "user_id"],
     },
-    "user/ban_status.GET": {
+    "user/ban_status/$user_id.GET": {
         "function": get_user_banned,
         "params": ["requestor", "user_id"],
     },
-    "user/ban_status.POST": {"function": ban_user, "params": ["requestor", "user_id"]},
-    "user/ban_status.DELETE": {
+    "user/ban_status/$user_id.POST": {
+        "function": ban_user,
+        "params": ["requestor", "user_id"],
+    },
+    "user/ban_status/$user_id.DELETE": {
         "function": unban_user,
         "params": ["requestor", "user_id"],
     },
-    "user/token.GET": {
+    "user/token/$user_id.GET": {
         "function": check_token_exists,
         "params": ["requestor", "user_id"],
     },
-    "user/token.POST": {
+    "user/token/$user_id.POST": {
         "function": add_token,
         "params": ["requestor", "user_id", "unhashed_token", "access_id"],
     },
-    "user/token.DELETE": {"function": delete_token, "params": ["requestor", "user_id"]},
-    "user/superpatron_status.GET": {
+    "user/token/$user_id.DELETE": {
+        "function": delete_token,
+        "params": ["requestor", "user_id"],
+    },
+    "user/superpatron_status/$user_id.GET": {
         "function": get_user_super_patron,
         "params": ["requestor", "user_id"],
     },
-    "user/superpatron_status.POST": {
+    "user/superpatron_status/$user_id.POST": {
         "function": add_super_patron,
         "params": ["requestor", "user_id"],
     },
-    "user/superpatron_status.DELETE": {
+    "user/superpatron_status/$user_id.DELETE": {
         "function": delete_super_patron,
         "params": ["requestor", "user_id"],
     },
-    "user/mod_status.GET": {
+    "user/mod_status/$user_id.GET": {
         "function": get_user_mod,
         "params": ["requestor", "user_id"],
     },
-    "user/mod_status.POST": {
+    "user/mod_status/$user_id.POST": {
         "function": add_mod,
         "params": ["requestor", "user_id"],
     },
-    "user/mod_status.DELETE": {
+    "user/mod_status/$user_id.DELETE": {
         "function": delete_mod,
         "params": ["requestor", "user_id"],
     },
-    "user/data_mod_status.GET": {
+    "user/data_mod_status/$user_id.GET": {
         "function": get_user_data_mod,
         "params": ["requestor", "user_id"],
     },
-    "user/data_mod_status.POST": {
+    "user/data_mod_status/$user_id.POST": {
         "function": add_data_mod,
         "params": ["requestor", "user_id"],
     },
-    "user/data_mod_status.DELETE": {
+    "user/data_mod_status/$user_id.DELETE": {
         "function": delete_data_mod,
         "params": ["requestor", "user_id"],
     },
-    "user/translator_status.GET": {
+    "user/translator_status/$user_id.GET": {
         "function": get_user_translator,
         "params": ["requestor", "user_id"],
     },
-    "user/translator_status.POST": {
+    "user/translator_status/$user_id.POST": {
         "function": add_translator,
         "params": ["requestor", "user_id"],
     },
-    "user/translator_status.DELETE": {
+    "user/translator_status/$user_id.DELETE": {
         "function": delete_translator,
         "params": ["requestor", "user_id"],
     },
-    "user/proofreader_status.GET": {
+    "user/proofreader_status/$user_id.GET": {
         "function": get_user_proofreader,
         "params": ["requestor", "user_id"],
     },
-    "user/proofreader_status.POST": {
+    "user/proofreader_status/$user_id.POST": {
         "function": add_proofreader,
         "params": ["requestor", "user_id"],
     },
-    "user/proofreader_status.DELETE": {
+    "user/proofreader_status/$user_id.DELETE": {
         "function": delete_proofreader,
         "params": ["requestor", "user_id"],
+    },
+    "twitter/$twitter_id/$channel_id.GET": {
+        "function": twitter.is_subscribed,
+        "params": ["requestor", "twitter_id", "channel_id"],
+    },
+    "twitter/$twitter_id/$channel_id.POST": {
+        "function": add_twitter_subscription,
+        "params": ["requestor", "account_id", "channel_id"],
+        "optional": ["role_id"],
+    },
+    "twitter/$twitter_id/$channel_id.DELETE": {
+        "function": delete_twitter_subscription,
+        "params": ["requestor", "account_id", "channel_id"],
+    },
+    "twitter/$twitter_info.GET": {
+        "function": get_subscriptions,
+        "params": ["requestor", "twitter_info"],
+    },  # twitter_info can be a twitter id or Twitter username.
+    "twitter/$twitter_info.POST": {
+        "function": get_and_add_twitter_id,
+        "params": ["requestor", "username"],
+    },
+    "twitter/$twitter_info.DELETE": {
+        "function": delete_twitter_account,
+        "params": ["requestor", "account_id"],
+    },
+    "twitter/subscriptions.GET": {
+        "function": get_subscriptions,
+        "params": ["requestor"],
+    },
+    "twitter/accounts.GET": {
+        "function": get_accounts,
+        "params": ["requestor"],
+    },
+    "twitter/timeline/$twitter_id.GET": {
+        "function": get_timeline,
+        "params": ["requestor", "twitter_id"],
     },
 }

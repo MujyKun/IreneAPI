@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS public.twitterfollowage
 (
-    username text,
+    accountid bigint,
     channelid bigint,
     roleid bigint,
-    PRIMARY KEY (username, channelid)
+    PRIMARY KEY (accountid, channelid)
 );
 
 ALTER TABLE public.twitterfollowage
     OWNER to postgres;
 COMMENT ON TABLE public.twitterfollowage
-    IS 'The discord text channels that are following a twitter user.';
+    IS 'The discord text channels that are following a Twitter account.';

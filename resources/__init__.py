@@ -1,7 +1,8 @@
 # noinspection PyPackageRequirements
 from .drive import Drive
 from . import keys
-from . import twitter
+from .twitter import Twitter
 
 
 drive = Drive()
+twitter = Twitter()

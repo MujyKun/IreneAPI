@@ -52,6 +52,7 @@ async def process_ws_data(socket: WebSocketSession, data: dict) -> dict:
         search_method = f"{route}.{method}"
         helper = helper_routes[search_method]
 
+        # required arguments
         helper_function_args = dict()
         for param in helper["params"]:
             if param == "requestor":
@@ -62,6 +63,14 @@ async def process_ws_data(socket: WebSocketSession, data: dict) -> dict:
         if len(helper["params"]) != len(helper_function_args):
             raise BadRequest
 
+        # optional arguments
+        optional_params = helper.get("optional")
+        if optional_params:
+            for param in helper["optional"]:
+                if data.get(param) is not None:
+                    helper_function_args[param] = data[param]
+
+        # NOTE: we will not raise a bad request for problems with optional parameters.
         # breakpoint()
         result = await helper["function"](**helper_function_args)
 

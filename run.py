@@ -8,6 +8,7 @@ from resources.keys import postgres_options, api_port
 from resources import drive
 from routes.groupmembers import groupmembers
 from routes.user import user
+from routes.twitter import twitter
 from ws import websocket_blueprint
 from routes.helpers.errors import BaseError
 from quart_openapi import Pint, Resource
@@ -22,6 +23,7 @@ swagger = Swagger(app)
 app.register_blueprint(groupmembers)
 app.register_blueprint(websocket_blueprint)
 app.register_blueprint(user)
+# app.register_blueprint(twitter)
 
 db = PgConnection(**postgres_options)
 
@@ -50,8 +52,8 @@ if __name__ == "__main__":
             """TWITTER TESTS"""
             twitter = Twitter()
             # req = twitter.get_user_id("mujykun")
-            # req = twitter.me()
-            req = twitter.get_user_timeline(username="mujykun")
+            req = twitter.me()
+            # req = twitter.get_user_timeline(username="mujykun")
             tweet = loop.run_until_complete(req)
             print(tweet)
         except Exception as e:
