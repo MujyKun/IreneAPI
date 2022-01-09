@@ -752,21 +752,37 @@ $$;create or replace function groupmembers.getgroup(t_group_id integer)
     returns table
             (
                 t_name        text,
-                t_dateid      integer,
+                t_startdate timestamp, t_enddate timestamp,
+                t_avatar text, t_banner text,
+                t_twitter text, t_youtube text, t_melon text, t_instagram text, t_vlive text,
+                t_spotify text, t_fancafe text, t_facebook text, t_tiktok text,
+                t_website text,
                 t_description text,
                 t_companyid   integer,
-                t_displayid   integer,
-                t_website     text,
-                t_socialid    integer,
-                t_tagids      integer[]
+                t_tags text[]
             )
     language plpgsql
 as
 $$
 
 begin
-    RETURN QUERY SELECT name, dateid, description, companyid, displayid, website, socialid, tagids
-                 FROM groupmembers.groups
+    RETURN QUERY SELECT g.name,
+                        d.startdate, d.enddate,
+                        di.avatar, di.banner,
+                        s.twitter, s.youtube, s.melon, s.instagram, s.vlive, s.spotify,
+                                        s.fancafe, s.facebook, s.tiktok,
+                        g.website,
+                        description,
+                        companyid,
+               (SELECT array_agg(ta.name) AS tags
+                    FROM groupmembers.grouptags gt
+                    LEFT JOIN groupmembers.tag ta ON gt.tagid = ta.tagid
+                    WHERE gt.groupid = g.groupid
+                    GROUP BY gt.groupid)
+                 FROM groupmembers.groups g
+                    LEFT JOIN groupmembers.dates d ON g.dateid = d.dateid
+                     LEFT JOIN groupmembers.display di ON g.displayid = di.displayid
+                     LEFT JOIN groupmembers.socialmedia s ON g.socialid = s.socialid
                  WHERE groupid = t_group_id;
 end;
 $$;create or replace function groupmembers.getgroupalias(t_aliasid integer)
@@ -875,28 +891,51 @@ begin
 end;
 $$;
 create or replace function groupmembers.getperson(t_person_id integer)
-    returns table (
-                      t_dateid integer,
-                      t_nameid integer,
-                      t_formernameid integer,
-                      t_gender char,
-                      t_description text,
-                      t_height integer,
-                      t_displayid integer,
-                      t_socialid integer,
-                      t_locationid integer,
-                      t_tagids integer[],
-                      t_bloodid integer,
-                      t_callcount integer)
+    returns table (z_person_id integer,
+      t_startdate timestamp, t_enddate timestamp,
+      t_firstname text, t_lastname text,
+      t_formerfirstname text, t_formerlastname text,
+      t_avatar text, t_banner text,
+      t_twitter text, t_youtube text, t_melon text, t_instagram text, t_vlive text,
+        t_spotify text, t_fancafe text, t_facebook text, t_tiktok text,
+      t_city text, t_country text,
+      t_bloodtype char(2),
+      t_gender char,
+      t_description text,
+      t_height integer,
+      t_callcount integer,
+      t_tags text[])
     language plpgsql
 as
 $$
 
 begin
-    RETURN QUERY SELECT person.dateid, nameid, formernameid, gender, description, height, displayid, socialid,
-                        locationid, tagids, bloodid, callcount
-                 FROM groupmembers.person
-                 WHERE personid = t_person_id;
+    RETURN QUERY SELECT  p.personid, d.startdate, d.enddate,
+        n.firstname, n.lastname,
+        na.firstname as formerfirstname, na.lastname as formerlastname,
+        di.avatar, di.banner,
+        s.twitter, s.youtube, s.melon, s.instagram, s.vlive, s.spotify,
+                        s.fancafe, s.facebook, s.tiktok,
+        l.city, l.country,
+        bl.name as bloodtype,
+        gender,
+        description,
+        height,
+        callcount,
+       (SELECT array_agg(ta.name) AS tags
+            FROM groupmembers.persontags pt
+            LEFT JOIN groupmembers.tag ta ON pt.tagid = ta.tagid
+            WHERE pt.personid = p.personid
+            GROUP BY pt.personid)
+       FROM groupmembers.person p
+             LEFT JOIN groupmembers.dates d ON p.dateid = d.dateid
+             LEFT JOIN groupmembers.name n ON p.nameid = n.nameid
+             LEFT JOIN groupmembers.name na ON p.formernameid = na.nameid
+             LEFT JOIN groupmembers.display di ON p.displayid = di.displayid
+             LEFT JOIN groupmembers.socialmedia s ON p.socialid = s.socialid
+             LEFT JOIN groupmembers.location l ON p.locationid = l.locationid
+             LEFT JOIN groupmembers.bloodtypes bl ON p.bloodid = bl.bloodid
+                WHERE personid = t_person_id;
 end;
 $$;create or replace function groupmembers.getpersonalias(t_aliasid integer)
     returns table

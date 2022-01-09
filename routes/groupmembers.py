@@ -1,8 +1,12 @@
-from quart import render_template
+from quart import Blueprint, request
+from quart_openapi import PintBlueprint, Resource
+from . import login
+import routes.helpers.groupmembers as helper
+import routes.helpers.api as api_helper
+from models import Requestor
+from .helpers import BadRequest, is_int64, USER, GOD
 
-from quart import Blueprint
-
-groupmembers = Blueprint("groupmembers", __name__)
+groupmembers = Blueprint("groupmembers", __name__, url_prefix="/groupmembers/")
 
 
 @groupmembers.route("/test")

@@ -21,11 +21,11 @@ swagger = Swagger(app)
 
 # print(app.config['SERVER_NAME'])
 # app.config['SERVER_NAME'] = "api.irenebot.com"
+app.register_blueprint(twitter)
 app.register_blueprint(groupmembers)
 app.register_blueprint(websocket_blueprint)
 app.register_blueprint(user)
 app.register_blueprint(channel)
-# app.register_blueprint(twitter)
 
 db = PgConnection(**postgres_options)
 
@@ -37,13 +37,32 @@ async def handle_custom(error):
     )
 
 
+@app.route("/docs")
+async def docs():
+    # Global Security
+    """
+    components:
+      securitySchemes:
+        Bearer Token:
+          name: Authorization
+          type: apiKey
+          in: header
+          description: 'Make sure the API key/token is preceded by "Bearer" when passed in. '
+        User ID:
+          name: user_id
+          type: apiKey
+          in: query
+          description: ''
+    security:
+      - Bearer Token: []
+      - User ID: []
+    """
+    return swagger.as_dict()
+
+
 @app.route("/")
 async def index():
-    # from routes.helpers.api import add_token
-    # from models import Requestor
-    # await add_token(requestor=Requestor(-1, 0), user_id=169401247374376960, unhashed_token="test", access_id=1)
-    return swagger.as_dict()
-    # return await render_template('index.html')
+    return await render_template("index.html")
 
 
 if __name__ == "__main__":
@@ -53,8 +72,8 @@ if __name__ == "__main__":
         try:
             """TWITTER TESTS"""
             twitter = Twitter()
-            # req = twitter.get_user_id("mujykun")
-            req = twitter.me()
+            req = twitter.get_user_id("mujykun")
+            # req = twitter.me()
             # req = twitter.get_user_timeline(username="mujykun")
             tweet = loop.run_until_complete(req)
             print(tweet)

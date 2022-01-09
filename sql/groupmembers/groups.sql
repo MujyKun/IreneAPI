@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS groupmembers.groups
     displayid integer,
     website text,
     socialid integer,
-    tagids integer[],
     PRIMARY KEY (groupid)
 );
 

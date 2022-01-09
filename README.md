@@ -19,7 +19,33 @@ CREATE DATABASE bot WITH OWNER = postgres ENCODING = 'UTF8' CONNECTION LIMIT = -
 6) Rename ``.env.example`` to `.env` and fill out the environment variables with your information.  
 7) After the first run, all tables should have been created. Unfortunately due to parsing issues and since ORM is not being used,  
 functions must be created manually and a file ``/sql/functions/create.sql`` will be created 
-after the first run which you may execute.
+after the first run which you may execute. The parsing issues will be fixed at a later time.
 
 
 ## Contribute
+
+## Development Guide
+
+- The API will only query functions or views from the database. The views and functions may provide specific information and may leave out unnecessary information.   
+**Example:** 
+```sql
+-- A table x has columns a, b, and c
+-- A view may provide the following query:
+SELECT a, b FROM x;
+
+-- The view should never specify all columns with *
+-- DO NOT:
+SELECT * FROM x;
+
+-- DO:
+SELECT a, b, c FROM x;
+
+-- Assuming the queries below are in a view called y
+-- The API may manipulate the views as needed.
+SELECT a, b FROM y;
+SELECT * FROM y;
+
+-- Doing it this way will allow the API to remain consistent with 
+-- how it queries and returns data.
+
+```

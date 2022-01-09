@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS groupmembers.person
     displayid integer,
     socialid integer,
     locationid integer,
-    tagids integer[],
     bloodid integer,
     callcount integer,
     PRIMARY KEY (personid)

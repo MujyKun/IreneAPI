@@ -26,3 +26,12 @@ class Channel(Resource):
         """
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.add_channel(requestor, channel_id)
+
+    async def delete(self, channel_id: int):
+        """Delete a channel.
+
+        Use this route to delete a channel. This will cascade all objects dependent on the channel and is not reversible.
+        Use with caution.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.delete_channel(requestor, channel_id)

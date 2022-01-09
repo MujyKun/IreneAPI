@@ -136,6 +136,7 @@ from .user import (
     get_user_translator,
     get_user_proofreader,
     get_user_data_mod,
+    get_all_users,
 )
 
 from .twitter import (
@@ -149,10 +150,107 @@ from .twitter import (
     get_timeline,
 )
 
-from .channel import add_channel
+from .channel import add_channel, delete_channel
+
+from .groupmembers import (
+    get_person,
+    get_persons,
+    get_tag,
+    get_tags,
+    get_date,
+    get_dates,
+    get_name,
+    get_names,
+    get_company,
+    get_companies,
+    get_display,
+    get_displays,
+    get_locations,
+    get_location,
+    get_media,
+    get_all_media,
+    get_person_alias,
+    get_person_aliases,
+    get_group_aliases,
+    get_group_alias,
+    get_social,
+    get_socials,
+    get_position,
+    get_positions,
+    get_fandoms,
+    get_fandom,
+    get_affiliation,
+    get_affiliations,
+    get_blood_type,
+    get_blood_types,
+)
 
 # Helper Functions for routes.
 helper_routes = {
+    "company/.GET": {"function": get_companies, "params": ["requestor"]},
+    "company/$company_id.GET": {
+        "function": get_company,
+        "params": ["requestor", "company_id"],
+    },
+    "display/.GET": {"function": get_displays, "params": ["requestor"]},
+    "display/$display_id.GET": {
+        "function": get_display,
+        "params": ["requestor", "display_id"],
+    },
+    "location/.GET": {"function": get_locations, "params": ["requestor"]},
+    "location/$location_id.GET": {
+        "function": get_location,
+        "params": ["requestor", "location_id"],
+    },
+    "media/.GET": {"function": get_all_media, "params": ["requestor"]},
+    "media/$name_id.GET": {"function": get_media, "params": ["requestor", "media_id"]},
+    "personalias/.GET": {"function": get_person_aliases, "params": ["requestor"]},
+    "personalias/$alias_id.GET": {
+        "function": get_person_alias,
+        "params": ["requestor", "alias_id"],
+    },
+    "groupalias/.GET": {"function": get_group_aliases, "params": ["requestor"]},
+    "groupalias/$alias_id.GET": {
+        "function": get_group_alias,
+        "params": ["requestor", "alias_id"],
+    },
+    "social/.GET": {"function": get_socials, "params": ["requestor"]},
+    "social/$social_id.GET": {
+        "function": get_social,
+        "params": ["requestor", "social_id"],
+    },
+    "position/.GET": {"function": get_positions, "params": ["requestor"]},
+    "position/$position_id.GET": {
+        "function": get_position,
+        "params": ["requestor", "position_id"],
+    },
+    "fandom/.GET": {"function": get_fandoms, "params": ["requestor"]},
+    "fandom/$name_id.GET": {
+        "function": get_fandom,
+        "params": ["requestor", "guild_id"],
+    },
+    "affiliation/.GET": {"function": get_affiliations, "params": ["requestor"]},
+    "affiliation/$affiliation_id.GET": {
+        "function": get_affiliation,
+        "params": ["requestor", "affiliation_id"],
+    },
+    "bloodtype/.GET": {"function": get_blood_types, "params": ["requestor"]},
+    "bloodtype/$blood_id.GET": {
+        "function": get_blood_type,
+        "params": ["requestor", "blood_id"],
+    },
+    "name/.GET": {"function": get_names, "params": ["requestor"]},
+    "name/$name_id.GET": {"function": get_name, "params": ["requestor", "name_id"]},
+    "date/.GET": {"function": get_dates, "params": ["requestor"]},
+    "date/$date_id.GET": {"function": get_date, "params": ["requestor", "date_id"]},
+    "tag/.GET": {"function": get_tags, "params": ["requestor"]},
+    "tag/$tag_id.GET": {"function": get_tag, "params": ["requestor", "tag_id"]},
+    "person/.GET": {"function": get_persons, "params": ["requestor"]},
+    "person/$person_id.GET": {
+        "function": get_person,
+        "params": ["requestor", "person_id"],
+    },
+    "user/.GET": {"function": get_all_users, "params": ["requestor"]},
     "user/$user_id.GET": {"function": get_user, "params": ["requestor", "user_id"]},
     "user/$user_id.POST": {"function": add_user, "params": ["requestor", "user_id"]},
     "user/$user_id.DELETE": {
@@ -294,6 +392,10 @@ helper_routes = {
     },
     "channel/$channel_id.POST": {
         "function": add_channel,
+        "params": ["requestor", "channel_id"],
+    },
+    "channel/$channel_id.DELETE": {
+        "function": delete_channel,
         "params": ["requestor", "channel_id"],
     },
 }

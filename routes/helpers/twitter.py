@@ -44,6 +44,7 @@ async def add_twitter_subscription(
     is_int64(account_id)
     is_int64(channel_id)
     if role_id:
+        role_id = int(role_id)
         is_int64(role_id)
 
     return await self.db.execute(
@@ -92,7 +93,7 @@ async def get_and_add_twitter_id(requestor: Requestor, username: str) -> dict:
 
 @check_permission(permission_level=DEVELOPER)
 async def get_subscriptions(
-    requestor: Requestor, twitter_info: Optional[Union[int, str]]
+    requestor: Requestor, twitter_info: Optional[Union[int, str]] = None
 ):
     """
     Get the subscriptions of one or several accounts.

@@ -38,7 +38,7 @@ class TwitterSubscription(Resource):
         # TODO: If the role_id is passed in as a query parameter,
         #  then it should not interfere with the login arguments.
         return await helper.add_twitter_subscription(
-            requestor, twitter_id, channel_id, *request.args
+            requestor, twitter_id, channel_id, role_id=request.args.get("role_id")
         )
 
     async def delete(self, twitter_id: int, channel_id: int):
@@ -52,7 +52,7 @@ class TwitterSubscription(Resource):
         )
 
 
-@twitter.route("<str:twitter_info>/")
+@twitter.route("<string:twitter_info>")
 @twitter.doc(params={"twitter_info": "Twitter username or ID to manage the status of."})
 class TwitterAccount(Resource):
     async def get(self, twitter_info: Union[int, str]):
@@ -84,7 +84,7 @@ class TwitterAccount(Resource):
         return await helper.delete_twitter_account(requestor, twitter_id)
 
 
-@twitter.route("subscriptions/")
+@twitter.route("subscriptions")
 @twitter.doc()
 class TwitterSubscriptions(Resource):
     async def get(self):
@@ -96,7 +96,7 @@ class TwitterSubscriptions(Resource):
         return await helper.get_subscriptions(requestor=requestor)
 
 
-@twitter.route("accounts/")
+@twitter.route("accounts")
 @twitter.doc()
 class TwitterAccountInfo(Resource):
     async def get(self):
@@ -108,7 +108,7 @@ class TwitterAccountInfo(Resource):
         return await helper.get_accounts(requestor=requestor)
 
 
-@twitter.route("timeline/<int:twitter_id>/")
+@twitter.route("timeline/<int:twitter_id>")
 @twitter.doc(params={"twitter_id": "Twitter Account ID to manage the status of."})
 class TwitterTimeline(Resource):
     async def get(self, twitter_id: int):
