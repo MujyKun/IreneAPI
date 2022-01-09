@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS groupmembers.media
     filetype text,
     affiliationid integer,
     enabled boolean,
+    nsfw boolean,
     PRIMARY KEY (mediaid)
 );
 

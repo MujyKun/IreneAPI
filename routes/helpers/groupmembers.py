@@ -27,6 +27,21 @@ async def get_persons(requestor: Requestor) -> dict:
     return await self.db.fetch("SELECT * FROM groupmembers.getpersons")
 
 
+@check_permission(permission_level=SUPER_PATRON)
+async def get_group(requestor: Requestor, group_id: int) -> dict:
+    """Get a group's information if they exist."""
+    is_int64(group_id)
+    return await self.db.fetch_row(
+        "SELECT * FROM groupmembers.getgroups WHERE groupid = $1", group_id
+    )
+
+
+@check_permission(permission_level=SUPER_PATRON)
+async def get_groups(requestor: Requestor) -> dict:
+    """Get all group information."""
+    return await self.db.fetch("SELECT * FROM groupmembers.getgroups")
+
+
 @check_permission(permission_level=USER)
 async def get_tag(requestor: Requestor, tag_id: int) -> dict:
     """Get a tag's information."""

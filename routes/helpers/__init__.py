@@ -155,6 +155,8 @@ from .channel import add_channel, delete_channel
 from .groupmembers import (
     get_person,
     get_persons,
+    get_group,
+    get_groups,
     get_tag,
     get_tags,
     get_date,
@@ -249,6 +251,11 @@ helper_routes = {
     "person/$person_id.GET": {
         "function": get_person,
         "params": ["requestor", "person_id"],
+    },
+    "group/.GET": {"function": get_groups, "params": ["requestor"]},
+    "group/$group_id.GET": {
+        "function": get_group,
+        "params": ["requestor", "group_id"],
     },
     "user/.GET": {"function": get_all_users, "params": ["requestor"]},
     "user/$user_id.GET": {"function": get_user, "params": ["requestor", "user_id"]},

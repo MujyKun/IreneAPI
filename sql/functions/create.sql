@@ -609,23 +609,6 @@ begin
     SELECT accessid INTO t_access_id FROM public.apitokens WHERE userid = t_userid;
     return t_access_id;
 end;
-$$;create or replace function groupmembers.getaffiliation(t_affiliation_id integer)
-    returns table
-            (
-                t_personid integer,
-                t_groupid integer,
-                t_positionids integer[],
-                t_stagename text
-            )
-    language plpgsql
-as
-$$
-
-begin
-    RETURN QUERY SELECT personid, groupid, positionids, stagename
-                 FROM groupmembers.affiliation
-                 WHERE affiliationid = t_affiliation_id;
-end;
 $$;create or replace function public.getbanstatus(t_userid bigint)
     returns boolean
     language plpgsql
@@ -638,21 +621,7 @@ begin
     return t_user_is_banned;
 end;
 $$;
-create or replace function groupmembers.getbloodtype(t_blood_id integer)
-    returns table
-            (
-                t_name text
-            )
-    language plpgsql
-as
-$$
-
-begin
-    RETURN QUERY SELECT name
-                 FROM groupmembers.bloodtypes
-                 WHERE t_blood_id = bloodid;
-end;
-$$;create or replace function public.getbotban(t_userid bigint)
+create or replace function public.getbotban(t_userid bigint)
     returns integer
     language plpgsql
 as
@@ -675,22 +644,6 @@ begin
     SELECT count into t_count FROM public.commandusage WHERE sessionid = t_sessionid AND commandname = t_commandname;
     return t_count;
 end;
-$$;create or replace function groupmembers.getcompany(t_company_id integer)
-    returns table
-            (
-                t_name text,
-                t_description text,
-                t_dateid integer
-            )
-    language plpgsql
-as
-$$
-
-begin
-    RETURN QUERY SELECT name, description, dateid
-                 FROM groupmembers.company
-                 WHERE companyid = t_company_id;
-end;
 $$;create or replace function public.getdatamodstatus(t_userid bigint)
     returns boolean
     language plpgsql
@@ -703,155 +656,7 @@ begin
     return t_user_is_datamod;
 end;
 $$;
-create or replace function groupmembers.getdate(t_dateid integer)
-    returns table
-            (
-                t_startdate timestamp,
-                t_enddate timestamp
-            )
-    language plpgsql
-as
-$$
-
-begin
-    RETURN QUERY SELECT startdate, enddate
-                 FROM groupmembers.dates
-                 WHERE dateid = t_dateid;
-end;
-$$;
-create or replace function groupmembers.getdisplay(t_displayid integer)
-    returns table
-            (
-                t_avatar text,
-                t_banner text
-            )
-    language plpgsql
-as
-$$
-
-begin
-    RETURN QUERY SELECT avatar, banner
-                 FROM groupmembers.display
-                 WHERE displayid = t_displayid;
-end;
-$$;create or replace function groupmembers.getfandom(t_groupid integer)
-    returns table
-            (
-                t_name text
-            )
-    language plpgsql
-as
-$$
-
-begin
-    RETURN QUERY SELECT name
-                 FROM groupmembers.fandom
-                 WHERE t_groupid = groupid;
-end;
-$$;create or replace function groupmembers.getgroup(t_group_id integer)
-    returns table
-            (
-                t_name        text,
-                t_startdate timestamp, t_enddate timestamp,
-                t_avatar text, t_banner text,
-                t_twitter text, t_youtube text, t_melon text, t_instagram text, t_vlive text,
-                t_spotify text, t_fancafe text, t_facebook text, t_tiktok text,
-                t_website text,
-                t_description text,
-                t_companyid   integer,
-                t_tags text[]
-            )
-    language plpgsql
-as
-$$
-
-begin
-    RETURN QUERY SELECT g.name,
-                        d.startdate, d.enddate,
-                        di.avatar, di.banner,
-                        s.twitter, s.youtube, s.melon, s.instagram, s.vlive, s.spotify,
-                                        s.fancafe, s.facebook, s.tiktok,
-                        g.website,
-                        description,
-                        companyid,
-               (SELECT array_agg(ta.name) AS tags
-                    FROM groupmembers.grouptags gt
-                    LEFT JOIN groupmembers.tag ta ON gt.tagid = ta.tagid
-                    WHERE gt.groupid = g.groupid
-                    GROUP BY gt.groupid)
-                 FROM groupmembers.groups g
-                    LEFT JOIN groupmembers.dates d ON g.dateid = d.dateid
-                     LEFT JOIN groupmembers.display di ON g.displayid = di.displayid
-                     LEFT JOIN groupmembers.socialmedia s ON g.socialid = s.socialid
-                 WHERE groupid = t_group_id;
-end;
-$$;create or replace function groupmembers.getgroupalias(t_aliasid integer)
-    returns table
-            (
-                t_alias text,
-                t_groupid integer,
-                t_guildid bigint
-            )
-    language plpgsql
-as
-$$
-
-begin
-    RETURN QUERY SELECT alias, groupid, guildid
-                 FROM groupmembers.groupaliases
-                 WHERE aliasid = t_aliasid;
-end;
-$$;create or replace function groupmembers.getgroupaliases(t_groupid integer)
-    returns table
-            (
-                t_aliasid integer,
-                t_alias text,
-                t_guildid bigint
-            )
-    language plpgsql
-as
-$$
-
-begin
-    RETURN QUERY SELECT aliasid, alias, guildid
-                 FROM groupmembers.groupaliases
-                 WHERE groupid = t_groupid;
-end;
-$$;create or replace function groupmembers.getlocation(t_locationid integer)
-    returns table
-            (
-                t_country text,
-                t_city integer
-            )
-    language plpgsql
-as
-$$
-
-begin
-    RETURN QUERY SELECT country, city
-                 FROM groupmembers.location
-                 WHERE locationid = t_locationid;
-end;
-$$;
-create or replace function groupmembers.getmedia(t_mediaid integer)
-    returns table
-            (
-                t_link text,
-                t_faces integer,
-                t_filetype text,
-                t_affiliationid integer,
-                t_enabled boolean
-            )
-    language plpgsql
-as
-$$
-
-begin
-    RETURN QUERY SELECT link, faces, filetype, affiliationid, enabled
-                 FROM groupmembers.media
-                 WHERE mediaid = t_mediaid;
-end;
-$$;create or replace function public.getmodstatus(t_userid bigint)
+create or replace function public.getmodstatus(t_userid bigint)
     returns boolean
     language plpgsql
 as
@@ -863,22 +668,7 @@ begin
     return t_user_is_mod;
 end;
 $$;
-create or replace function groupmembers.getname(t_nameid integer)
-    returns table
-            (
-                t_firstname text,
-                t_lastname text
-            )
-    language plpgsql
-as
-$$
-
-begin
-    RETURN QUERY SELECT firstname, lastname
-                 FROM groupmembers.name
-                 WHERE t_nameid = nameid;
-end;
-$$;create or replace function public.getpatronstatus(t_userid bigint)
+create or replace function public.getpatronstatus(t_userid bigint)
     returns boolean
     language plpgsql
 as
@@ -890,100 +680,7 @@ begin
     return t_user_is_patron;
 end;
 $$;
-create or replace function groupmembers.getperson(t_person_id integer)
-    returns table (z_person_id integer,
-      t_startdate timestamp, t_enddate timestamp,
-      t_firstname text, t_lastname text,
-      t_formerfirstname text, t_formerlastname text,
-      t_avatar text, t_banner text,
-      t_twitter text, t_youtube text, t_melon text, t_instagram text, t_vlive text,
-        t_spotify text, t_fancafe text, t_facebook text, t_tiktok text,
-      t_city text, t_country text,
-      t_bloodtype char(2),
-      t_gender char,
-      t_description text,
-      t_height integer,
-      t_callcount integer,
-      t_tags text[])
-    language plpgsql
-as
-$$
-
-begin
-    RETURN QUERY SELECT  p.personid, d.startdate, d.enddate,
-        n.firstname, n.lastname,
-        na.firstname as formerfirstname, na.lastname as formerlastname,
-        di.avatar, di.banner,
-        s.twitter, s.youtube, s.melon, s.instagram, s.vlive, s.spotify,
-                        s.fancafe, s.facebook, s.tiktok,
-        l.city, l.country,
-        bl.name as bloodtype,
-        gender,
-        description,
-        height,
-        callcount,
-       (SELECT array_agg(ta.name) AS tags
-            FROM groupmembers.persontags pt
-            LEFT JOIN groupmembers.tag ta ON pt.tagid = ta.tagid
-            WHERE pt.personid = p.personid
-            GROUP BY pt.personid)
-       FROM groupmembers.person p
-             LEFT JOIN groupmembers.dates d ON p.dateid = d.dateid
-             LEFT JOIN groupmembers.name n ON p.nameid = n.nameid
-             LEFT JOIN groupmembers.name na ON p.formernameid = na.nameid
-             LEFT JOIN groupmembers.display di ON p.displayid = di.displayid
-             LEFT JOIN groupmembers.socialmedia s ON p.socialid = s.socialid
-             LEFT JOIN groupmembers.location l ON p.locationid = l.locationid
-             LEFT JOIN groupmembers.bloodtypes bl ON p.bloodid = bl.bloodid
-                WHERE personid = t_person_id;
-end;
-$$;create or replace function groupmembers.getpersonalias(t_aliasid integer)
-    returns table
-            (
-                t_alias text,
-                t_personid integer,
-                t_guildid bigint
-            )
-    language plpgsql
-as
-$$
-
-begin
-    RETURN QUERY SELECT alias, personid, guildid
-                 FROM groupmembers.personaliases
-                 WHERE aliasid = t_aliasid;
-end;
-$$;create or replace function groupmembers.getpersonaliases(t_personid integer)
-    returns table
-            (
-                t_aliasid integer,
-                t_alias text,
-                t_guildid bigint
-            )
-    language plpgsql
-as
-$$
-
-begin
-    RETURN QUERY SELECT aliasid, alias, guildid
-                 FROM groupmembers.personaliases
-                 WHERE personid = t_personid;
-end;
-$$;create or replace function groupmembers.getposition(t_positionid integer)
-    returns table
-            (
-                t_name text
-            )
-    language plpgsql
-as
-$$
-
-begin
-    RETURN QUERY SELECT name
-                 FROM groupmembers.position
-                 WHERE positionid = t_positionid;
-end;
-$$;create or replace function groupmembers.getpositionid(t_positionname text)
+create or replace function groupmembers.getpositionid(t_positionname text)
     returns table
             (
                 t_positionid integer
@@ -1009,29 +706,6 @@ begin
     return t_user_is_proofreader;
 end;
 $$;
-create or replace function groupmembers.getsocials(t_socialid integer)
-    returns table
-            (
-                t_twitter text,
-                t_youtube text,
-                t_melon text,
-                t_instagram text,
-                t_vlive text,
-                t_spotify text,
-                t_fancafe text,
-                t_facebook text,
-                t_tiktok text
-            )
-    language plpgsql
-as
-$$
-
-begin
-    RETURN QUERY SELECT twitter, youtube, melon, instagram, vlive, spotify, fancafe, facebook, tiktok
-                 FROM groupmembers.socialmedia
-                 WHERE socialid = t_socialid;
-end;
-$$;
 create or replace function public.getsuperpatronstatus(t_userid bigint)
     returns boolean
     language plpgsql
@@ -1044,21 +718,7 @@ begin
     return t_user_is_super_patron;
 end;
 $$;
-create or replace function groupmembers.gettag(t_tagid integer)
-    returns table
-            (
-                t_name text
-            )
-    language plpgsql
-as
-$$
-
-begin
-    RETURN QUERY SELECT name
-                 FROM groupmembers.tag
-                 WHERE tagid = t_tagid;
-end;
-$$;create or replace function groupmembers.gettagid(t_tagname text)
+create or replace function groupmembers.gettagid(t_tagname text)
     returns table
             (
                 t_tagid integer
@@ -1144,92 +804,6 @@ declare
 begin
     SELECT count into t_count FROM public.apiusage WHERE userid = t_userid AND endpoint = t_endpoint;
     return t_count;
-end;
-$$;create or replace function public.getuser(t_userid bigint)
-    returns table
-            (
-                userid bigint,
-                balance text,
-                ggfilteractive boolean,
-                xp integer,
-                ispatron boolean,
-                ismod boolean,
-                isproofreader boolean,
-                istranslator boolean,
-                isdatamod boolean,
-                issuperpatron boolean,
-                isbanned boolean,
-                language char(5),
-                access integer,
-                lastfmusername text,
-                timezone text,
-                roblevel integer,
-                dailylevel integer,
-                beglevel integer,
-                profilelevel integer
-            )
-    language plpgsql
-as
-$$
-begin
-    RETURN QUERY SELECT u.userid,
-                        u.balance,
-                        u.ggfilteractive,
-                        u.xp,
-                        (SELECT exists(
-                            SELECT 1
-                            FROM public.patron
-                            WHERE patron.userid = t_userid))
-                            AS is_patron,
-                        (SELECT exists(
-                            SELECT 1
-                            FROM public.mods
-                            WHERE mods.userid = t_userid))
-                            AS is_mod,
-                        (SELECT exists(
-                            SELECT 1
-                            FROM public.proofreader
-                            WHERE proofreader.userid = t_userid))
-                            AS is_proofreader,
-                        (SELECT exists(
-                            SELECT 1
-                            FROM public.translator
-                            WHERE translator.userid = t_userid))
-                            AS is_translator,
-                        (SELECT exists(
-                            SELECT 1
-                            FROM public.datamods
-                            WHERE datamods.userid = t_userid))
-                            AS is_data_mod,
-                        (SELECT exists(
-                            SELECT 1
-                            FROM public.superpatron
-                            WHERE superpatron.userid = t_userid))
-                            AS is_super_patron,
-                        (SELECT exists(
-                            SELECT 1
-                            FROM public.botbanned
-                            WHERE botbanned.userid = t_userid))
-                            AS is_banned,
-                        (SELECT shortname
-                            FROM public.languages
-                            WHERE u.languageid = public.languages.languageid)
-                            AS language,
-                        (SELECT accessid
-                            FROM public.apitokens
-                            WHERE u.userid = public.apitokens.userid)
-                            AS accessid,
-                        (SELECT username
-                            FROM public.lastfm
-                            WHERE u.userid = public.lastfm.userid)
-                            AS lastfmuser,
-                        (SELECT shortname
-                            FROM public.timezones
-                            WHERE u.timezoneid = public.timezones.id)
-                            AS tzname,
-                        l.rob, l.daily, l.beg, l.profile
-
-    FROM users u LEFT JOIN public.levels l ON l.userid = u.userid WHERE u.userid = t_userid;
 end;
 $$;create or replace function public.logfunc(t_userid bigint, t_func text, t_response text, t_args text, t_kwargs text)
     returns void
