@@ -70,7 +70,7 @@ WHERE m.id = i.memberid""")
 
 @app.route('/groupgender/<group_id>', methods=['GET'])
 def get_group_gender(group_id):
-    c.execute("SELECT gender from groupmembers.group WHERE groupid=%s", (group_id,))
+    c.execute("SELECT gender from groupmembers.groups WHERE groupid=%s", (group_id,))
     for gender in c.fetchall():
         return gender
     
