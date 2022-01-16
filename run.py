@@ -68,6 +68,13 @@ WHERE m.id = i.memberid""")
     return all_members
 
 
+@app.route('/groupgender/<group_id>', methods=['GET'])
+def get_group_gender(group_id):
+    c.execute("SELECT gender from groupmembers.group WHERE groupid=%s", (group_id,))
+    for gender in c.fetchall():
+        return gender
+    
+
 @app.route('/members/<idol_id>/', methods=['GET'])
 def get_member(idol_id):
     """Get full name and stage name of an idol by it's id."""
