@@ -27,14 +27,6 @@ class Tag(Resource):
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.get_tag(requestor, tag_id)
 
-    async def post(self, tag_id: int):
-        """Add a tag.
-
-        Use this route to add a tag.
-        """
-        requestor = await login(headers=request.headers, data=request.args)
-        return await helper.add_tag(requestor, tag_id)
-
     async def delete(self, tag_id: int):
         """Delete a tag.
 
@@ -55,3 +47,11 @@ class Tags(Resource):
         """
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.get_tags(requestor)
+
+    async def post(self):
+        """Add a tag.
+
+        Use this route to add a tag.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.add_tag(requestor, request.args.get("name"))

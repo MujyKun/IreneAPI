@@ -210,6 +210,8 @@ from .groupmembers import (
     delete_name,
     add_date,
     delete_date,
+    add_tag,
+    delete_tag,
 )
 
 from .guild import get_guild, get_guilds, add_guild, delete_guild
