@@ -55,3 +55,30 @@ class Groups(Resource):
         """
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.get_groups(requestor)
+
+
+@group.route("<int:group_id>/media")
+@group.doc(
+    params={
+        "group_id": "Group ID to get media information for.",
+    }
+)
+class GroupMedia(Resource):
+    async def get(self, group_id: int):
+        """Get a list of media information that belong to a Group.
+
+        Use this route to get a list of media information that belong to a Group.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.get_group_media_info(requestor, group_id)
+
+    async def post(self, group_id: int):
+        """Generate random group media that can be filtered.
+
+        Use this route to generate random group media that can be filtered.
+
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        kwargs = helper.get_media_kwargs(requestor, request.args)
+        kwargs["group_id"] = group_id
+        return await helper.generate_media_group(**kwargs)

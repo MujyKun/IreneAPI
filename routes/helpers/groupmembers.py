@@ -1,3 +1,5 @@
+from typing import List
+
 from . import (
     self,
     check_permission,
@@ -10,6 +12,8 @@ from . import (
     USER,
 )
 from models import Requestor
+from resources import drive
+from resources.keys import person_folder, image_host
 
 
 @check_permission(permission_level=SUPER_PATRON)
@@ -18,6 +22,144 @@ async def get_person(requestor: Requestor, person_id: int) -> dict:
     is_int64(person_id)
     return await self.db.fetch_row(
         "SELECT * FROM groupmembers.getpersons WHERE personid = $1", person_id
+    )
+
+
+async def _get_media_info(object_id: int, object_id_type="person") -> dict:
+    """
+    Get the media information for a person, group, or affiliation.
+
+    WARNING: An internal function that should not be accessed directly by a user since object_id_type is implemented
+    with string manipulation and can be subject to SQL Injection.
+
+    NOTE: object_id_type can also support the input of "media", but is suited for "person", "affiliation", or "group".
+    """
+    is_int64(object_id)
+    return await self.db.fetch(
+        f"SELECT * FROM groupmembers.getmedia WHERE {object_id_type}id = $1", object_id
+    )
+
+
+@check_permission(permission_level=SUPER_PATRON)
+async def get_person_media_info(requestor: Requestor, person_id: int) -> dict:
+    """Get a person's media information."""
+    return await _get_media_info(person_id, "person")
+
+
+@check_permission(permission_level=SUPER_PATRON)
+async def get_group_media_info(requestor: Requestor, group_id: int) -> dict:
+    """Get a group's media information."""
+    return await _get_media_info(group_id, "group")
+
+
+@check_permission(permission_level=SUPER_PATRON)
+async def get_affiliation_media_info(requestor: Requestor, affiliation_id: int) -> dict:
+    """Get an affiliation's media information."""
+    return await _get_media_info(affiliation_id, "affiliation")
+
+
+async def _generate_media(
+    object_id: int,
+    min_faces: int = 1,
+    max_faces: int = 999,
+    file_type=None,
+    nsfw=True,
+    enabled=True,
+    object_id_type="person",
+):
+    """
+    Generate and download the media for a person, group, or affiliation based on set filters.
+
+    WARNING: An internal function that should not be accessed directly by a user since object_id_type is implemented
+    with string manipulation and can be subject to SQL Injection.
+
+    NOTE: object_id_type can also support the input of "media", but is suited for "person", "affiliation", or "group".
+    """
+    is_int64(object_id)
+    is_int64(min_faces)
+    is_int64(max_faces)
+
+    args = {object_id, min_faces, max_faces, nsfw, enabled}
+    query = (
+        f"SELECT * FROM groupmembers.getmedia WHERE {object_id_type}id = $1 AND faces > $2 AND faces < $3 "
+        "AND nsfw = $4 AND enabled = $5"
+    )
+    if file_type:
+        args.add(file_type)
+        query += " AND filetype = $6"
+    query += "ORDER BY RAND() LIMIT 1"
+    media_info = await self.db.fetch_row(query, *args)
+    if not media_info["results"]:
+        return media_info
+
+    g_drive_id = drive.get_id_from_url(media_info["results"]["link"])
+    await drive.download_file(g_drive_id, person_folder)
+    media_info["results"]["host"] = f"{image_host}{media_info['results']['mediaid']}"
+
+
+@check_permission(permission_level=SUPER_PATRON)
+async def generate_media_person(
+    requestor: Requestor,
+    person_id: int,
+    min_faces: int = 1,
+    max_faces: int = 999,
+    file_type=None,
+    nsfw=True,
+    enabled=True,
+) -> dict:
+    """Generate media for a person."""
+    return await _generate_media(
+        person_id,
+        min_faces,
+        max_faces,
+        file_type,
+        nsfw,
+        enabled,
+        object_id_type="person",
+    )
+
+
+@check_permission(permission_level=SUPER_PATRON)
+async def generate_media_group(
+    requestor: Requestor,
+    person_id: int,
+    min_faces: int = 1,
+    max_faces: int = 999,
+    file_type=None,
+    nsfw=True,
+    enabled=True,
+) -> dict:
+    """Generate media for a group."""
+    return await _generate_media(
+        person_id,
+        min_faces,
+        max_faces,
+        file_type,
+        nsfw,
+        enabled,
+        object_id_type="group",
+    )
+
+
+@check_permission(permission_level=SUPER_PATRON)
+async def generate_media_affiliation(
+    requestor: Requestor,
+    person_id: int,
+    min_faces: int = 1,
+    max_faces: int = 999,
+    file_type=None,
+    nsfw=True,
+    enabled=True,
+) -> dict:
+    """Generate media for an affiliation."""
+    return await _generate_media(
+        person_id,
+        min_faces,
+        max_faces,
+        file_type,
+        nsfw,
+        enabled,
+        object_id_type="affiliation",
     )
 
 
@@ -215,7 +357,7 @@ async def delete_location(requestor: Requestor, location_id: int):
     return await self.db.execute("SELECT groupmembers.deletelocation($1})", location_id)
 
 
-@check_permission(permission_level=USER)
+@check_permission(permission_level=DEVELOPER)
 async def get_media(requestor: Requestor, media_id: int) -> dict:
     """Get media information."""
     is_int64(media_id)
@@ -224,7 +366,7 @@ async def get_media(requestor: Requestor, media_id: int) -> dict:
     )
 
 
-@check_permission(permission_level=USER)
+@check_permission(permission_level=DEVELOPER)
 async def get_all_media(requestor: Requestor) -> dict:
     """Get all media information."""
     return await self.db.fetch("SELECT * FROM groupmembers.getmedia")
@@ -502,3 +644,24 @@ async def delete_blood_type(requestor: Requestor, blood_id: int) -> dict:
 async def get_blood_types(requestor: Requestor) -> dict:
     """Get all blood type information."""
     return await self.db.fetch("SELECT * FROM groupmembers.getbloodtypes")
+
+
+def get_media_kwargs(requestor, user_args):
+    """Get media kwargs based on user args."""
+    kwargs = {"requestor": requestor}
+    min_faces = user_args.get("min_faces")
+    max_faces = user_args.get("max_faces")
+    file_type = user_args.get("file_type")
+    nsfw = user_args.get("nsfw")
+    enabled = user_args.get("enabled")
+    if min_faces is not None:
+        kwargs["min_faces"] = min_faces
+    if max_faces is not None:
+        kwargs["max_faces"] = max_faces
+    if file_type is not None:
+        kwargs["file_type"] = file_type
+    if nsfw is not None:
+        kwargs["nsfw"] = nsfw
+    if enabled is not None:
+        kwargs["enabled"] = enabled
+    return kwargs

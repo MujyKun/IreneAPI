@@ -61,3 +61,30 @@ class Affiliations(Resource):
         return await helper.add_affiliation(
             requestor, person_id, group_id, position_ids, stage_name
         )
+
+
+@affiliation.route("<int:affiliation_id>/media")
+@affiliation.doc(
+    params={
+        "affiliation_id": "Affiliation ID to get media information for.",
+    }
+)
+class AffiliationMedia(Resource):
+    async def get(self, affiliation_id: int):
+        """Get a list of media information that belong to an Affiliation.
+
+        Use this route to get a list of media information that belong to an Affiliation.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.get_affiliation_media_info(requestor, affiliation_id)
+
+    async def post(self, affiliation_id: int):
+        """Generate random affiliation media that can be filtered.
+
+        Use this route to generate random affiliation media that can be filtered.
+
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        kwargs = helper.get_media_kwargs(requestor, request.args)
+        kwargs["affiliation_id"] = affiliation_id
+        return await helper.generate_media_group(**kwargs)

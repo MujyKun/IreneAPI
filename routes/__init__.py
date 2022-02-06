@@ -56,3 +56,25 @@ async def login(
     # if handle_websocket:
     # await websocket.close(code=error_code, reason=error_reason)
     raise InvalidLogin
+
+
+from .affiliation import affiliation
+from .bloodtype import bloodtype
+from .company import company
+from .date import date
+from .display import display
+from .fandom import fandom
+from .group import group
+from .groupalias import groupalias
+from .guild import guild
+from .location import location
+from .media import media
+from .name import name
+from .person import person
+from .personalias import personalias
+from .position import position
+from .social import social
+from .tag import tag
+from .twitter import twitter
+from .channel import channel
+from .user import user

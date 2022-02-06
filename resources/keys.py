@@ -37,7 +37,7 @@ api_port = os.getenv("API_PORT")
 # Private Keys are separated by commas
 private_keys: list = (os.getenv("PRIVATE_KEYS")).split(",")
 
-idol_folder = os.getenv("FOLDER_LOCATION")
+person_folder = os.getenv("FOLDER_LOCATION")
 
 # MAIN SITE
 main_site_port = os.getenv("SITE_PORT")

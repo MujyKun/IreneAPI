@@ -37,7 +37,23 @@ begin
     INSERT INTO groupmembers.automedia(channelid, personids)
     VALUES(t_channel_id, t_personids);
 end;
-$$;create or replace function public.addchannel(t_channelid bigint)
+$$;create or replace function groupmembers.addbloodtype(t_name text)
+    returns integer
+    language plpgsql
+as
+$$
+declare
+    t_blood_id integer;
+begin
+
+    INSERT INTO groupmembers.bloodtypes(name)
+    VALUES(t_name) returning bloodid INTO t_blood_id;
+    return t_blood_id;
+end;
+$$;
+
+
+create or replace function public.addchannel(t_channelid bigint)
     returns void
     language plpgsql
 as
@@ -176,7 +192,80 @@ begin
     return t_alias_id;
 end;
 $$;
-create or replace function public.addguildprefix(t_guildid bigint, t_prefix text)
+create or replace function public.addguild(
+            t_guildid bigint,
+            t_name text,
+            t_emojicount integer,
+            t_region text,
+            t_afktimeout integer,
+            t_icon text,
+            t_ownerid bigint,
+            t_banner text,
+            t_description text,
+            t_mfalevel integer,
+            t_splash text,
+            t_nitrolevel integer,
+            t_boosts integer,
+            t_textchannelcount integer,
+            t_voicechannelcount integer,
+            t_categorycount integer,
+            t_emojilimit integer,
+            t_membercount integer,
+            t_rolecount integer,
+            t_shardid integer,
+            t_createdate timestamptz,
+            t_hasbot bool)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    INSERT INTO public.guilds(guildid,
+                              name,
+                              emojicount,
+                              region,
+                              afktimeout,
+                              icon,
+                              ownerid,
+                              banner,
+                              description,
+                              mfalevel,
+                              splash,
+                              nitrolevel,
+                              boosts,
+                              textchannelcount,
+                              voicechannelcount,
+                              categorycount,
+                              emojilimit,
+                              membercount,
+                              rolecount,
+                              shardid,
+                              createdate,
+                              hasbot)
+    VALUES(t_guildid,
+            t_name,
+            t_emojicount,
+            t_region,
+            t_afktimeout,
+            t_icon,
+            t_ownerid,
+            t_banner,
+            t_description,
+            t_mfalevel,
+            t_splash,
+            t_nitrolevel,
+            t_boosts,
+            t_textchannelcount,
+            t_voicechannelcount,
+            t_categorycount,
+            t_emojilimit,
+            t_membercount,
+            t_rolecount,
+            t_shardid,
+            t_createdate,
+            t_hasbot);
+end;
+$$;create or replace function public.addguildprefix(t_guildid bigint, t_prefix text)
     returns void
     language plpgsql
 as
@@ -485,7 +574,34 @@ begin
         WHERE userid = t_userid;
     END IF;
 end;
-$$;create or replace function public.deletecustomcommand(t_guildid bigint, t_name text)
+$$;create or replace function groupmembers.deleteaffiliation(t_affiliation_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM groupmembers.affiliation WHERE affiliationid = t_affiliation_id;
+end;
+$$;
+create or replace function groupmembers.deletebloodtype(t_blood_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM groupmembers.bloodtypes WHERE bloodid = t_blood_id;
+end;
+$$;
+create or replace function groupmembers.deletecompany(t_company_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM groupmembers.company WHERE companyid = t_company_id;
+end;
+$$;
+create or replace function public.deletecustomcommand(t_guildid bigint, t_name text)
     returns void
     language plpgsql
 as
@@ -510,6 +626,68 @@ begin
     DELETE FROM public.datamods WHERE userid = t_userid;
 end;
 $$;
+create or replace function groupmembers.deletedate(t_date_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM groupmembers.dates WHERE dateid = t_date_id;
+end;
+$$;
+create or replace function groupmembers.deletedisplay(t_display_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM groupmembers.display WHERE displayid = t_display_id;
+end;
+$$;
+create or replace function groupmembers.deletefandom(t_group_id integer, t_name text)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM groupmembers.fandom WHERE groupid = t_group_id AND name = t_name ;
+end;
+$$;create or replace function public.deletegroupalias(t_aliasid integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM groupmembers.groupaliases WHERE aliasid = t_aliasid;
+end;
+$$;
+create or replace function public.deleteguild(t_guildid bigint)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM public.guilds WHERE guildid = t_guildid;
+end;
+$$;
+create or replace function groupmembers.deletelocation(t_location_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM groupmembers.company WHERE companyid = t_company_id;
+end;
+$$;
+create or replace function groupmembers.deletemedia(t_media_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM groupmembers.media WHERE mediaid = t_media_id;
+end;
+$$;
 create or replace function public.deletemod(t_userid bigint)
     returns void
     language plpgsql
@@ -517,6 +695,15 @@ as
 $$
 begin
     DELETE FROM public.mods WHERE userid = t_userid;
+end;
+$$;
+create or replace function groupmembers.deletename(t_name_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM groupmembers.name WHERE nameid = t_name_id;
 end;
 $$;
 create or replace function public.deletepatron(t_userid bigint)
@@ -528,6 +715,28 @@ begin
     DELETE FROM public.patron WHERE userid = t_userid;
 end;
 $$;
+create or replace function public.deletepersonalias(t_aliasid integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM groupmembers.personaliases WHERE aliasid = t_aliasid;
+end;
+$$;
+create or replace function groupmembers.deleteposition(t_position_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM groupmembers.position WHERE positionid = t_position_id;
+end;
+$$;
+@check_permission(permission_level=DEVELOPER)
+async def add_fandom(requestor: Requestor, group_id, fandom_name) -> dict:
+    """Add a fandom"""
+    return await self.db.execute("SELECT * FROM groupmembers.addfandom($1, $2)", group_id, fandom_name)
 create or replace function public.deleteproofreader(t_userid bigint)
     returns void
     language plpgsql
@@ -536,7 +745,16 @@ $$
 begin
     DELETE FROM public.proofreader WHERE userid = t_userid;
 end;
-$$;create or replace function public.deletesuperpatron(t_userid bigint)
+$$;create or replace function groupmembers.deletesocial(t_social_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM groupmembers.socialmedia WHERE socialid = t_social_id;
+end;
+$$;
+create or replace function public.deletesuperpatron(t_userid bigint)
     returns void
     language plpgsql
 as
@@ -544,7 +762,16 @@ $$
 begin
     DELETE FROM public.superpatron WHERE userid = t_userid;
 end;
-$$;create or replace function public.deletetoken(t_userid bigint)
+$$;create or replace function groupmembers.deletetag(t_tag_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM groupmembers.tag WHERE tagid = t_tag_id;
+end;
+$$;
+create or replace function public.deletetoken(t_userid bigint)
     returns void
     language plpgsql
 as

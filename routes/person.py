@@ -55,3 +55,30 @@ class Persons(Resource):
         """
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.get_persons(requestor)
+
+
+@person.route("<int:person_id>/media")
+@person.doc(
+    params={
+        "person_id": "Person ID to get media information for.",
+    }
+)
+class PersonMedia(Resource):
+    async def get(self, person_id: int):
+        """Get a list of media information that belong to a Person.
+
+        Use this route to get a list of media information that belong to a Person.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.get_person_media_info(requestor, person_id)
+
+    async def post(self, person_id: int):
+        """Generate random person media that can be filtered.
+
+        Use this route to generate random person media that can be filtered.
+
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        kwargs = helper.get_media_kwargs(requestor, request.args)
+        kwargs["person_id"] = person_id
+        return await helper.generate_media_person(**kwargs)

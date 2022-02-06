@@ -6,10 +6,29 @@ from models import PgConnection
 # noinspection PyUnresolvedReferences, PyPackageRequirements
 from resources.keys import postgres_options, api_port
 from resources import drive
-from routes.groupmembers import groupmembers
-from routes.user import user
-from routes.twitter import twitter
-from routes.channel import channel
+
+from routes import (
+    affiliation,
+    bloodtype,
+    company,
+    date,
+    display,
+    fandom,
+    group,
+    groupalias,
+    guild,
+    location,
+    media,
+    name,
+    person,
+    personalias,
+    position,
+    social,
+    tag,
+    twitter,
+    channel,
+    user,
+)
 from ws import websocket_blueprint
 from routes.helpers.errors import BaseError
 from quart_openapi import Pint, Resource
@@ -19,13 +38,34 @@ from resources.twitter import Twitter
 app = Pint(__name__, title="IreneAPI", contact_email="mujy@irenebot.com", version="2.0")
 swagger = Swagger(app)
 
+
+blueprints = [
+    affiliation,
+    bloodtype,
+    company,
+    date,
+    display,
+    fandom,
+    group,
+    groupalias,
+    guild,
+    location,
+    media,
+    name,
+    person,
+    personalias,
+    position,
+    social,
+    tag,
+    twitter,
+    channel,
+    user,
+]
+
 # print(app.config['SERVER_NAME'])
 # app.config['SERVER_NAME'] = "api.irenebot.com"
-app.register_blueprint(twitter)
-app.register_blueprint(groupmembers)
-app.register_blueprint(websocket_blueprint)
-app.register_blueprint(user)
-app.register_blueprint(channel)
+for blueprint in blueprints:
+    app.register_blueprint(blueprint)
 
 db = PgConnection(**postgres_options)
 

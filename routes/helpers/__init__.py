@@ -212,6 +212,12 @@ from .groupmembers import (
     delete_date,
     add_tag,
     delete_tag,
+    get_person_media_info,
+    get_group_media_info,
+    get_affiliation_media_info,
+    generate_media_group,
+    generate_media_person,
+    generate_media_affiliation,
 )
 
 from .guild import get_guild, get_guilds, add_guild, delete_guild
@@ -390,6 +396,15 @@ helper_routes = {
         "function": get_fandoms_by_group,
         "params": ["requestor", "group_id"],
     },
+    "affiliation/$affiliation_id/media.GET": {
+        "function": get_affiliation_media_info,
+        "params": ["requestor", "affiliation_id"],
+    },
+    "affiliation/$affiliation_id/media.POST": {
+        "function": generate_media_affiliation,
+        "params": ["requestor", "affiliation_id"],
+        "optional": ["min_faces", "max_faces", "file_type", "nsfw", "enabled"],
+    },
     "affiliation/.GET": {"function": get_affiliations, "params": ["requestor"]},
     "affiliation/.POST": {
         "function": add_affiliation,
@@ -437,10 +452,28 @@ helper_routes = {
     "tag/.POST": {"function": add_tag, "params": ["requestor", "name"]},
     "tag/$tag_id.GET": {"function": get_tag, "params": ["requestor", "tag_id"]},
     "tag/$tag_id.DELETE": {"function": delete_tag, "params": ["requestor", "tag_id"]},
+    "person/$person_id/media.GET": {
+        "function": get_person_media_info,
+        "params": ["requestor", "person_id"],
+    },
+    "person/$person_id/media.POST": {
+        "function": generate_media_person,
+        "params": ["requestor", "person_id"],
+        "optional": ["min_faces", "max_faces", "file_type", "nsfw", "enabled"],
+    },
     "person/.GET": {"function": get_persons, "params": ["requestor"]},
     "person/$person_id.GET": {
         "function": get_person,
         "params": ["requestor", "person_id"],
+    },
+    "group/$group_id/media.GET": {
+        "function": get_group_media_info,
+        "params": ["requestor", "group_id"],
+    },
+    "group/$group_id/media.POST": {
+        "function": generate_media_group,
+        "params": ["requestor", "group_id"],
+        "optional": ["min_faces", "max_faces", "file_type", "nsfw", "enabled"],
     },
     "group/.GET": {"function": get_groups, "params": ["requestor"]},
     "group/$group_id.GET": {
