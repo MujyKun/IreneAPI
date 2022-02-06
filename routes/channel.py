@@ -19,13 +19,13 @@ channel = PintBlueprint("channel", __name__, url_prefix="/channel/")
     }
 )
 class Channel(Resource):
-    async def post(self, channel_id: int):
-        """Add a channel.
+    async def get(self, channel_id: int):
+        """Get a channel.
 
-        Use this route to add a channel.
+        Use this route to get a channel.
         """
         requestor = await login(headers=request.headers, data=request.args)
-        return await helper.add_channel(requestor, channel_id)
+        return await helper.get_channel(requestor, channel_id)
 
     async def delete(self, channel_id: int):
         """Delete a channel.
@@ -35,3 +35,25 @@ class Channel(Resource):
         """
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.delete_channel(requestor, channel_id)
+
+
+@channel.route("")
+@channel.doc()
+class Channels(Resource):
+    async def get(self):
+        """Get all channels.
+
+        Use this route to get all channels.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.get_channels(requestor)
+
+    async def post(self):
+        """Add a channel.
+
+        Use this route to add a channel.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.add_channel(
+            requestor, channel_id=request.args.get("channel_id")
+        )

@@ -44,6 +44,7 @@ class Twitter(PeonyClient):
         :param username: (str) The user's username.
         """
         response = await self.api.users.by.username[username].get()
+
         if response.get("data"):
             return int(response["data"]["id"])
 

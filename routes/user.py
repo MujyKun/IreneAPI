@@ -119,7 +119,7 @@ class UserTokenStatus(Resource):
         requestor = Requestor(user_id=0, permission_level=USER)
         return await api_helper.check_token_exists(requestor, user_id)
 
-    async def post(self, user_id: int, unhashed_token: str, access_id: int):
+    async def post(self, user_id: int):
         """Add an api token.
 
         Use this route to add a token for a user.
@@ -127,7 +127,11 @@ class UserTokenStatus(Resource):
 
         """
         requestor = await login(headers=request.headers, data=request.args)
-        return await api_helper.add_token(requestor, unhashed_token, access_id)
+        return await api_helper.add_token(
+            requestor,
+            unhashed_token=request.args.get("unhashed_token"),
+            access_id=request.args.get("access_id"),
+        )
 
     async def delete(self, user_id: int):
         """Delete a user's token.

@@ -36,7 +36,6 @@ SUPER_PATRON = Access(2)
 FRIEND = Access(3)
 USER = Access(4)
 
-
 db: Optional[DbConnection] = None
 
 
@@ -150,7 +149,7 @@ from .twitter import (
     get_timeline,
 )
 
-from .channel import add_channel, delete_channel
+from .channel import add_channel, delete_channel, get_channel, get_channels
 
 from .groupmembers import (
     get_person,
@@ -180,18 +179,92 @@ from .groupmembers import (
     get_position,
     get_positions,
     get_fandoms,
-    get_fandom,
+    get_fandoms_by_group,
     get_affiliation,
     get_affiliations,
     get_blood_type,
     get_blood_types,
+    add_company,
+    add_display,
+    add_location,
+    delete_company,
+    delete_display,
+    delete_location,
+    add_media,
+    add_person_alias,
+    add_group_alias,
+    add_social,
+    delete_social,
+    delete_group_alias,
+    delete_person_alias,
+    delete_media,
+    add_position,
+    delete_position,
+    add_fandom,
+    delete_fandom,
+    delete_affiliation,
+    add_affiliation,
+    add_blood_type,
+    delete_blood_type,
+    add_name,
+    delete_name,
+    add_date,
+    delete_date,
 )
 
+from .guild import get_guild, get_guilds, add_guild, delete_guild
+
 # Helper Functions for routes.
+
 helper_routes = {
+    "guild/.GET": {"function": get_guilds, "params": ["requestor"]},
+    "guild/$guild_id.GET": {
+        "function": get_guild,
+        "params": ["requestor", "guild_id"],
+    },
+    "guild/.POST": {
+        "function": add_guild,
+        "params": [
+            "requestor",
+            "guild_id",
+            "name",
+            "emoji_count",
+            "region",
+            "afk_timeout",
+            "icon",
+            "owner_id",
+            "banner",
+            "description",
+            "mfa_level",
+            "splash",
+            "nitro_level",
+            "boosts",
+            "text_channel_count",
+            "voice_channel_count",
+            "category_count",
+            "emoji_limit",
+            "member_count",
+            "role_count",
+            "shard_id",
+            "create_date",
+            "has_bot",
+        ],
+    },
+    "guild/$guild_id.DELETE": {
+        "function": delete_guild,
+        "params": ["requestor", "guild_id"],
+    },
     "company/.GET": {"function": get_companies, "params": ["requestor"]},
     "company/$company_id.GET": {
         "function": get_company,
+        "params": ["requestor", "company_id"],
+    },
+    "company/.POST": {
+        "function": add_company,
+        "params": ["requestor", "name", "description", "date_id"],
+    },
+    "company/$company_id.DELETE": {
+        "function": delete_company,
         "params": ["requestor", "company_id"],
     },
     "display/.GET": {"function": get_displays, "params": ["requestor"]},
@@ -199,54 +272,169 @@ helper_routes = {
         "function": get_display,
         "params": ["requestor", "display_id"],
     },
+    "display/.POST": {
+        "function": add_display,
+        "params": ["requestor", "avatar", "banner"],
+    },
+    "display/$display_id.DELETE": {
+        "function": delete_display,
+        "params": ["requestor", "display_id"],
+    },
     "location/.GET": {"function": get_locations, "params": ["requestor"]},
     "location/$location_id.GET": {
         "function": get_location,
         "params": ["requestor", "location_id"],
     },
+    "location/POST": {
+        "function": add_location,
+        "params": ["requestor", "country", "city"],
+    },
+    "location/$location_id.DELETE": {
+        "function": delete_location,
+        "params": ["requestor", "location_id"],
+    },
     "media/.GET": {"function": get_all_media, "params": ["requestor"]},
-    "media/$name_id.GET": {"function": get_media, "params": ["requestor", "media_id"]},
+    "media/.POST": {
+        "function": add_media,
+        "params": [
+            "requestor",
+            "link",
+            "faces",
+            "file_type",
+            "affiliation_id",
+            "enabled",
+        ],
+    },
+    "media/$media_id.GET": {"function": get_media, "params": ["requestor", "media_id"]},
+    "media/$media_id.DELETE": {
+        "function": get_media,
+        "params": ["requestor", "media_id"],
+    },
     "personalias/.GET": {"function": get_person_aliases, "params": ["requestor"]},
     "personalias/$alias_id.GET": {
         "function": get_person_alias,
         "params": ["requestor", "alias_id"],
+    },
+    "personalias/$alias_id.DELETE": {
+        "function": delete_person_alias,
+        "params": ["requestor", "alias_id"],
+    },
+    "personalias/.POST": {
+        "function": add_person_alias,
+        "params": ["requestor", "alias", "person_id"],
+        "optional": ["guild_id"],
     },
     "groupalias/.GET": {"function": get_group_aliases, "params": ["requestor"]},
     "groupalias/$alias_id.GET": {
         "function": get_group_alias,
         "params": ["requestor", "alias_id"],
     },
+    "groupalias/$alias_id.DELETE": {
+        "function": delete_group_alias,
+        "params": ["requestor", "alias_id"],
+    },
+    "groupalias/.POST": {
+        "function": add_group_alias,
+        "params": ["requestor", "alias", "group_id"],
+        "optional": ["guild_id"],
+    },
     "social/.GET": {"function": get_socials, "params": ["requestor"]},
-    "social/$social_id.GET": {
+    "social/.POST": {
+        "function": add_social,
+        "params": [
+            "requestor",
+            "twitter",
+            "youtube",
+            "melon",
+            "instagram",
+            "vlive",
+            "spotify",
+            "fancafe",
+            "facebook",
+            "tiktok",
+        ],
+    },
+    "social/$position_id.GET": {
         "function": get_social,
-        "params": ["requestor", "social_id"],
+        "params": ["requestor", "position_id"],
+    },
+    "social/$position_id.DELETE": {
+        "function": delete_social,
+        "params": ["requestor", "position_id"],
     },
     "position/.GET": {"function": get_positions, "params": ["requestor"]},
+    "position/.POST": {
+        "function": add_position,
+        "params": ["requestor", "position_name"],
+    },
     "position/$position_id.GET": {
         "function": get_position,
         "params": ["requestor", "position_id"],
     },
+    "position/$position_id.DELETE": {
+        "function": delete_position,
+        "params": ["requestor", "position_id"],
+    },
     "fandom/.GET": {"function": get_fandoms, "params": ["requestor"]},
-    "fandom/$name_id.GET": {
-        "function": get_fandom,
-        "params": ["requestor", "guild_id"],
+    "fandom/$group_id.DELETE": {
+        "function": delete_fandom,
+        "params": ["requestor", "group_id", "fandom_name"],
+    },
+    "fandom/$group_id.POST": {
+        "function": add_fandom,
+        "params": ["requestor", "group_id", "fandom_name"],
+    },
+    "fandom/$group_id.GET": {
+        "function": get_fandoms_by_group,
+        "params": ["requestor", "group_id"],
     },
     "affiliation/.GET": {"function": get_affiliations, "params": ["requestor"]},
+    "affiliation/.POST": {
+        "function": add_affiliation,
+        "params": ["requestor", "person_id", "group_id", "position_ids", "stage_name"],
+    },
     "affiliation/$affiliation_id.GET": {
         "function": get_affiliation,
         "params": ["requestor", "affiliation_id"],
     },
+    "affiliation/$affiliation_id.DELETE": {
+        "function": delete_affiliation,
+        "params": ["requestor", "affiliation_id"],
+    },
     "bloodtype/.GET": {"function": get_blood_types, "params": ["requestor"]},
+    "bloodtype/.POST": {"function": add_blood_type, "params": ["requestor", "name"]},
     "bloodtype/$blood_id.GET": {
         "function": get_blood_type,
         "params": ["requestor", "blood_id"],
     },
+    "bloodtype/$blood_id.DELETE": {
+        "function": delete_blood_type,
+        "params": ["requestor", "blood_id"],
+    },
     "name/.GET": {"function": get_names, "params": ["requestor"]},
+    "name/.POST": {
+        "function": add_name,
+        "params": ["requestor", "first_name", "last_name"],
+    },
     "name/$name_id.GET": {"function": get_name, "params": ["requestor", "name_id"]},
+    "name/$name_id.DELETE": {
+        "function": delete_name,
+        "params": ["requestor", "name_id"],
+    },
     "date/.GET": {"function": get_dates, "params": ["requestor"]},
+    "date/.POST": {
+        "function": add_date,
+        "params": ["requestor", "start_date", "end_date"],
+    },
     "date/$date_id.GET": {"function": get_date, "params": ["requestor", "date_id"]},
+    "date/$date_id.DELETE": {
+        "function": delete_date,
+        "params": ["requestor", "date_id"],
+    },
     "tag/.GET": {"function": get_tags, "params": ["requestor"]},
+    "tag/.POST": {"function": add_tag, "params": ["requestor", "name"]},
     "tag/$tag_id.GET": {"function": get_tag, "params": ["requestor", "tag_id"]},
+    "tag/$tag_id.DELETE": {"function": delete_tag, "params": ["requestor", "tag_id"]},
     "person/.GET": {"function": get_persons, "params": ["requestor"]},
     "person/$person_id.GET": {
         "function": get_person,
@@ -397,7 +585,15 @@ helper_routes = {
         "function": get_timeline,
         "params": ["requestor", "twitter_id"],
     },
-    "channel/$channel_id.POST": {
+    "channel/.GET": {
+        "function": get_channels,
+        "params": ["requestor"],
+    },
+    "channel/$channel_id.GET": {
+        "function": get_channel,
+        "params": ["requestor", "channel_id"],
+    },
+    "channel/POST": {
         "function": add_channel,
         "params": ["requestor", "channel_id"],
     },
