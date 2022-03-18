@@ -61,4 +61,5 @@ class Medias(Resource):
             file_type=request.args.get("file_type"),
             affiliation_id=request.args.get("affiliation_id"),
             enabled=request.args.get("enabled"),
+            is_nsfw=request.args.get("is_nsfw"),
         )

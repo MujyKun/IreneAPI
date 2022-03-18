@@ -187,10 +187,14 @@ from .groupmembers import (
     add_company,
     add_display,
     add_location,
+    delete_person,
+    delete_group,
     delete_company,
     delete_display,
     delete_location,
     add_media,
+    add_group,
+    add_person,
     add_person_alias,
     add_group_alias,
     add_social,
@@ -293,7 +297,7 @@ helper_routes = {
         "function": get_location,
         "params": ["requestor", "location_id"],
     },
-    "location/POST": {
+    "location/.POST": {
         "function": add_location,
         "params": ["requestor", "country", "city"],
     },
@@ -311,6 +315,7 @@ helper_routes = {
             "file_type",
             "affiliation_id",
             "enabled",
+            "is_nsfw",
         ],
     },
     "media/$media_id.GET": {"function": get_media, "params": ["requestor", "media_id"]},
@@ -462,8 +467,30 @@ helper_routes = {
         "optional": ["min_faces", "max_faces", "file_type", "nsfw", "enabled"],
     },
     "person/.GET": {"function": get_persons, "params": ["requestor"]},
+    "person/.POST": {
+        "function": add_person,
+        "params": [
+            "requestor",
+            "date_id",
+            "name_id",
+            "former_name_id",
+            "gender",
+            "description",
+            "height",
+            "display_id",
+            "social_id",
+            "location_id",
+            "tag_ids",
+            "blood_id",
+            "call_count",
+        ],
+    },
     "person/$person_id.GET": {
         "function": get_person,
+        "params": ["requestor", "person_id"],
+    },
+    "person/$person_id.DELETE": {
+        "function": delete_person,
         "params": ["requestor", "person_id"],
     },
     "group/$group_id/media.GET": {
@@ -476,8 +503,26 @@ helper_routes = {
         "optional": ["min_faces", "max_faces", "file_type", "nsfw", "enabled"],
     },
     "group/.GET": {"function": get_groups, "params": ["requestor"]},
+    "group/.POST": {
+        "function": add_group,
+        "params": [
+            "requestor",
+            "group_name",
+            "date_id",
+            "description",
+            "company_id",
+            "display_id",
+            "website",
+            "social_id",
+            "tag_ids",
+        ],
+    },
     "group/$group_id.GET": {
         "function": get_group,
+        "params": ["requestor", "group_id"],
+    },
+    "group/$group_id.DELETE": {
+        "function": delete_group,
         "params": ["requestor", "group_id"],
     },
     "user/.GET": {"function": get_all_users, "params": ["requestor"]},
@@ -628,7 +673,7 @@ helper_routes = {
         "function": get_channel,
         "params": ["requestor", "channel_id"],
     },
-    "channel/POST": {
+    "channel/.POST": {
         "function": add_channel,
         "params": ["requestor", "channel_id"],
     },

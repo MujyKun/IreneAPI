@@ -48,4 +48,5 @@ SELECT * FROM y;
 -- Doing it this way will allow the API to remain consistent with 
 -- how it queries and returns data.
 
+-- The only exception to this are dynamic internal functions (that must also be prefixed with an underscore).  
 ```

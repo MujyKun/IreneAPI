@@ -27,14 +27,6 @@ class Group(Resource):
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.get_group(requestor, group_id)
 
-    async def post(self, group_id: int):
-        """Add a group.
-
-        Use this route to add a group.
-        """
-        requestor = await login(headers=request.headers, data=request.args)
-        return await helper.add_group(requestor, group_id)
-
     async def delete(self, group_id: int):
         """Delete a group.
 
@@ -55,6 +47,32 @@ class Groups(Resource):
         """
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.get_groups(requestor)
+
+    async def post(self):
+        """Add a group.
+
+        Use this route to add a group.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        group_name = request.args.get("group_name")
+        date_id = request.args.get("date_id")
+        description = request.args.get("description")
+        company_id = request.args.get("company_id")
+        display_id = request.args.get("display_id")
+        website = request.args.get("website")
+        social_id = request.args.get("social_id")
+        tag_ids = request.args.get("tag_ids")
+        return await helper.add_group(
+            requestor,
+            group_name,
+            date_id,
+            description,
+            company_id,
+            display_id,
+            website,
+            social_id,
+            tag_ids,
+        )
 
 
 @group.route("<int:group_id>/media")

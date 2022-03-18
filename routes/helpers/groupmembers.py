@@ -25,6 +25,15 @@ async def get_person(requestor: Requestor, person_id: int) -> dict:
     )
 
 
+@check_permission(permission_level=DEVELOPER)
+async def delete_person(requestor: Requestor, person_id: int) -> dict:
+    """Delete a group permanently."""
+    is_int64(person_id)
+    return await self.db.execute(
+        "SELECT * FROM groupmembers.deleteperson($1)", person_id
+    )
+
+
 async def _get_media_info(object_id: int, object_id_type="person") -> dict:
     """
     Get the media information for a person, group, or affiliation.
@@ -94,7 +103,9 @@ async def _generate_media(
 
     g_drive_id = drive.get_id_from_url(media_info["results"]["link"])
     await drive.download_file(g_drive_id, person_folder)
+    # https://images.irenebot.com/00000000
     media_info["results"]["host"] = f"{image_host}{media_info['results']['mediaid']}"
+    return media_info
 
 
 @check_permission(permission_level=SUPER_PATRON)
@@ -178,10 +189,77 @@ async def get_group(requestor: Requestor, group_id: int) -> dict:
     )
 
 
+@check_permission(permission_level=DEVELOPER)
+async def add_group(
+    requestor: Requestor,
+    group_name,
+    date_id,
+    description,
+    company_id,
+    display_id,
+    website,
+    social_id,
+    tag_ids,
+) -> dict:
+    """Add a group."""
+    return await self.db.fetch_row(
+        "SELECT * FROM groupmembers.addgroup($1, $2, $3, $4, $5, $6, $7, $8)",
+        group_name,
+        date_id,
+        description,
+        company_id,
+        display_id,
+        website,
+        social_id,
+        tag_ids,
+    )
+
+
+@check_permission(permission_level=DEVELOPER)
+async def add_person(
+    requestor: Requestor,
+    date_id,
+    name_id,
+    former_name_id,
+    gender,
+    description,
+    height,
+    display_id,
+    social_id,
+    location_id,
+    tag_ids,
+    blood_id,
+    call_count,
+) -> dict:
+    """Add a person."""
+    return await self.db.fetch_row(
+        "SELECT * FROM groupmembers.addperson($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+        date_id,
+        name_id,
+        former_name_id,
+        gender,
+        description,
+        height,
+        display_id,
+        social_id,
+        location_id,
+        tag_ids,
+        blood_id,
+        call_count,
+    )
+
+
 @check_permission(permission_level=SUPER_PATRON)
 async def get_groups(requestor: Requestor) -> dict:
     """Get all group information."""
     return await self.db.fetch("SELECT * FROM groupmembers.getgroups")
+
+
+@check_permission(permission_level=DEVELOPER)
+async def delete_group(requestor: Requestor, group_id: int) -> dict:
+    """Delete a group permanently."""
+    is_int64(group_id)
+    return await self.db.execute("SELECT * FROM groupmembers.deletegroup($1)", group_id)
 
 
 @check_permission(permission_level=USER)
@@ -374,16 +452,17 @@ async def get_all_media(requestor: Requestor) -> dict:
 
 @check_permission(permission_level=DEVELOPER)
 async def add_media(
-    requestor: Requestor, link, faces, file_type, affiliation_id, enabled
+    requestor: Requestor, link, faces, file_type, affiliation_id, enabled, is_nsfw
 ):
     """Add media."""
     return await self.db.execute(
-        "SELECT groupmembers.addmedia($1, $2, $3, $4, $5)",
+        "SELECT groupmembers.addmedia($1, $2, $3, $4, $5, $6)",
         link,
         faces,
         file_type,
         affiliation_id,
         enabled,
+        is_nsfw,
     )
 
 
