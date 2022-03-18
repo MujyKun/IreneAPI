@@ -294,7 +294,8 @@ begin
     VALUES(t_country, t_city) returning locationid INTO t_location_id;
     return t_location_id;
 end;
-$$;create or replace function groupmembers.addmedia(t_link text, t_faces integer, t_filetype text, t_affiliationid integer, t_enabled boolean)
+$$;create or replace function groupmembers.addmedia(t_link text, t_faces integer, t_filetype text,
+t_affiliationid integer, t_enabled boolean, t_nsfw boolean)
     returns integer
     language plpgsql
 as
@@ -303,8 +304,8 @@ declare
     t_media_id integer;
 begin
 
-    INSERT INTO groupmembers.media(link, faces, filetype, affiliationid, enabled)
-    VALUES(t_link, t_faces, t_filetype, t_affiliationid, t_enabled) returning mediaid INTO t_media_id;
+    INSERT INTO groupmembers.media(link, faces, filetype, affiliationid, enabled, nsfw)
+    VALUES(t_link, t_faces, t_filetype, t_affiliationid, t_enabled, t_nsfw) returning mediaid INTO t_media_id;
     return t_media_id;
 end;
 $$;create or replace function public.addmod(t_userid bigint)
@@ -652,7 +653,16 @@ $$
 begin
     DELETE FROM groupmembers.fandom WHERE groupid = t_group_id AND name = t_name ;
 end;
-$$;create or replace function public.deletegroupalias(t_aliasid integer)
+$$;create or replace function groupmembers.deletegroup(t_group_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM groupmembers.groups WHERE groupid = t_group_id;
+end;
+$$;
+create or replace function public.deletegroupalias(t_aliasid integer)
     returns void
     language plpgsql
 as
@@ -713,6 +723,15 @@ as
 $$
 begin
     DELETE FROM public.patron WHERE userid = t_userid;
+end;
+$$;
+create or replace function groupmembers.deleteperson(t_person_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM groupmembers.person WHERE personid  = t_person_id;
 end;
 $$;
 create or replace function public.deletepersonalias(t_aliasid integer)

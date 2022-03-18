@@ -367,13 +367,13 @@ helper_routes = {
             "tiktok",
         ],
     },
-    "social/$position_id.GET": {
+    "social/$social_id.GET": {
         "function": get_social,
-        "params": ["requestor", "position_id"],
+        "params": ["requestor", "social_id"],
     },
-    "social/$position_id.DELETE": {
+    "social/$social_id.DELETE": {
         "function": delete_social,
-        "params": ["requestor", "position_id"],
+        "params": ["requestor", "social_id"],
     },
     "position/.GET": {"function": get_positions, "params": ["requestor"]},
     "position/.POST": {

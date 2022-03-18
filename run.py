@@ -60,6 +60,7 @@ blueprints = [
     twitter,
     channel,
     user,
+    websocket_blueprint,
 ]
 
 # print(app.config['SERVER_NAME'])

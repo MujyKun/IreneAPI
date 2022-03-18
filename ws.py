@@ -48,6 +48,11 @@ async def process_ws_data(socket: WebSocketSession, data: dict) -> dict:
             data.pop("callback_id")
 
         route = data["route"]
+        # Add a slash to the end of the route if it's only the blueprint keyword.
+        # we know it's a main/single route if there is no slash in the route at all.
+        if "/" not in route:
+            route += "/"
+
         method: str = (data["method"]).upper()
         search_method = f"{route}.{method}"
         helper = helper_routes[search_method]
