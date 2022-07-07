@@ -87,7 +87,7 @@ class DbConnection:
         """
 
     async def update_db_structure(self):
-        """Attempt to create the DB structure."""
+        """Attempt to create/update the DB structure."""
         sql_folder_name = "sql"
         create_file_name = "create.sql"
         inexecutable_queries = ""
@@ -122,21 +122,3 @@ class DbConnection:
             f"{sql_folder_name}/functions/{create_file_name}", "w"
         ) as manual_file:
             await manual_file.write(inexecutable_queries)
-
-    async def migration(self):
-        """Migrate old data to the new database."""
-        await self._connect_to_other_database(
-            **{
-                "host": self._db_host,
-                "database": "postgres",
-                "user": self._db_user,
-                "password": self.__db_pass,
-                "port": self._db_port,
-            }
-        )
-
-        ...
-
-    async def _connect_to_other_database(self, **kwargs):
-        """Create a db connection to another database using the same credentials."""
-        ...
