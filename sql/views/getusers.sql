@@ -54,5 +54,7 @@ CREATE OR REPLACE VIEW public.getusers AS
                             FROM public.timezones
                             WHERE u.timezoneid = public.timezones.id)
                             AS timezone,
-                        l.rob as roblevel, l.daily as dailylevel, l.beg as beglevel, l.profile as profilelevel
-    FROM users u LEFT JOIN public.levels l ON l.userid = u.userid;
+                        l.rob as roblevel, l.daily as dailylevel, l.beg as beglevel, l.profile as profilelevel,
+                        gf.groupids as ggfiltergroups, gf.personids as ggfilterpersons
+    FROM users u LEFT JOIN public.levels l ON l.userid = u.userid LEFT JOIN
+        guessinggame.filtered gf ON gf.userid = u.userid;

@@ -164,6 +164,20 @@ begin
     INSERT INTO groupmembers.fandom(groupid, name)
     VALUES(t_groupid, t_name);
 end;
+$$;create or replace function guessinggame.addgg(t_dateid integer, t_media_ids integer[], t_status_ids integer[],
+                                                    t_mode_id integer, t_difficulty text, t_is_nsfw bool)
+    returns integer
+    language plpgsql
+as
+$$
+declare
+    t_gg_id integer;
+begin
+
+    INSERT INTO guessinggame.games(dateid, mediaids, statusids, modeid, difficulty, isnsfw)
+    VALUES (t_dateid, t_media_ids, t_status_ids, t_mode_id, t_difficulty, t_is_nsfw) returning gameid INTO t_gg_id;
+    return t_gg_id;
+end;
 $$;create or replace function groupmembers.addgroup(t_name text, t_dateid integer, t_description text, t_companyid integer,
                                                  t_displayid integer, t_website text, t_socialid integer, t_tagids integer[])
     returns integer
@@ -653,7 +667,16 @@ $$
 begin
     DELETE FROM groupmembers.fandom WHERE groupid = t_group_id AND name = t_name ;
 end;
-$$;create or replace function groupmembers.deletegroup(t_group_id integer)
+$$;create or replace function guessinggame.deletegg(t_gg_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM guessinggame.games WHERE gameid = t_gg_id;
+end;
+$$;
+create or replace function groupmembers.deletegroup(t_group_id integer)
     returns void
     language plpgsql
 as
@@ -1059,5 +1082,49 @@ $$
 begin
     INSERT INTO public.apiusage(userid, func, response, args, kwargs)
     VALUES(t_userid, t_func, t_response, t_args, t_kwargs);
+end;
+$$;create or replace function public.toggleggfilter(t_userid bigint, active bool)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    UPDATE public.users SET ggfilteractive = active WHERE userid = t_userid;
+end;
+$$;
+create or replace function groupmembers.updatedate(t_date_id int, t_end_date timestamp)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    UPDATE groupmembers.dates SET enddate = t_end_date WHERE dateid = t_date_id;
+end;
+$$;create or replace function guessinggame.upsertggfiltergroups(user_id bigint, group_ids integer[])
+    returns void
+    language plpgsql
+as
+$$
+begin
+    INSERT INTO guessinggame.filtered(userid, groupids) VALUES (user_id, group_ids)
+    ON CONFLICT (userid) DO UPDATE SET groupids = group_ids WHERE guessinggame.filtered.userid = user_id;
+end;
+$$;create or replace function guessinggame.upsertggfilterpersons(user_id bigint, person_ids integer[])
+    returns void
+    language plpgsql
+as
+$$
+begin
+    INSERT INTO guessinggame.filtered(userid, personids) VALUES (user_id, person_ids)
+    ON CONFLICT (userid) DO UPDATE SET personids = person_ids WHERE guessinggame.filtered.userid = user_id;
+end;
+$$;create or replace function guessinggame.upsertmediadifficulty(media_id integer, failed_guesses integer, correct_guesses integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    INSERT INTO guessinggame.difficulty(mediaid, failed, correct) VALUES (media_id, failed_guesses, correct_guesses)
+    ON CONFLICT (mediaid) DO UPDATE SET failed = failed_guesses, correct = correct_guesses WHERE guessinggame.difficulty.mediaid = media_id;
 end;
 $$;

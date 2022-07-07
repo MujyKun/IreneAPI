@@ -23,6 +23,18 @@ class Users(Resource):
         return await helper.get_all_users(requestor, user_id)
 
 
+@user.route("toggleggfilter/<int:user_id>")
+@user.doc(params={"user_id": "User ID to manage the status of."})
+class UserToggleGGFilter(Resource):
+    async def post(self, user_id: int):
+        """Toggle the GG Filter of a user.
+
+        Pass in 'active' whether the filter is active or not.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.toggle_gg_filter(requestor, user_id, request.args["active"])
+
+
 @user.route("<int:user_id>")
 @user.doc(params={"user_id": "User ID to manage the status of."})
 class UserStatus(Resource):

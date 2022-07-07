@@ -36,6 +36,16 @@ class Date(Resource):
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.delete_date(requestor, date_id)
 
+    async def put(self, date_id: int):
+        """Updates a date.
+
+        Use this route to update a date's end date.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.update_date(
+            requestor, date_id, request.args.get("end_date")
+        )
+
 
 @date.route("")
 @date.doc()

@@ -14,6 +14,7 @@ from . import (
 from models import Requestor
 from resources import drive
 from resources.keys import person_folder, image_host
+from datetime import datetime
 
 
 @check_permission(permission_level=SUPER_PATRON)
@@ -306,10 +307,22 @@ async def get_dates(requestor: Requestor) -> dict:
 
 
 @check_permission(permission_level=DEVELOPER)
-async def add_date(requestor: Requestor, start_date, end_date) -> dict:
+async def add_date(requestor: Requestor, start_date: str, end_date: str) -> dict:
     """Add date information."""
+    start_date = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S.%f")
+    if end_date:
+        end_date = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S.%f")
     return await self.db.fetch_row(
         "SELECT * FROM groupmembers.adddate($1, $2)", start_date, end_date
+    )
+
+
+@check_permission(permission_level=DEVELOPER)
+async def update_date(requestor: Requestor, date_id: int, end_date: str) -> dict:
+    """Update the end date."""
+    end_date = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S.%f")
+    return await self.db.fetch_row(
+        "SELECT * FROM groupmembers.updatedate($1, $2)", date_id, end_date
     )
 
 
@@ -374,7 +387,7 @@ async def add_company(requestor: Requestor, name: str, description: str, date_id
 @check_permission(permission_level=DEVELOPER)
 async def delete_company(requestor: Requestor, company_id: int):
     """Delete a company."""
-    return await self.db.execute("SELECT groupmembers.deletecompany($1})", company_id)
+    return await self.db.execute("SELECT groupmembers.deletecompany($1)", company_id)
 
 
 @check_permission(permission_level=USER)
@@ -403,7 +416,7 @@ async def add_display(requestor: Requestor, avatar: str, banner: str):
 @check_permission(permission_level=DEVELOPER)
 async def delete_display(requestor: Requestor, display_id: int):
     """Delete a display."""
-    return await self.db.execute("SELECT groupmembers.deletedisplay($1})", display_id)
+    return await self.db.execute("SELECT groupmembers.deletedisplay($1)", display_id)
 
 
 @check_permission(permission_level=USER)
@@ -432,7 +445,7 @@ async def add_location(requestor: Requestor, country: str, city: str):
 @check_permission(permission_level=DEVELOPER)
 async def delete_location(requestor: Requestor, location_id: int):
     """Delete a location."""
-    return await self.db.execute("SELECT groupmembers.deletelocation($1})", location_id)
+    return await self.db.execute("SELECT groupmembers.deletelocation($1)", location_id)
 
 
 @check_permission(permission_level=DEVELOPER)
@@ -448,6 +461,19 @@ async def get_media(requestor: Requestor, media_id: int) -> dict:
 async def get_all_media(requestor: Requestor) -> dict:
     """Get all media information."""
     return await self.db.fetch("SELECT * FROM groupmembers.getmedia")
+
+
+@check_permission(permission_level=DEVELOPER)
+async def upsert_media_difficulty(
+    requestor: Requestor, media_id, failed_guesses, correct_guesses
+):
+    """Upsert media difficulty."""
+    return await self.db.execute(
+        "SELECT * FROM guessinggame.upsertmediadifficulty($1, $2, $3)",
+        media_id,
+        failed_guesses,
+        correct_guesses,
+    )
 
 
 @check_permission(permission_level=DEVELOPER)
@@ -469,7 +495,7 @@ async def add_media(
 @check_permission(permission_level=DEVELOPER)
 async def delete_media(requestor: Requestor, media_id: int):
     """Delete media."""
-    return await self.db.execute("SELECT groupmembers.deletemedia($1})", media_id)
+    return await self.db.execute("SELECT groupmembers.deletemedia($1)", media_id)
 
 
 @check_permission(permission_level=USER)
@@ -506,7 +532,7 @@ async def add_person_alias(
 @check_permission(permission_level=USER)
 async def delete_person_alias(requestor: Requestor, alias_id: int) -> dict:
     """Delete a person alias."""
-    return await self.db.execute("SELECT groupmembers.deletepersonalias($1})", alias_id)
+    return await self.db.execute("SELECT groupmembers.deletepersonalias($1)", alias_id)
 
 
 @check_permission(permission_level=USER)
@@ -541,7 +567,7 @@ async def add_group_alias(requestor: Requestor, alias, group_id, guild_id=None) 
 @check_permission(permission_level=USER)
 async def delete_group_alias(requestor: Requestor, alias_id: int) -> dict:
     """Delete a group alias."""
-    return await self.db.execute("SELECT groupmembers.deletegroupalias($1})", alias_id)
+    return await self.db.execute("SELECT groupmembers.deletegroupalias($1)", alias_id)
 
 
 @check_permission(permission_level=USER)

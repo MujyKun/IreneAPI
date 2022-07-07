@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS guessinggame.games
     mediaids integer[],
     statusids integer[],
     modeid integer,
+    difficulty text,
+    isnsfw bool,
     PRIMARY KEY (gameid)
 );
 

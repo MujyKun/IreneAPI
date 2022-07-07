@@ -36,6 +36,19 @@ class Media(Resource):
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.delete_media(requestor, media_id)
 
+    async def post(self, media_id: int):
+        """Update media difficulty.
+
+        Use this route to update media difficulty.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.upsert_media_difficulty(
+            requestor,
+            media_id,
+            failed_guesses=request.args["failed_guesses"],
+            correct_guesses=request.args["correct_guesses"],
+        )
+
 
 @media.route("")
 @media.doc()

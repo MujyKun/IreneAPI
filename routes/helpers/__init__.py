@@ -24,7 +24,7 @@ from .errors import LackingPermissions, BadRequest
 
 def is_int64(value: int):
     """Confirm if an integer is in range of int64 to prevent overflow."""
-    if -9223372036854775808 > value or value > 9223372036854775807:
+    if value is None or (-9223372036854775808 > value or value > 9223372036854775807):
         raise BadRequest
 
 
@@ -136,6 +136,9 @@ from .user import (
     get_user_proofreader,
     get_user_data_mod,
     get_all_users,
+    toggle_gg_filter,
+    upsert_gg_filter_groups,
+    upsert_gg_filter_persons,
 )
 
 from .twitter import (
@@ -213,6 +216,7 @@ from .groupmembers import (
     add_name,
     delete_name,
     add_date,
+    update_date,
     delete_date,
     add_tag,
     delete_tag,
@@ -222,13 +226,34 @@ from .groupmembers import (
     generate_media_group,
     generate_media_person,
     generate_media_affiliation,
+    upsert_media_difficulty,
 )
+
+from .guessinggame import add_gg, delete_gg, get_gg, get_all_ggs
 
 from .guild import get_guild, get_guilds, add_guild, delete_guild
 
 # Helper Functions for routes.
 
 helper_routes = {
+    "guessinggame/$gg_id.GET": {"function": get_gg, "params": ["requestor", "game_id"]},
+    "guessinggame/$gg_id.DELETE": {
+        "function": delete_gg,
+        "params": ["requestor", "game_id"],
+    },
+    "guessinggame/.GET": {"function": get_all_ggs, "params": ["requestor"]},
+    "guessinggame/.POST": {
+        "function": add_gg,
+        "params": [
+            "requestor",
+            "date_id",
+            "media_ids",
+            "status_ids",
+            "mode_id",
+            "difficulty",
+            "is_nsfw",
+        ],
+    },
     "guild/.GET": {"function": get_guilds, "params": ["requestor"]},
     "guild/$guild_id.GET": {
         "function": get_guild,
@@ -322,6 +347,10 @@ helper_routes = {
     "media/$media_id.DELETE": {
         "function": get_media,
         "params": ["requestor", "media_id"],
+    },
+    "media/$media_id.POST": {
+        "function": upsert_media_difficulty,
+        "params": ["requestor", "media_id", "failed_guesses", "correct_guesses"],
     },
     "personalias/.GET": {"function": get_person_aliases, "params": ["requestor"]},
     "personalias/$alias_id.GET": {
@@ -449,6 +478,10 @@ helper_routes = {
         "params": ["requestor", "start_date", "end_date"],
     },
     "date/$date_id.GET": {"function": get_date, "params": ["requestor", "date_id"]},
+    "date/$date_id.PUT": {
+        "function": update_date,
+        "params": ["requestor", "date_id", "end_date"],
+    },
     "date/$date_id.DELETE": {
         "function": delete_date,
         "params": ["requestor", "date_id"],
@@ -526,6 +559,18 @@ helper_routes = {
         "params": ["requestor", "group_id"],
     },
     "user/.GET": {"function": get_all_users, "params": ["requestor"]},
+    "user/toggleggfilter/$user_id.POST": {
+        "function": toggle_gg_filter,
+        "params": ["requestor", "user_id", "active"],
+    },
+    "user/ggfilterpersons/$user_id.POST": {
+        "function": upsert_gg_filter_persons,
+        "params": ["requestor", "user_id", "person_ids"],
+    },
+    "user/ggfiltergroups/$user_id.POST": {
+        "function": upsert_gg_filter_groups,
+        "params": ["requestor", "user_id", "group_ids"],
+    },
     "user/$user_id.GET": {"function": get_user, "params": ["requestor", "user_id"]},
     "user/$user_id.POST": {"function": add_user, "params": ["requestor", "user_id"]},
     "user/$user_id.DELETE": {

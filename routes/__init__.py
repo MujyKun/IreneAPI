@@ -78,3 +78,4 @@ from .tag import tag
 from .twitter import twitter
 from .channel import channel
 from .user import user
+from .guessinggame import gg as guessinggame

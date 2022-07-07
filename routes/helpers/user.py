@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from . import (
     self,
     check_permission,
@@ -26,6 +28,34 @@ async def get_user(requestor: Requestor, user_id: int) -> dict:
     """
     is_int64(user_id)
     return await self.db.fetch_row("SELECT * FROM public.getuser($1)", user_id)
+
+
+@check_permission(permission_level=DEVELOPER)
+async def toggle_gg_filter(requestor: Requestor, user_id: int, active: bool):
+    """Toggle a GG Filter."""
+    return await self.db.execute(
+        "SELECT public.toggleggfilter($1, $2)", user_id, active
+    )
+
+
+@check_permission(permission_level=DEVELOPER)
+async def upsert_gg_filter_persons(
+    requestor: Requestor, user_id: int, person_ids: Tuple[int]
+):
+    """Upsert persons for a gg filter"""
+    return await self.db.execute(
+        "SELECT guessinggame.upsertggfilterpersons($1,$2)", user_id, person_ids
+    )
+
+
+@check_permission(permission_level=DEVELOPER)
+async def upsert_gg_filter_groups(
+    requestor: Requestor, user_id: int, group_ids: Tuple[int]
+):
+    """Upsert groups for a ggg filter"""
+    return await self.db.execute(
+        "SELECT guessinggame.upsertggfiltergroups($1,$2)", user_id, group_ids
+    )
 
 
 @check_permission(permission_level=DEVELOPER)

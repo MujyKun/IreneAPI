@@ -1,4 +1,5 @@
 CREATE OR REPLACE VIEW groupmembers.getmedia AS
-    SELECT mediaid, link, faces, filetype, media.affiliationid, a.personid, a.groupid, enabled, nsfw
-        FROM groupmembers.media LEFT JOIN
-            groupmembers.affiliation a on media.affiliationid = a.affiliationid;
+    SELECT m.mediaid, link, faces, filetype, m.affiliationid, a.personid, a.groupid, enabled, nsfw, d.failed, d.correct
+        FROM groupmembers.media m LEFT JOIN
+            groupmembers.affiliation a on m.affiliationid = a.affiliationid
+            LEFT JOIN guessinggame.difficulty d on d.mediaid = m.mediaid;

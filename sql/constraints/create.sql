@@ -85,7 +85,7 @@ ALTER TABLE blackjack.customcards DROP CONSTRAINT IF EXISTS customcards_valueid;
 ALTER TABLE blackjack.customcards ADD CONSTRAINT customcards_valueid FOREIGN KEY (valueid) REFERENCES blackjack.cardvalues(id) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE blackjack.userstatus DROP CONSTRAINT IF EXISTS bj_userstatus_userid;
-ALTER TABLE guessinggame.filteredgroups DROP CONSTRAINT IF EXISTS filteredgroups_userid;
+ALTER TABLE guessinggame.filtered DROP CONSTRAINT IF EXISTS filteredgroups_userid;
 ALTER TABLE guessinggame.userstatus DROP CONSTRAINT IF EXISTS gg_userstatus_userid;
 ALTER TABLE unscramblegame.stats DROP CONSTRAINT IF EXISTS us_stats_userid;
 ALTER TABLE unscramblegame.userstatus DROP CONSTRAINT IF EXISTS us_userstatus_userid;
@@ -103,7 +103,7 @@ ALTER TABLE public.superpatron DROP CONSTRAINT IF EXISTS super_userid;
 ALTER TABLE public.translator DROP CONSTRAINT IF EXISTS translator_userid;
 ALTER TABLE public.proofreader DROP CONSTRAINT IF EXISTS proofreader_userid;
 ALTER TABLE blackjack.userstatus ADD CONSTRAINT bj_userstatus_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE guessinggame.filteredgroups ADD CONSTRAINT filteredgroups_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE guessinggame.filtered ADD CONSTRAINT filteredgroups_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE guessinggame.userstatus ADD CONSTRAINT gg_userstatus_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE unscramblegame.stats ADD CONSTRAINT us_stats_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE unscramblegame.userstatus ADD CONSTRAINT us_userstatus_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
