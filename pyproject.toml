@@ -24,7 +24,7 @@ google-auth = "1.32.1"
 google-auth-httplib2 = "0.1.0"
 google-auth-oauthlib = "0.4.4"
 psycopg2 = "2.9.2"
-black = "21.12b0"
+black = "^22.6.0"
 pre-commit = "2.16.0"
 quart-openapi = {version = "1.7.2", extras = ["doc"]}
 aiogoogle = "^3.1.1"
