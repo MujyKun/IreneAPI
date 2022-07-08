@@ -517,4 +517,4 @@ INSERT INTO public.languages(shortname, name) VALUES ('af', 'Afrikaans'),
 
 INSERT INTO public.apiaccess(accessid, name) VALUES (-1, 'God'), (0, 'Owner'), (1, 'Developer'), (2, 'Super Patron'), (3, 'Friend'), (4, 'User');
 
-INSERT INTO guessinggame.modes(modeid, name) VALUES(1, 'Normal'), (2, 'Group');
+INSERT INTO modes(modeid, name) VALUES(1, 'Normal'), (2, 'Group');

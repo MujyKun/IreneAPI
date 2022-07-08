@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS guessinggame.userstatus
+CREATE TABLE IF NOT EXISTS userstatus
 (
     statusid serial,
     userid bigint,
@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS guessinggame.userstatus
     PRIMARY KEY (statusid, userid)
 );
 
-ALTER TABLE guessinggame.userstatus
+ALTER TABLE userstatus
     OWNER to postgres;
-COMMENT ON TABLE guessinggame.userstatus
+COMMENT ON TABLE userstatus
     IS 'The status of a user during a specific game.';

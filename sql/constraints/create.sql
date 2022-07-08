@@ -86,9 +86,9 @@ ALTER TABLE blackjack.customcards ADD CONSTRAINT customcards_valueid FOREIGN KEY
 
 ALTER TABLE blackjack.userstatus DROP CONSTRAINT IF EXISTS bj_userstatus_userid;
 ALTER TABLE guessinggame.filtered DROP CONSTRAINT IF EXISTS filteredgroups_userid;
-ALTER TABLE guessinggame.userstatus DROP CONSTRAINT IF EXISTS gg_userstatus_userid;
+ALTER TABLE userstatus DROP CONSTRAINT IF EXISTS gg_userstatus_userid;
 ALTER TABLE unscramblegame.stats DROP CONSTRAINT IF EXISTS us_stats_userid;
-ALTER TABLE unscramblegame.userstatus DROP CONSTRAINT IF EXISTS us_userstatus_userid;
+ALTER TABLE userstatus DROP CONSTRAINT IF EXISTS us_userstatus_userid;
 ALTER TABLE public.apitokens DROP CONSTRAINT IF EXISTS token_userid;
 ALTER TABLE public.apiusage DROP CONSTRAINT IF EXISTS usage_userid;
 ALTER TABLE public.botbanned DROP CONSTRAINT IF EXISTS botbanned_userid;
@@ -104,9 +104,9 @@ ALTER TABLE public.translator DROP CONSTRAINT IF EXISTS translator_userid;
 ALTER TABLE public.proofreader DROP CONSTRAINT IF EXISTS proofreader_userid;
 ALTER TABLE blackjack.userstatus ADD CONSTRAINT bj_userstatus_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE guessinggame.filtered ADD CONSTRAINT filteredgroups_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE guessinggame.userstatus ADD CONSTRAINT gg_userstatus_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE userstatus ADD CONSTRAINT gg_userstatus_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE unscramblegame.stats ADD CONSTRAINT us_stats_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE unscramblegame.userstatus ADD CONSTRAINT us_userstatus_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE userstatus ADD CONSTRAINT us_userstatus_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE public.apitokens ADD CONSTRAINT token_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE public.apiusage ADD CONSTRAINT usage_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE public.botbanned ADD CONSTRAINT botbanned_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -126,10 +126,10 @@ ALTER TABLE guessinggame.games DROP CONSTRAINT IF EXISTS gg_games_modeid;
 ALTER TABLE guessinggame.stats DROP CONSTRAINT IF EXISTS gg_stats_modeid;
 ALTER TABLE unscramblegame.games DROP CONSTRAINT IF EXISTS us_games_modeid;
 ALTER TABLE unscramblegame.stats DROP CONSTRAINT IF EXISTS us_stats_modeid;
-ALTER TABLE guessinggame.games ADD CONSTRAINT gg_games_modeid FOREIGN KEY (modeid) REFERENCES guessinggame.modes(modeid) ON DELETE SET NULL ON UPDATE CASCADE;
-ALTER TABLE guessinggame.stats ADD CONSTRAINT gg_stats_modeid FOREIGN KEY (modeid) REFERENCES guessinggame.modes(modeid) ON DELETE SET NULL ON UPDATE CASCADE;
-ALTER TABLE unscramblegame.games ADD CONSTRAINT us_games_modeid FOREIGN KEY (modeid) REFERENCES unscramblegame.modes(modeid) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE unscramblegame.stats ADD CONSTRAINT us_stats_modeid FOREIGN KEY (modeid) REFERENCES unscramblegame.modes(modeid) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE guessinggame.games ADD CONSTRAINT gg_games_modeid FOREIGN KEY (modeid) REFERENCES modes(modeid) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE guessinggame.stats ADD CONSTRAINT gg_stats_modeid FOREIGN KEY (modeid) REFERENCES modes(modeid) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE unscramblegame.games ADD CONSTRAINT us_games_modeid FOREIGN KEY (modeid) REFERENCES modes(modeid) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE unscramblegame.stats ADD CONSTRAINT us_stats_modeid FOREIGN KEY (modeid) REFERENCES modes(modeid) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE interactions.media DROP CONSTRAINT IF EXISTS media_typeid;
 ALTER TABLE interactions.media ADD CONSTRAINT media_typeid FOREIGN KEY (typeid) REFERENCES interactions.interactiontypes(typeid) ON DELETE CASCADE ON UPDATE CASCADE;
