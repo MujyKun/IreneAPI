@@ -29,6 +29,7 @@ from routes import (
     channel,
     user,
     guessinggame,
+    user_status,
 )
 from ws import websocket_blueprint
 from routes.helpers.errors import BaseError
@@ -62,6 +63,7 @@ blueprints = [
     channel,
     user,
     guessinggame,
+    user_status,
     websocket_blueprint,
 ]
 

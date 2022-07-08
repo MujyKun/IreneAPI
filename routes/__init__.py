@@ -77,5 +77,6 @@ from .social import social
 from .tag import tag
 from .twitter import twitter
 from .channel import channel
+from .userstatus import status as user_status
 from .user import user
 from .guessinggame import gg as guessinggame

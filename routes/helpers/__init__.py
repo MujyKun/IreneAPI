@@ -229,6 +229,14 @@ from .groupmembers import (
     upsert_media_difficulty,
 )
 
+from .userstatus import (
+    update_status,
+    delete_status,
+    get_status,
+    get_statuses,
+    add_status,
+)
+
 from .guessinggame import add_gg, delete_gg, get_gg, get_all_ggs
 
 from .guild import get_guild, get_guilds, add_guild, delete_guild
@@ -236,6 +244,23 @@ from .guild import get_guild, get_guilds, add_guild, delete_guild
 # Helper Functions for routes.
 
 helper_routes = {
+    "user_status/.GET": {"function": get_statuses, "params": ["requestor"]},
+    "user_status/.POST": {
+        "function": add_status,
+        "params": ["requestor", "user_id", "score"],
+    },
+    "user_status/$status_id.GET": {
+        "function": get_status,
+        "params": ["requestor", "status_id"],
+    },
+    "user_status/$status_id.PUT": {
+        "function": update_status,
+        "params": ["requestor", "user_id", "score"],
+    },
+    "user_status/$status_id.DELETE": {
+        "function": delete_status,
+        "params": ["requestor", "status_id"],
+    },
     "guessinggame/$gg_id.GET": {"function": get_gg, "params": ["requestor", "game_id"]},
     "guessinggame/$gg_id.DELETE": {
         "function": delete_gg,
