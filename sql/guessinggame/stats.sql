@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS guessinggame.stats
 (
     userid bigint,
     modeid integer,
+    difficultyid integer,
     value integer,
     PRIMARY KEY (userid)
 );

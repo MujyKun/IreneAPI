@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS unscramblegame.games
     dateid integer,
     statusids integer[],
     modeid integer,
+    difficultyid integer,
     PRIMARY KEY (gameid)
 );
 

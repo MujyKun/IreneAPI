@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS unscramblegame.stats
 (
     userid bigint,
     modeid integer,
+    difficultyid integer,
     value integer,
     PRIMARY KEY (value)
 );

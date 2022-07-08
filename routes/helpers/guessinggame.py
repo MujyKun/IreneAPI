@@ -34,7 +34,13 @@ async def delete_gg(requestor: Requestor, game_id: int) -> dict:
 
 @check_permission(permission_level=DEVELOPER)
 async def add_gg(
-    requestor: Requestor, date_id, media_ids, status_ids, mode_id, difficulty, is_nsfw
+    requestor: Requestor,
+    date_id,
+    media_ids,
+    status_ids,
+    mode_id,
+    difficulty_id,
+    is_nsfw,
 ) -> dict:
     """Add a guessing game."""
     return await self.db.fetch_row(
@@ -43,6 +49,6 @@ async def add_gg(
         media_ids,
         status_ids,
         mode_id,
-        difficulty,
+        difficulty_id,
         is_nsfw,
     )

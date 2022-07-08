@@ -63,6 +63,6 @@ class GeneralGuessingGame(Resource):
             media_ids=request.args.get("media_ids"),
             status_ids=request.args.get("status_ids"),
             mode_id=request.args.get("mode_id"),
-            difficulty=request.args.get("difficulty"),
+            difficulty_id=request.args.get("difficulty_id"),
             is_nsfw=request.args.get("is_nsfw"),
         )

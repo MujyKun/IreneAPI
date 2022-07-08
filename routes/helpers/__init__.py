@@ -250,7 +250,7 @@ helper_routes = {
             "media_ids",
             "status_ids",
             "mode_id",
-            "difficulty",
+            "difficulty_id",
             "is_nsfw",
         ],
     },

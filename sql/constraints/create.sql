@@ -157,3 +157,4 @@ ALTER TABLE public.users ADD CONSTRAINT users_timezone FOREIGN KEY (timezoneid) 
 
 ALTER TABLE public.users DROP CONSTRAINT IF EXISTS users_language;
 ALTER TABLE public.users ADD CONSTRAINT users_language FOREIGN KEY (languageid) REFERENCES public.languages(languageid) ON DELETE SET NULL ON UPDATE CASCADE;
+
