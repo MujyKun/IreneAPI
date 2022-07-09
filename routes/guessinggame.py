@@ -39,6 +39,20 @@ class GuessingGame(Resource):
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.delete_gg(requestor, gg_id)
 
+    async def put(self, gg_id: int):
+        """
+        Update a guessing game's media and status ids.
+
+        Use this route to update a guessing game's media & status ids.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.update_media_and_status(
+            requestor,
+            gg_id,
+            request.args.get("media_ids"),
+            request.args.get("status_ids"),
+        )
+
 
 @gg.route("")
 @gg.doc()

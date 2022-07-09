@@ -80,3 +80,4 @@ from .channel import channel
 from .userstatus import status as user_status
 from .user import user
 from .guessinggame import gg as guessinggame
+from .unscramblegame import us as unscramblegame

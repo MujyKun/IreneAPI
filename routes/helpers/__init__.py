@@ -237,13 +237,49 @@ from .userstatus import (
     add_status,
 )
 
-from .guessinggame import add_gg, delete_gg, get_gg, get_all_ggs
+from .guessinggame import (
+    add_gg,
+    delete_gg,
+    get_gg,
+    get_all_ggs,
+    update_media_and_status,
+)
+from .unscramblegame import (
+    add_us,
+    delete_us,
+    get_us,
+    get_all_uss,
+    update_status as update_us_status,
+)
 
 from .guild import get_guild, get_guilds, add_guild, delete_guild
 
 # Helper Functions for routes.
 
 helper_routes = {
+    "unscramblegame/$us_id.GET": {
+        "function": get_us,
+        "params": ["requestor", "game_id"],
+    },
+    "unscramblegame/$us_id.PUT": {
+        "function": update_us_status,
+        "params": ["requestor", "game_id", "status_ids"],
+    },
+    "unscramblegame/$us_id.DELETE": {
+        "function": delete_us,
+        "params": ["requestor", "game_id"],
+    },
+    "unscramblegame/.GET": {"function": get_all_uss, "params": ["requestor"]},
+    "unscramblegame/.POST": {
+        "function": add_us,
+        "params": [
+            "requestor",
+            "date_id",
+            "status_ids",
+            "mode_id",
+            "difficulty_id",
+        ],
+    },
     "user_status/.GET": {"function": get_statuses, "params": ["requestor"]},
     "user_status/.POST": {
         "function": add_status,
@@ -255,13 +291,17 @@ helper_routes = {
     },
     "user_status/$status_id.PUT": {
         "function": update_status,
-        "params": ["requestor", "user_id", "score"],
+        "params": ["requestor", "status_id", "score"],
     },
     "user_status/$status_id.DELETE": {
         "function": delete_status,
         "params": ["requestor", "status_id"],
     },
     "guessinggame/$gg_id.GET": {"function": get_gg, "params": ["requestor", "game_id"]},
+    "guessinggame/$gg_id.PUT": {
+        "function": update_media_and_status,
+        "params": ["requestor", "game_id", "media_ids", "status_ids"],
+    },
     "guessinggame/$gg_id.DELETE": {
         "function": delete_gg,
         "params": ["requestor", "game_id"],

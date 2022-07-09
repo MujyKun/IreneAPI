@@ -165,7 +165,7 @@ begin
     VALUES(t_groupid, t_name);
 end;
 $$;create or replace function guessinggame.addgg(t_dateid integer, t_media_ids integer[], t_status_ids integer[],
-                                                    t_mode_id integer, t_difficulty text, t_is_nsfw bool)
+                                                    t_mode_id integer, t_difficulty_id integer, t_is_nsfw bool)
     returns integer
     language plpgsql
 as
@@ -174,8 +174,8 @@ declare
     t_gg_id integer;
 begin
 
-    INSERT INTO guessinggame.games(dateid, mediaids, statusids, modeid, difficulty, isnsfw)
-    VALUES (t_dateid, t_media_ids, t_status_ids, t_mode_id, t_difficulty, t_is_nsfw) returning gameid INTO t_gg_id;
+    INSERT INTO guessinggame.games(dateid, mediaids, statusids, modeid, difficultyid, isnsfw)
+    VALUES (t_dateid, t_media_ids, t_status_ids, t_mode_id, t_difficulty_id, t_is_nsfw) returning gameid INTO t_gg_id;
     return t_gg_id;
 end;
 $$;create or replace function groupmembers.addgroup(t_name text, t_dateid integer, t_description text, t_companyid integer,
@@ -524,7 +524,23 @@ begin
         VALUES(t_accountid, t_channelid, t_roleid);
     END IF;
 end;
-$$;create or replace function public.addusage(t_userid bigint, t_endpoint text)
+$$;create or replace function unscramblegame.addus(t_dateid integer, t_status_ids integer[], t_mode_id integer,
+        t_difficulty_id integer)
+    returns integer
+    language plpgsql
+as
+$$
+declare
+    t_us_id integer;
+begin
+
+    INSERT INTO unscramblegame.games(dateid, statusids, modeid, difficultyid)
+    VALUES (t_dateid, t_status_ids, t_mode_id, t_difficulty_id) returning gameid INTO t_us_id;
+    return t_us_id;
+end;
+$$;
+
+create or replace function public.addusage(t_userid bigint, t_endpoint text)
     returns integer
     language plpgsql
 as
@@ -557,6 +573,19 @@ begin
         INSERT INTO public.users(userid)
         VALUES(t_userid);
     END IF;
+end;
+$$;create or replace function public.adduserstatus(t_user_id bigint, t_score int)
+    returns integer
+    language plpgsql
+as
+$$
+declare
+    t_status_id integer;
+begin
+
+    INSERT INTO public.userstatus(userid, score)
+    VALUES(t_user_id, t_score) returning statusid INTO t_status_id;
+    return t_status_id;
 end;
 $$;create or replace function public.botban(t_userid bigint)
     returns void
@@ -847,13 +876,31 @@ $$
 begin
     DELETE FROM public.twitterfollowage WHERE accountid = t_accountid AND channelid = t_channelid;
 end;
-$$;create or replace function public.deleteuser(t_userid bigint)
+$$;create or replace function unscramblegame.deleteus(t_us_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM unscramblegame.games WHERE gameid = t_us_id;
+end;
+$$;
+create or replace function public.deleteuser(t_userid bigint)
     returns void
     language plpgsql
 as
 $$
 begin
     DELETE FROM public.users WHERE userid = t_userid;
+end;
+$$;
+create or replace function public.deleteuserstatus(t_status_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM public.userstatus WHERE statusid = t_status_id;
 end;
 $$;
 create or replace function public.getaccess(t_userid bigint)
@@ -1099,6 +1146,30 @@ as
 $$
 begin
     UPDATE groupmembers.dates SET enddate = t_end_date WHERE dateid = t_date_id;
+end;
+$$;create or replace function guessinggame.updatemediaandstatus(t_game_id int, t_media_ids integer[], t_status_ids integer[])
+    returns void
+    language plpgsql
+as
+$$
+begin
+    UPDATE guessinggame.games SET mediaids = t_media_ids, statusids = t_status_ids WHERE gameid = t_game_id;
+end;
+$$;create or replace function unscramblegame.updatestatus(t_game_id int, t_status_ids integer[])
+    returns void
+    language plpgsql
+as
+$$
+begin
+    UPDATE unscramblegame.games SET statusids = t_status_ids WHERE gameid = t_game_id;
+end;
+$$;create or replace function public.updateuserstatus(t_status_id integer, t_score int)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    UPDATE public.userstatus SET score = t_score WHERE statusid = t_status_id;
 end;
 $$;create or replace function guessinggame.upsertggfiltergroups(user_id bigint, group_ids integer[])
     returns void

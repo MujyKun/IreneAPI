@@ -19,6 +19,19 @@ async def get_all_ggs(requestor: Requestor) -> dict:
 
 
 @check_permission(permission_level=DEVELOPER)
+async def update_media_and_status(
+    requestor: Requestor, game_id, media_ids, status_ids
+) -> dict:
+    """Update media and status IDs for a game."""
+    return await self.db.execute(
+        "SELECT guessinggame.updatemediaandstatus($1, $2, $3)",
+        game_id,
+        media_ids,
+        status_ids,
+    )
+
+
+@check_permission(permission_level=DEVELOPER)
 async def get_gg(requestor: Requestor, game_id: int) -> dict:
     """Get a specific guessing game's information."""
     return await self.db.fetch_row(
@@ -28,7 +41,7 @@ async def get_gg(requestor: Requestor, game_id: int) -> dict:
 
 @check_permission(permission_level=DEVELOPER)
 async def delete_gg(requestor: Requestor, game_id: int) -> dict:
-    """Get all guessing game information."""
+    """Delete a guessing game."""
     return await self.db.execute("SELECT guessinggame.deletegg($1)", game_id)
 
 

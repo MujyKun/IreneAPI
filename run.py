@@ -7,6 +7,7 @@ from models import PgConnection
 from resources.keys import postgres_options, api_port
 from resources import drive
 
+from ws import websocket_blueprint
 from routes import (
     affiliation,
     bloodtype,
@@ -30,8 +31,8 @@ from routes import (
     user,
     guessinggame,
     user_status,
+    unscramblegame,
 )
-from ws import websocket_blueprint
 from routes.helpers.errors import BaseError
 from quart_openapi import Pint, Resource
 from quart_openapi import Swagger
@@ -64,6 +65,7 @@ blueprints = [
     user,
     guessinggame,
     user_status,
+    unscramblegame,
     websocket_blueprint,
 ]
 

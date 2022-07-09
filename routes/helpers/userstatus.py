@@ -27,10 +27,10 @@ from models import Requestor
 
 
 @check_permission(permission_level=DEVELOPER)
-async def update_status(requestor: Requestor, user_id: int, score: str) -> dict:
+async def update_status(requestor: Requestor, status_id: int, score: int) -> dict:
     """Update the score."""
     return await self.db.fetch_row(
-        "SELECT * FROM updateuserstatus($1, $2)", user_id, score
+        "SELECT * FROM updateuserstatus($1, $2)", status_id, score
     )
 
 
