@@ -1,0 +1,66 @@
+from . import (
+    self,
+    check_permission,
+    is_int64,
+    GOD,
+    OWNER,
+    DEVELOPER,
+    SUPER_PATRON,
+    FRIEND,
+    USER,
+)
+from models import Requestor
+
+
+@check_permission(permission_level=DEVELOPER)
+async def get_twitch_channels(requestor: Requestor) -> dict:
+    """Get all twitch channels."""
+    return await self.db.fetch("SELECT * FROM public.gettwitchchannels")
+
+
+@check_permission(permission_level=DEVELOPER)
+async def get_twitch_channel(requestor: Requestor, username: str) -> dict:
+    """Get a specific twitch channel's information.
+
+    NOTE: This will return several rows (each row containing a subscription)
+    """
+    return await self.db.fetch(
+        "SELECT * FROM public.gettwitchchannels WHERE username = $1", username
+    )
+
+
+@check_permission(permission_level=DEVELOPER)
+async def update_posted(requestor: Requestor, username, channel_ids, posted) -> dict:
+    """Change the channels posted to."""
+    return await self.db.execute(
+        "SELECT public.updateposted($1, $2, $3)", username, channel_ids, posted
+    )
+
+
+@check_permission(permission_level=DEVELOPER)
+async def unsubscribe_from_twitch_channel(
+    requestor: Requestor, username: str, channel_id: int
+) -> dict:
+    """Unsubscribe from a twitch channel."""
+    is_int64(channel_id)
+    return await self.db.execute(
+        "SELECT public.unsubscribefromtwitch($1)", username, channel_id
+    )
+
+
+@check_permission(permission_level=DEVELOPER)
+async def subscribe_to_twitch_channel(
+    requestor: Requestor, username, guild_id, channel_id, role_id=None
+) -> dict:
+    """Subscribe to a twitch channel."""
+    is_int64(guild_id)
+    is_int64(channel_id)
+    if role_id:
+        is_int64(role_id)
+    return await self.db.execute(
+        "SELECT * FROM public.subscribetotwitch($1, $2, $3, $4)",
+        username,
+        guild_id,
+        channel_id,
+        role_id,
+    )

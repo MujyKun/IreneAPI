@@ -31,6 +31,7 @@ from routes import (
     user,
     guessinggame,
     user_status,
+    twitch,
     unscramblegame,
 )
 from routes.helpers.errors import BaseError
@@ -66,6 +67,7 @@ blueprints = [
     guessinggame,
     user_status,
     unscramblegame,
+    twitch,
     websocket_blueprint,
 ]
 

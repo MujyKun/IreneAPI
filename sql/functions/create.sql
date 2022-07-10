@@ -210,7 +210,6 @@ create or replace function public.addguild(
             t_guildid bigint,
             t_name text,
             t_emojicount integer,
-            t_region text,
             t_afktimeout integer,
             t_icon text,
             t_ownerid bigint,
@@ -237,7 +236,6 @@ begin
     INSERT INTO public.guilds(guildid,
                               name,
                               emojicount,
-                              region,
                               afktimeout,
                               icon,
                               ownerid,
@@ -259,7 +257,6 @@ begin
     VALUES(t_guildid,
             t_name,
             t_emojicount,
-            t_region,
             t_afktimeout,
             t_icon,
             t_ownerid,
@@ -1130,6 +1127,17 @@ begin
     INSERT INTO public.apiusage(userid, func, response, args, kwargs)
     VALUES(t_userid, t_func, t_response, t_args, t_kwargs);
 end;
+$$;create or replace function public.subscribetotwitch(t_username text, t_guild_id bigint, t_channel_id bigint,
+            t_role_id bigint)
+    returns void
+    language plpgsql
+as
+$$
+begin
+
+    INSERT INTO public.twitchfollowage(username, guildid, channelid, posted, roleid) VALUES(t_username,
+                                                                t_guild_id, t_channel_id, False, t_role_id);
+end;
 $$;create or replace function public.toggleggfilter(t_userid bigint, active bool)
     returns void
     language plpgsql
@@ -1137,6 +1145,15 @@ as
 $$
 begin
     UPDATE public.users SET ggfilteractive = active WHERE userid = t_userid;
+end;
+$$;
+create or replace function public.unsubscribefromtwitch(t_username text, t_channel_id bigint)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM public.twitchfollowage WHERE username = t_username AND channelid = t_channel_id ;
 end;
 $$;
 create or replace function groupmembers.updatedate(t_date_id int, t_end_date timestamp)
@@ -1154,6 +1171,14 @@ as
 $$
 begin
     UPDATE guessinggame.games SET mediaids = t_media_ids, statusids = t_status_ids WHERE gameid = t_game_id;
+end;
+$$;create or replace function public.updateposted(t_username text, channel_ids integer[], t_posted bool)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    UPDATE public.twitchfollowage SET posted = t_posted WHERE username = t_username AND channelid IN(channel_ids);
 end;
 $$;create or replace function unscramblegame.updatestatus(t_game_id int, t_status_ids integer[])
     returns void

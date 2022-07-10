@@ -1,5 +1,6 @@
 from . import self, check_permission, OWNER, DEVELOPER, SUPER_PATRON, FRIEND, USER
 from models import Requestor
+from datetime import datetime
 
 
 @check_permission(permission_level=DEVELOPER)
@@ -8,7 +9,6 @@ async def add_guild(
     guild_id: int,
     name: str,
     emoji_count: int,
-    region: str,
     afk_timeout: int,
     icon: str,
     owner_id: int,
@@ -31,11 +31,10 @@ async def add_guild(
     """Add a guild."""
     return await self.db.execute(
         "SELECT public.addguild($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, "
-        "$15, $16, $17, $18, $19, $20, $21, $22)",
+        "$15, $16, $17, $18, $19, $20, $21)",
         guild_id,
         name,
         emoji_count,
-        region,
         afk_timeout,
         icon,
         owner_id,
@@ -52,7 +51,7 @@ async def add_guild(
         member_count,
         role_count,
         shard_id,
-        create_date,
+        datetime.strptime(create_date.replace("+00:00", ""), "%Y-%m-%d %H:%M:%S.%f"),
         has_bot,
     )
 

@@ -3,7 +3,6 @@ CREATE TABLE IF NOT EXISTS public.guilds
     guildid bigint,
     name text,
     emojicount integer,
-    region text,
     afktimeout integer,
     icon text,
     ownerid bigint,

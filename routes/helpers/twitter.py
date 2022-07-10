@@ -23,7 +23,7 @@ async def add_twitter_account(
     Add a Twitter account's information to the Database.
     """
     return await self.db.execute(
-        "SELECT public.addtwitteraccount($1, $2)", account_id, username.lower()
+        "SELECT public.addtwitteraccount($1, $2)", int(account_id), username.lower()
     )
 
 

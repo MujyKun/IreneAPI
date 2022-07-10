@@ -3,7 +3,6 @@ SELECT
        guildid,
        name,
        emojicount,
-       region,
        afktimeout,
        icon,
        ownerid,

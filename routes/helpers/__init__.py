@@ -254,9 +254,35 @@ from .unscramblegame import (
 
 from .guild import get_guild, get_guilds, add_guild, delete_guild
 
+from .twitch import (
+    get_twitch_channels,
+    get_twitch_channel,
+    update_posted,
+    unsubscribe_from_twitch_channel,
+    subscribe_to_twitch_channel,
+)
+
 # Helper Functions for routes.
 
 helper_routes = {
+    "twitch/$username.GET": {
+        "function": get_twitch_channel,
+        "params": ["requestor", "username"],
+    },
+    "twitch/$username.POST": {
+        "function": subscribe_to_twitch_channel,
+        "params": ["requestor", "username", "guild_id", "channel_id"],
+        "optional": ["role_id"],
+    },
+    "twitch/$username.DELETE": {
+        "function": unsubscribe_from_twitch_channel,
+        "params": ["requestor", "username", "channel_id"],
+    },
+    "twitch/$username.PUT": {
+        "function": update_posted,
+        "params": ["requestor", "username", "channel_ids", "posted"],
+    },
+    "twitch/.GET": {"function": get_twitch_channels, "params": ["requestor"]},
     "unscramblegame/$us_id.GET": {
         "function": get_us,
         "params": ["requestor", "game_id"],
@@ -331,7 +357,6 @@ helper_routes = {
             "guild_id",
             "name",
             "emoji_count",
-            "region",
             "afk_timeout",
             "icon",
             "owner_id",
