@@ -1172,7 +1172,7 @@ $$
 begin
     UPDATE guessinggame.games SET mediaids = t_media_ids, statusids = t_status_ids WHERE gameid = t_game_id;
 end;
-$$;create or replace function public.updateposted(t_username text, channel_ids integer[], t_posted bool)
+$$;create or replace function public.updateposted(t_username text, channel_ids bigint[], t_posted bool)
     returns void
     language plpgsql
 as

@@ -1,4 +1,3 @@
-import psycopg2
 import os
 from dotenv import load_dotenv
 
@@ -59,6 +58,9 @@ twitter_consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
 twitter_consumer_secret = os.getenv("TWITTER_CONSUMER_SECRET")
 twitter_access_key = os.getenv("TWITTER_ACCESS_KEY")
 twitter_access_secret = os.getenv("TWITTER_ACCESS_SECRET")
+
+twitch_client_id = os.getenv("TWITCH_CLIENT_ID")
+twitch_client_secret = os.getenv("TWITCH_CLIENT_SECRET")
 
 # db_conn = psycopg2.connect(**postgres_options)
 # c = db_conn.cursor()

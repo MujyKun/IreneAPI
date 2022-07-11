@@ -75,3 +75,68 @@ class TwitchChannels(Resource):
         """
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.get_twitch_channels(requestor)
+
+
+@twitch.route("filter/$guild_id")
+@twitch.doc(
+    params={
+        "guild_id": "Discord Guild ID.",
+    }
+)
+class TwitchChannelsFilter(Resource):
+    async def get(self, guild_id):
+        """Get all channels affiliated with a guild.
+
+        Use this route to get all channels affiliated with a guild.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.get_twitch_channels_by_guild(requestor, guild_id)
+
+
+@twitch.route("is_live")
+@twitch.doc()
+class TwitchIsLive(Resource):
+    async def get(self):
+        """
+        Get the live status of twitch accounts.
+
+        Use this route to get the live status of twitch accounts.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.is_live(requestor, usernames=request.args.get("usernames"))
+
+
+@twitch.route("exists/$username")
+@twitch.doc(
+    params={
+        "username": "Twitch username to confirm if it exists.",
+    }
+)
+class TwitchExists(Resource):
+    async def get(self, username):
+        """
+        Check if a twitch username exists.
+
+        Use this route to check if a username exists.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.username_exists(
+            requestor, username=request.args.get("username")
+        )
+
+
+@twitch.route("already_posted/$username")
+@twitch.doc(
+    params={
+        "username": "Twitch username to check if already posted to a discord channel.",
+    }
+)
+class TwitchAlreadyPosted(Resource):
+    async def get(self, username):
+        """
+        Get all discord channels that have posted messages.
+
+        Use this route to check which discord channels have posted messages.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.get_posted(requestor, username=request.args.get("username"))

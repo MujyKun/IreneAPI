@@ -260,11 +260,31 @@ from .twitch import (
     update_posted,
     unsubscribe_from_twitch_channel,
     subscribe_to_twitch_channel,
+    get_twitch_channels_by_guild,
+    is_live as is_twitch_live,
+    username_exists as twitch_acc_exists,
+    get_posted,
 )
 
 # Helper Functions for routes.
 
 helper_routes = {
+    "twitch/already_posted/$username.GET": {
+        "function": get_posted,
+        "params": ["requestor", "username"],
+    },
+    "twitch/exists/$username.GET": {
+        "function": twitch_acc_exists,
+        "params": ["requestor", "username"],
+    },
+    "twitch/is_live.GET": {
+        "function": is_twitch_live,
+        "params": ["requestor", "usernames"],
+    },
+    "twitch/filter/$guild_id.GET": {
+        "function": get_twitch_channels_by_guild,
+        "params": ["requestor", "guild_id"],
+    },
     "twitch/$username.GET": {
         "function": get_twitch_channel,
         "params": ["requestor", "username"],
