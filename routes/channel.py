@@ -55,5 +55,7 @@ class Channels(Resource):
         """
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.add_channel(
-            requestor, channel_id=request.args.get("channel_id")
+            requestor,
+            channel_id=request.args.get("channel_id"),
+            guild_id=request.args.get("guild_id"),
         )

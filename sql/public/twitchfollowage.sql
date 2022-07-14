@@ -1,11 +1,10 @@
 CREATE TABLE IF NOT EXISTS public.twitchfollowage
 (
     username text,
-    guildid bigint,
     channelid bigint,
     posted boolean,
     roleid bigint,
-    PRIMARY KEY (username, guildid)
+    PRIMARY KEY (username, channelid)
 );
 
 ALTER TABLE public.twitchfollowage

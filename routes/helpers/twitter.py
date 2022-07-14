@@ -16,56 +16,14 @@ from resources import twitter
 
 
 @check_permission(permission_level=DEVELOPER)
-async def add_twitter_account(
-    requestor: Requestor, account_id: int, username: str
+async def _add_twitter_account(
+    requestor: Requestor, twitter_id: int, username: str
 ) -> dict:
     """
     Add a Twitter account's information to the Database.
     """
     return await self.db.execute(
-        "SELECT public.addtwitteraccount($1, $2)", int(account_id), username.lower()
-    )
-
-
-@check_permission(permission_level=DEVELOPER)
-async def delete_twitter_account(requestor: Requestor, account_id: int) -> dict:
-    """Delete a Twitter account from the Database."""
-    is_int64(account_id)
-    return await self.db.execute("SELECT public.deletetwitteraccount($1)", account_id)
-
-
-@check_permission(permission_level=DEVELOPER)
-async def add_twitter_subscription(
-    requestor: Requestor, account_id: int, channel_id: int, role_id: int = None
-) -> dict:
-    """
-    Make a channel subscribe to a Twitter account.
-    """
-    is_int64(account_id)
-    is_int64(channel_id)
-    if role_id:
-        role_id = int(role_id)
-        is_int64(role_id)
-
-    return await self.db.execute(
-        "SELECT public.addtwittersubscription($1, $2, $3)",
-        account_id,
-        channel_id,
-        role_id,
-    )
-
-
-@check_permission(permission_level=DEVELOPER)
-async def delete_twitter_subscription(
-    requestor: Requestor, account_id: int, channel_id: int
-) -> dict:
-    """
-    Delete a channel's subscription to a Twitter account.
-    """
-    is_int64(account_id)
-    is_int64(channel_id)
-    return await self.db.execute(
-        "SELECT public.deletetwittersubscription($1, $2)", account_id, channel_id
+        "SELECT public.addtwitteraccount($1, $2)", int(twitter_id), username.lower()
     )
 
 
@@ -73,7 +31,6 @@ async def delete_twitter_subscription(
 async def get_and_add_twitter_id(requestor: Requestor, username: str) -> dict:
     """
     Get and add a Twitter account to the database if it does not already exist.
-
     Will search database first and then make an api call.
     """
     username = username.lower()
@@ -81,40 +38,82 @@ async def get_and_add_twitter_id(requestor: Requestor, username: str) -> dict:
         "SELECT * FROM public.gettwitterid($1)", username
     )
     if response.get("results"):
-        return response
+        return {"results": {"twitter_id": response["results"]["t_accountid"]}}
 
     # make a call to twitter api.
-    account_id = await twitter.get_user_id(username=username)
+    twitter_id = await twitter.get_user_id(username=username)
 
-    if account_id:
-        await add_twitter_account(requestor, account_id, username)
-        return {"results": {"account_id": account_id}}
-
-
-@check_permission(permission_level=DEVELOPER)
-async def get_subscriptions(
-    requestor: Requestor, twitter_info: Optional[Union[int, str]] = None
-):
-    """
-    Get the subscriptions of one or several accounts.
-    """
-    query = "SELECT accountid, channelid, roleid FROM public.twitterfollowage"
-    if isinstance(twitter_info, str):
-        twitter_id = await get_and_add_twitter_id(twitter_info)
-    elif isinstance(twitter_info, int):
-        twitter_id = twitter_info
-    else:
-        return await self.db.fetch(query)
-
-    return await self.db.fetch(f"{query} WHERE accountid = $1", twitter_id)
+    if twitter_id:
+        await _add_twitter_account(requestor, twitter_id, username)
+        return {"results": {"twitter_id": twitter_id}}
+    return {"results": None}
 
 
 @check_permission(permission_level=DEVELOPER)
-async def get_accounts(requestor: Requestor):
+async def username_exists(requestor: Requestor, username: str) -> dict:
+    exists = bool(await twitter.get_user_id(username=username))
+    return {"results": exists}
+
+
+@check_permission(permission_level=DEVELOPER)
+async def add_twitter_subscription(
+    requestor: Requestor, twitter_id: int, channel_id: int, role_id: int = None
+) -> dict:
     """
-    Get the list of saved account ids and usernames.
+    Make a channel subscribe to a Twitter account.
     """
-    return await self.db.fetch("SELECT accountid, username FROM public.twitteraccounts")
+    is_int64(twitter_id)
+    is_int64(channel_id)
+    if role_id:
+        is_int64(role_id)
+
+    return await self.db.execute(
+        "SELECT public.addtwittersubscription($1, $2, $3, $4)",
+        twitter_id,
+        channel_id,
+        role_id,
+        False,
+    )
+
+
+@check_permission(permission_level=DEVELOPER)
+async def delete_twitter_subscription(
+    requestor: Requestor, twitter_id: int, channel_id: int
+) -> dict:
+    """
+    Delete a channel's subscription to a Twitter account.
+    """
+    is_int64(twitter_id)
+    is_int64(channel_id)
+    return await self.db.execute(
+        "SELECT public.deletetwittersubscription($1, $2)", twitter_id, channel_id
+    )
+
+
+@check_permission(permission_level=DEVELOPER)
+async def get_all_subscriptions(requestor: Requestor):
+    """Get all subscriptions."""
+    return await self.db.fetch("SELECT * FROM public.gettwitterchannels")
+
+
+@check_permission(permission_level=DEVELOPER)
+async def get_subscriptions(requestor: Requestor, username):
+    """Get all subscriptions for a specific Twitter username."""
+    return await self.db.fetch(
+        "SELECT * FROM public.gettwitterchannels WHERE username = $1", username
+    )
+
+
+@check_permission(permission_level=DEVELOPER)
+async def get_twitter_channels_by_guild(requestor: Requestor, guild_id: int) -> dict:
+    """Get specific Twitter channels subscribed to by a guild.
+
+    NOTE: This will return several rows (each row containing a subscription)
+    """
+    is_int64(guild_id)
+    return await self.db.fetch(
+        "SELECT * FROM public.gettwitterchannels WHERE guildid = $1", guild_id
+    )
 
 
 @check_permission(permission_level=DEVELOPER)
@@ -122,14 +121,25 @@ async def get_timeline(requestor: Requestor, twitter_id: int):
     """
     Get the timeline of an account.
     """
-    return await twitter.get_user_timeline(user_id=twitter_id)
+    full_info = await twitter.get_user_timeline(user_id=twitter_id)
+    timeline_data = full_info.get("data")
+    return {"results": timeline_data}
 
 
 @check_permission(permission_level=DEVELOPER)
-async def is_subscribed(requestor: Requestor, twitter_id: int, channel_id: int):
-    """
-    Check if a channel is subscribed.
-    """
-    return await self.db.fetch_row(
-        "SELECT public.gettwitterstatus($1, $2)", twitter_id, channel_id
+async def get_posted(requestor: Requestor, username: str) -> dict:
+    """Get all discord channels that have posted messages for a specific twitter account."""
+    return await self.db.fetch(
+        "SELECT * FROM public.gettwitterchannels WHERE username = $1 AND posted IS TRUE",
+        username,
+    )
+
+
+@check_permission(permission_level=DEVELOPER)
+async def update_posted(requestor: Requestor, twitter_id, channel_ids, posted) -> dict:
+    """Change the channels posted to."""
+    for channel_id in channel_ids:
+        is_int64(channel_id)
+    return await self.db.execute(
+        "SELECT public.updatepostedtwitter($1, $2, $3)", twitter_id, channel_ids, posted
     )

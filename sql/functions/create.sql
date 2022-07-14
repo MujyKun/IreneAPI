@@ -53,7 +53,7 @@ end;
 $$;
 
 
-create or replace function public.addchannel(t_channelid bigint)
+create or replace function public.addchannel(t_channelid bigint, t_guildid bigint)
     returns void
     language plpgsql
 as
@@ -64,11 +64,12 @@ begin
     SELECT COUNT(*) INTO t_channel_exists FROM public.channels WHERE t_channelid = channelid;
 
     IF t_channel_exists = 0 THEN
-        INSERT INTO public.channels(channelid)
-        VALUES(t_channelid);
+        INSERT INTO public.channels(channelid, guildid)
+        VALUES(t_channelid, t_guildid);
     END IF;
 end;
-$$;create or replace function public.addcommandusage(t_sessionid integer, t_commandname text)
+$$;
+create or replace function public.addcommandusage(t_sessionid integer, t_commandname text)
     returns integer
     language plpgsql
 as
@@ -504,7 +505,8 @@ begin
     END IF;
 end;
 $$;
-create or replace function public.addtwittersubscription(t_accountid bigint, t_channelid bigint, t_roleid bigint)
+create or replace function public.addtwittersubscription(t_accountid bigint, t_channelid bigint, t_roleid bigint,
+        t_posted bool)
     returns void
     language plpgsql
 as
@@ -517,11 +519,12 @@ begin
         WHERE t_accountid = accountid AND t_channelid = channelid;
 
     IF t_already_exists = 0 THEN
-        INSERT INTO public.twitterfollowage(accountid, channelid, roleid)
-        VALUES(t_accountid, t_channelid, t_roleid);
+        INSERT INTO public.twitterfollowage(accountid, channelid, roleid, posted)
+        VALUES(t_accountid, t_channelid, t_roleid, t_posted);
     END IF;
 end;
-$$;create or replace function unscramblegame.addus(t_dateid integer, t_status_ids integer[], t_mode_id integer,
+$$;
+create or replace function unscramblegame.addus(t_dateid integer, t_status_ids integer[], t_mode_id integer,
         t_difficulty_id integer)
     returns integer
     language plpgsql
@@ -1178,7 +1181,15 @@ $$;create or replace function public.updateposted(t_username text, channel_ids b
 as
 $$
 begin
-    UPDATE public.twitchfollowage SET posted = t_posted WHERE username = t_username AND channelid IN(channel_ids);
+    UPDATE public.twitchfollowage SET posted = t_posted WHERE username = t_username AND channelid = any(channel_ids);
+end;
+$$;create or replace function public.updatepostedtwitter(t_account_id int, channel_ids bigint[], t_posted bool)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    UPDATE public.twitterfollowage SET posted = t_posted WHERE accountid = t_account_id AND channelid = any(channel_ids);
 end;
 $$;create or replace function unscramblegame.updatestatus(t_game_id int, t_status_ids integer[])
     returns void

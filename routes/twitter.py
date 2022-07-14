@@ -12,109 +12,142 @@ from .helpers import BadRequest, is_int64, USER, GOD
 twitter = PintBlueprint("twitter", __name__, url_prefix="/twitter/")
 
 
-@twitter.route("<int:twitter_id>/<int:channel_id>")
-@twitter.doc(
-    params={
-        "twitter_id": "Twitter Account ID to manage the status of.",
-        "channel_id": "Channel ID to associate with the Twitter account.",
-    }
-)
-class TwitterSubscription(Resource):
-    async def get(self, twitter_id: int, channel_id: int):
-        """Check if a channel is subscribed to a Twitter channel.
+@twitter.route("<int:twitter_id>")
+@twitter.doc(params={"twitter_id": "Twitter Account ID to manage."})
+class TwitterAccount(Resource):
+    async def get(self, twitter_id):
+        """Get the timeline of a Twitter account.
 
-        Use this route to check if a channel is following a Twitter account. A login is NOT needed.
-        """
-        requestor = Requestor(0, GOD)
-        return await helper.is_subscribed(requestor, twitter_id, channel_id)
-
-    async def post(self, twitter_id: int, channel_id: int):
-        """Make a channel subscribe to a Twitter account.
-
-        Use this route to have a channel subscribe to a Twitter account.
-        Pass in a role_id as a query parameter if there is one.
+        Use this route to get the timeline of a Twitter account.
         """
         requestor = await login(headers=request.headers, data=request.args)
-        # TODO: If the role_id is passed in as a query parameter,
-        #  then it should not interfere with the login arguments.
-        return await helper.add_twitter_subscription(
-            requestor, twitter_id, channel_id, role_id=request.args.get("role_id")
+        return await helper.get_timeline(requestor, twitter_id)
+
+    async def put(self, twitter_id):
+        """Change whether a channel has been posted to.
+
+        Use this route to change the flag whether a channel has been posted to.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.update_posted(
+            requestor,
+            twitter_id=twitter_id,
+            channel_ids=request.args.get("channel_ids"),
+            posted=request.args.get("posted"),
         )
 
-    async def delete(self, twitter_id: int, channel_id: int):
-        """Make a channel unsubscribe from a Twitter account.
 
-        Use this route to have a channel unsubscribe from a Twitter account.
+@twitter.route("account/$username")
+@twitter.doc(params={"username": "Twitter Username to manage."})
+class TwitterUsername(Resource):
+    async def post(self, username):
+        """
+        Get (and Add) a Twitter Account.
+
+        Use this route to get a Twitter account's ID and insert it
+        into the database (if it does not already exist).
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.get_and_add_twitter_id(requestor, username)
+
+
+@twitter.route("already_posted/$username")
+@twitter.doc(
+    params={
+        "username": "Twitter username to check if already posted to a Discord channel."
+    }
+)
+class TwitterAlreadyPosted(Resource):
+    async def get(self, username):
+        """
+        Get all discord channels that have posted messages.
+
+        Use this route to check which discord channels have posted messages.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.get_posted(requestor, username=username)
+
+
+@twitter.route("")
+@twitter.doc()
+class TwitterAllSubscriptions(Resource):
+    async def get(self):
+        """Get all Twitter subscriptions.
+
+        Use this route to get all Twitter subscriptions.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.get_all_subscriptions(requestor)
+
+
+@twitter.route("<string:username>")
+@twitter.doc(params={"username": "Twitter Account Username to manage."})
+class TwitterSubscriptions(Resource):
+    async def get(self, username):
+        """Get the subscriptions for a specific Twitter username.
+
+        Use this route to get the subscriptions for a specific Twitter account.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.get_subscriptions(requestor, username=username)
+
+
+@twitter.route("modify/$twitter_id")
+@twitter.doc(params={"twitter_id": "Twitter Account ID to manage."})
+class TwitterSubscriptionsModify(Resource):
+    async def delete(self, twitter_id):
+        """Unsubscribe from a Twitter account.
+
+        Use this route to unsubscribe from a Twitter account.
         """
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.delete_twitter_subscription(
-            requestor, twitter_id, channel_id
+            requestor, twitter_id=twitter_id, channel_id=request.args.get("channel_id")
+        )
+
+    async def post(self, twitter_id):
+        """Subscribe to a Twitter account.
+
+        Use this route to subscribe to a Twitter account.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.add_twitter_subscription(
+            requestor,
+            twitter_id=twitter_id,
+            channel_id=request.args.get("channel_id"),
+            role_id=request.args.get("role_id"),
         )
 
 
-@twitter.route("<string:twitter_info>")
-@twitter.doc(params={"twitter_info": "Twitter username or ID to manage the status of."})
-class TwitterAccount(Resource):
-    async def get(self, twitter_info: Union[int, str]):
-        """Get the channels subscribed to the Twitter account.
+@twitter.route("exists/$username")
+@twitter.doc(
+    params={
+        "username": "Twitter username to confirm if it exists.",
+    }
+)
+class TwitterExists(Resource):
+    async def get(self, username):
+        """Check if a Twitter username exists.
 
-        Use this route to get the channel ids subscribed to the Twitter account. A login is needed.
-        Can pass in either a Twitter username or an Account ID.
+        Use this route to check if a Twitter username exists.
         """
         requestor = await login(headers=request.headers, data=request.args)
-        return await helper.get_subscriptions(requestor, twitter_info)
+        return await helper.username_exists(
+            requestor, username=request.args.get("username")
+        )
 
-    async def post(self, twitter_name: str):
-        """Add a Twitter account to the Database.
 
-        Use this route to add a Twitter account to the Database.
-        It is important to note a Twitter username must be entered and not a Twitter Account ID.
+@twitter.route("filter/$guild_id")
+@twitter.doc(
+    params={
+        "guild_id": "Discord Guild ID.",
+    }
+)
+class TwitterFilter(Resource):
+    async def get(self, guild_id):
+        """Get all channels affiliated with a guild.
+
+        Use this route to get all channels affiliated with a guild.
         """
         requestor = await login(headers=request.headers, data=request.args)
-        return await helper.get_and_add_twitter_id(requestor, twitter_name)
-
-    async def delete(self, twitter_id: int):
-        """Delete a Twitter account from the Database.
-
-        Use this route to remove a Twitter account from the Database.
-        This will also drop all subscriptions to the account. Use with caution.
-        It is important to note a Twitter Account ID must be entered and not a Twitter username.
-        """
-        requestor = await login(headers=request.headers, data=request.args)
-        return await helper.delete_twitter_account(requestor, twitter_id)
-
-
-@twitter.route("subscriptions")
-@twitter.doc()
-class TwitterSubscriptions(Resource):
-    async def get(self):
-        """Get the channels subscribed to all Twitter accounts.
-
-        Use this route to get the channel ids subscribed to all Twitter accounts. A login is needed.
-        """
-        requestor = await login(headers=request.headers, data=request.args)
-        return await helper.get_subscriptions(requestor=requestor)
-
-
-@twitter.route("accounts")
-@twitter.doc()
-class TwitterAccountInfo(Resource):
-    async def get(self):
-        """Get the accounts registered within the database.
-
-        Use this route to get the account ids and Twitter usernames registered. A login is needed.
-        """
-        requestor = await login(headers=request.headers, data=request.args)
-        return await helper.get_accounts(requestor=requestor)
-
-
-@twitter.route("timeline/<int:twitter_id>")
-@twitter.doc(params={"twitter_id": "Twitter Account ID to manage the status of."})
-class TwitterTimeline(Resource):
-    async def get(self, twitter_id: int):
-        """Get the timeline of a Twitter Account.
-
-        Use this route to get the timeline of a Twitter account. A login is needed.
-        """
-        requestor = await login(headers=request.headers, data=request.args)
-        return await helper.get_timeline(requestor=requestor, twitter_id=twitter_id)
+        return await helper.get_twitter_channels_by_guild(requestor, guild_id)

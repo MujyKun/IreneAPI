@@ -12,10 +12,14 @@ from models import Requestor
 
 
 @check_permission(permission_level=DEVELOPER)
-async def add_channel(requestor: Requestor, channel_id: int):
+async def add_channel(requestor: Requestor, channel_id: int, guild_id: int = None):
     """Add a channel."""
     is_int64(channel_id)
-    return await self.db.execute("SELECT public.addchannel($1)", channel_id)
+    if guild_id is not None:
+        is_int64(guild_id)
+    return await self.db.execute(
+        "SELECT public.addchannel($1, $2)", channel_id, guild_id
+    )
 
 
 @check_permission(permission_level=DEVELOPER)

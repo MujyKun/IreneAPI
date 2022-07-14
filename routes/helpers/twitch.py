@@ -35,10 +35,11 @@ async def get_twitch_channel(requestor: Requestor, username: str) -> dict:
 
 @check_permission(permission_level=DEVELOPER)
 async def get_twitch_channels_by_guild(requestor: Requestor, guild_id: int) -> dict:
-    """Get specific twitch channels subscribed to by guild.
+    """Get specific twitch channels subscribed to by a guild.
 
     NOTE: This will return several rows (each row containing a subscription)
     """
+    is_int64(guild_id)
     return await self.db.fetch(
         "SELECT * FROM public.gettwitchchannels WHERE guildid = $1", guild_id
     )

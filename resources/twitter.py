@@ -1,5 +1,6 @@
 from typing import Optional
 
+import peony.exceptions
 from peony.oauth_dance import oauth_dance, get_access_token
 from peony import PeonyClient
 from . import keys
@@ -33,6 +34,9 @@ class Twitter(PeonyClient):
         if not user_id and not username:
             return
 
+        if user_id:
+            user_id = str(user_id)
+
         return await self.api.users[
             user_id if user_id else (await self.get_user_id(username))
         ].tweets.get()
@@ -43,10 +47,14 @@ class Twitter(PeonyClient):
 
         :param username: (str) The user's username.
         """
-        response = await self.api.users.by.username[username].get()
+        try:
+            response = await self.api.users.by.username[username].get()
 
-        if response.get("data"):
-            return int(response["data"]["id"])
+            if response.get("data"):
+                return int(response["data"]["id"])
+        # any other exceptions should be raised.
+        except peony.exceptions.HTTPBadRequest as e:
+            return None
 
     async def me(self):
         """

@@ -142,14 +142,16 @@ from .user import (
 )
 
 from .twitter import (
-    add_twitter_account,
-    delete_twitter_account,
     add_twitter_subscription,
     delete_twitter_subscription,
     get_and_add_twitter_id,
-    get_subscriptions,
-    get_accounts,
-    get_timeline,
+    get_subscriptions as get_twitter_subscriptions,
+    get_timeline as get_twitter_timeline,
+    get_posted as get_twitter_posted,
+    update_posted as update_twitter_posted,
+    get_all_subscriptions as get_all_twitter_subscriptions,
+    username_exists as twitter_username_exists,
+    get_twitter_channels_by_guild,
 )
 
 from .channel import add_channel, delete_channel, get_channel, get_channels
@@ -269,6 +271,47 @@ from .twitch import (
 # Helper Functions for routes.
 
 helper_routes = {
+    "twitter/$twitter_id.GET": {
+        "function": get_twitter_timeline,
+        "params": ["requestor", "twitter_id"],
+    },
+    "twitter/$twitter_id.PUT": {
+        "function": update_twitter_posted,
+        "params": ["requestor", "twitter_id", "channel_ids", "posted"],
+    },
+    "twitter/account/$username.POST": {
+        "function": get_and_add_twitter_id,
+        "params": ["requestor", "username"],
+    },
+    "twitter/already_posted/$username.GET": {
+        "function": get_twitter_posted,
+        "params": ["requestor", "username"],
+    },
+    "twitter/.GET": {
+        "function": get_all_twitter_subscriptions,
+        "params": ["requestor"],
+    },
+    "twitter/$username.GET": {
+        "function": get_twitter_subscriptions,
+        "params": ["requestor", "username"],
+    },
+    "twitter/modify/$twitter_id.DELETE": {
+        "function": delete_twitter_subscription,
+        "params": ["requestor", "twitter_id", "channel_id"],
+    },
+    "twitter/modify/$twitter_id.POST": {
+        "function": add_twitter_subscription,
+        "params": ["requestor", "twitter_id", "channel_id"],
+        "optional": ["role_id"],
+    },
+    "twitter/exists/$username.GET": {
+        "function": twitter_username_exists,
+        "params": ["requestor", "username"],
+    },
+    "twitter/filter/$guild_id.GET": {
+        "function": get_twitter_channels_by_guild,
+        "params": ["requestor", "guild_id"],
+    },
     "twitch/already_posted/$username.GET": {
         "function": get_posted,
         "params": ["requestor", "username"],
@@ -783,43 +826,6 @@ helper_routes = {
         "function": delete_proofreader,
         "params": ["requestor", "user_id"],
     },
-    "twitter/$twitter_id/$channel_id.GET": {
-        "function": twitter.is_subscribed,
-        "params": ["requestor", "twitter_id", "channel_id"],
-    },
-    "twitter/$twitter_id/$channel_id.POST": {
-        "function": add_twitter_subscription,
-        "params": ["requestor", "account_id", "channel_id"],
-        "optional": ["role_id"],
-    },
-    "twitter/$twitter_id/$channel_id.DELETE": {
-        "function": delete_twitter_subscription,
-        "params": ["requestor", "account_id", "channel_id"],
-    },
-    "twitter/$twitter_info.GET": {
-        "function": get_subscriptions,
-        "params": ["requestor", "twitter_info"],
-    },  # twitter_info can be a twitter id or Twitter username.
-    "twitter/$twitter_info.POST": {
-        "function": get_and_add_twitter_id,
-        "params": ["requestor", "username"],
-    },
-    "twitter/$twitter_info.DELETE": {
-        "function": delete_twitter_account,
-        "params": ["requestor", "account_id"],
-    },
-    "twitter/subscriptions.GET": {
-        "function": get_subscriptions,
-        "params": ["requestor"],
-    },
-    "twitter/accounts.GET": {
-        "function": get_accounts,
-        "params": ["requestor"],
-    },
-    "twitter/timeline/$twitter_id.GET": {
-        "function": get_timeline,
-        "params": ["requestor", "twitter_id"],
-    },
     "channel/.GET": {
         "function": get_channels,
         "params": ["requestor"],
@@ -831,6 +837,7 @@ helper_routes = {
     "channel/.POST": {
         "function": add_channel,
         "params": ["requestor", "channel_id"],
+        "optional": ["guild_id"],
     },
     "channel/$channel_id.DELETE": {
         "function": delete_channel,

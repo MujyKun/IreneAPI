@@ -12,7 +12,7 @@ from .helpers import BadRequest, is_int64, USER, GOD
 twitch = PintBlueprint("twitch", __name__, url_prefix="/twitch/")
 
 
-@twitch.route("<int:username>")
+@twitch.route("<string:username>")
 @twitch.doc(
     params={
         "username": "Twitch username to manage.",
@@ -120,9 +120,7 @@ class TwitchExists(Resource):
         Use this route to check if a username exists.
         """
         requestor = await login(headers=request.headers, data=request.args)
-        return await helper.username_exists(
-            requestor, username=request.args.get("username")
-        )
+        return await helper.username_exists(requestor, username=username)
 
 
 @twitch.route("already_posted/$username")
@@ -139,4 +137,4 @@ class TwitchAlreadyPosted(Resource):
         Use this route to check which discord channels have posted messages.
         """
         requestor = await login(headers=request.headers, data=request.args)
-        return await helper.get_posted(requestor, username=request.args.get("username"))
+        return await helper.get_posted(requestor, username=username)
