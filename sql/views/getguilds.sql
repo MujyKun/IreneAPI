@@ -20,5 +20,7 @@ SELECT
        rolecount,
        shardid,
        createdate,
-       hasbot
+       hasbot,
+        (SELECT array_agg(t_gp.prefix)
+        FROM public.guildprefixes t_gp WHERE g.guildid = t_gp.guildid) AS prefixes
 FROM public.guilds g;

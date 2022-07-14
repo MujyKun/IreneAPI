@@ -252,7 +252,16 @@ from .unscramblegame import (
     update_status as update_us_status,
 )
 
-from .guild import get_guild, get_guilds, add_guild, delete_guild
+from .guild import (
+    get_guild,
+    get_guilds,
+    add_guild,
+    delete_guild,
+    add_prefix,
+    delete_prefix,
+    get_prefixes,
+    get_all_prefixes,
+)
 
 from .twitch import (
     get_twitch_channels,
@@ -269,6 +278,20 @@ from .twitch import (
 # Helper Functions for routes.
 
 helper_routes = {
+    "prefix/.GET": {"function": get_all_prefixes, "params": ["requestor"]},
+    "prefix/$guild_id.GET": {
+        "function": get_prefixes,
+        "params": ["requestor", "guild_id", "prefix"],
+    },
+    "prefix/$guild_id.POST": {
+        "function": add_prefix,
+        "params": ["requestor", "guild_id", "prefix"],
+    },
+    "prefix/$guild_id.DELETE": {
+        "function": delete_prefix,
+        "params": ["requestor", "guild_id", "prefix"],
+    },
+    "prefix/$guild_id"
     "twitter/$twitter_id.GET": {
         "function": get_twitter_timeline,
         "params": ["requestor", "twitter_id"],

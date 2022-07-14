@@ -79,3 +79,49 @@ class Guilds(Resource):
             create_date=request.args.get("create_date"),
             has_bot=request.args.get("has_bot"),
         )
+
+
+@guild.route("prefix/$guild_id")
+@guild.doc(
+    params={
+        "guild_id": "Guild ID to manage.",
+    }
+)
+class Prefixes(Resource):
+    async def get(self, guild_id):
+        """Get a guild's prefixes.
+
+        Use this route to get a specific guild's prefixes.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.get_prefixes(requestor, guild_id)
+
+    async def post(self, guild_id):
+        """Add a prefix to a guild.
+
+        Use this prefix to add a prefix to a guild.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.add_prefix(requestor, guild_id, request.args.get("prefix"))
+
+    async def delete(self, guild_id):
+        """Delete a prefix from a guild.
+
+        Use this route to delete a prefix from a guild.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.delete_prefix(
+            requestor, guild_id, request.args.get("prefix")
+        )
+
+
+@guild.route("prefix/")
+@guild.doc()
+class GeneralPrefixes(Resource):
+    async def get(self, guild_id):
+        """Get all guild prefixes.
+
+        Use this route to get all guild prefixes.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.get_all_prefixes(requestor)

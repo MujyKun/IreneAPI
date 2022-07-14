@@ -32,7 +32,6 @@ ALTER TABLE interactions.disabledtypes DROP CONSTRAINT IF EXISTS interactions_gu
 ALTER TABLE public.guildprefixes DROP CONSTRAINT IF EXISTS guildprefixes_guildid;
 ALTER TABLE public.logging DROP CONSTRAINT IF EXISTS logging_guildid;
 ALTER TABLE public.roles DROP CONSTRAINT IF EXISTS roles_guildid;
-ALTER TABLE public.twitchfollowage DROP CONSTRAINT IF EXISTS twitchfollowage_guildid;
 ALTER TABLE groupmembers.groupaliases ADD CONSTRAINT groupaliases_guildid FOREIGN KEY (guildid) REFERENCES public.guilds(guildid) ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE groupmembers.personaliases ADD CONSTRAINT personaliases_guildid FOREIGN KEY (guildid) REFERENCES public.guilds(guildid) ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE public.customcommands ADD CONSTRAINT customcommands_guildid FOREIGN KEY (guildid) REFERENCES public.guilds(guildid) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -40,7 +39,6 @@ ALTER TABLE interactions.disabledtypes ADD CONSTRAINT interactions_guildid FOREI
 ALTER TABLE public.guildprefixes ADD CONSTRAINT guildprefixes_guildid FOREIGN KEY (guildid) REFERENCES public.guilds(guildid) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE public.logging ADD CONSTRAINT logging_guildid FOREIGN KEY (guildid) REFERENCES public.guilds(guildid) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE public.roles ADD CONSTRAINT roles_guildid FOREIGN KEY (guildid) REFERENCES public.guilds(guildid) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE public.twitchfollowage ADD CONSTRAINT twitchfollowage_guildid FOREIGN KEY (guildid) REFERENCES public.guilds(guildid) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE groupmembers.personaliases DROP CONSTRAINT IF EXISTS personaliases_personid;
 ALTER TABLE groupmembers.affiliation DROP CONSTRAINT IF EXISTS affiliation_personid;

@@ -1,6 +1,42 @@
-from . import self, check_permission, OWNER, DEVELOPER, SUPER_PATRON, FRIEND, USER
+from . import (
+    self,
+    check_permission,
+    OWNER,
+    DEVELOPER,
+    SUPER_PATRON,
+    FRIEND,
+    USER,
+    is_int64,
+)
 from models import Requestor
 from datetime import datetime
+
+
+@check_permission(permission_level=DEVELOPER)
+async def get_prefixes(requestor: Requestor, guild_id: int):
+    is_int64(guild_id)
+    return await self.db.fetch_row(
+        "SELECT * FROM public.getprefixes WHERE guildid = $1", guild_id
+    )
+
+
+@check_permission(permission_level=DEVELOPER)
+async def get_all_prefixes(requestor: Requestor):
+    return await self.db.fetch("SELECT * FROM public.getprefixes")
+
+
+@check_permission(permission_level=DEVELOPER)
+async def add_prefix(requestor: Requestor, guild_id: int, prefix: str):
+    is_int64(guild_id)
+    if not prefix:
+        return {"results": {"error": "An invalid prefix was entered."}}
+    return await self.db.execute("SELECT public.addprefix($1, $2)", guild_id, prefix)
+
+
+@check_permission(permission_level=DEVELOPER)
+async def delete_prefix(requestor: Requestor, guild_id: int, prefix: str):
+    is_int64(guild_id)
+    return await self.db.execute("SELECT public.deleteprefix($1, $2)", guild_id, prefix)
 
 
 @check_permission(permission_level=DEVELOPER)

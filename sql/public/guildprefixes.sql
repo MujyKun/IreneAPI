@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS public.guildprefixes
 (
     guildid bigint,
     prefix text,
-    PRIMARY KEY (guildid)
+    PRIMARY KEY (guildid, prefix)
 );
 
 ALTER TABLE public.guildprefixes
