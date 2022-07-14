@@ -3,7 +3,6 @@ CREATE TABLE IF NOT EXISTS public.twitterfollowage
     accountid bigint,
     channelid bigint,
     roleid bigint,
-    posted bool,
     PRIMARY KEY (accountid, channelid)
 );
 

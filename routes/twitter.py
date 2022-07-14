@@ -23,19 +23,6 @@ class TwitterAccount(Resource):
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.get_timeline(requestor, twitter_id)
 
-    async def put(self, twitter_id):
-        """Change whether a channel has been posted to.
-
-        Use this route to change the flag whether a channel has been posted to.
-        """
-        requestor = await login(headers=request.headers, data=request.args)
-        return await helper.update_posted(
-            requestor,
-            twitter_id=twitter_id,
-            channel_ids=request.args.get("channel_ids"),
-            posted=request.args.get("posted"),
-        )
-
 
 @twitter.route("account/$username")
 @twitter.doc(params={"username": "Twitter Username to manage."})
@@ -49,23 +36,6 @@ class TwitterUsername(Resource):
         """
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.get_and_add_twitter_id(requestor, username)
-
-
-@twitter.route("already_posted/$username")
-@twitter.doc(
-    params={
-        "username": "Twitter username to check if already posted to a Discord channel."
-    }
-)
-class TwitterAlreadyPosted(Resource):
-    async def get(self, username):
-        """
-        Get all discord channels that have posted messages.
-
-        Use this route to check which discord channels have posted messages.
-        """
-        requestor = await login(headers=request.headers, data=request.args)
-        return await helper.get_posted(requestor, username=username)
 
 
 @twitter.route("")

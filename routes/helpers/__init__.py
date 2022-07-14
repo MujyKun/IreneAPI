@@ -147,8 +147,6 @@ from .twitter import (
     get_and_add_twitter_id,
     get_subscriptions as get_twitter_subscriptions,
     get_timeline as get_twitter_timeline,
-    get_posted as get_twitter_posted,
-    update_posted as update_twitter_posted,
     get_all_subscriptions as get_all_twitter_subscriptions,
     username_exists as twitter_username_exists,
     get_twitter_channels_by_guild,
@@ -275,16 +273,8 @@ helper_routes = {
         "function": get_twitter_timeline,
         "params": ["requestor", "twitter_id"],
     },
-    "twitter/$twitter_id.PUT": {
-        "function": update_twitter_posted,
-        "params": ["requestor", "twitter_id", "channel_ids", "posted"],
-    },
     "twitter/account/$username.POST": {
         "function": get_and_add_twitter_id,
-        "params": ["requestor", "username"],
-    },
-    "twitter/already_posted/$username.GET": {
-        "function": get_twitter_posted,
         "params": ["requestor", "username"],
     },
     "twitter/.GET": {

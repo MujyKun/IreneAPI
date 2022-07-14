@@ -124,22 +124,3 @@ async def get_timeline(requestor: Requestor, twitter_id: int):
     full_info = await twitter.get_user_timeline(user_id=twitter_id)
     timeline_data = full_info.get("data")
     return {"results": timeline_data}
-
-
-@check_permission(permission_level=DEVELOPER)
-async def get_posted(requestor: Requestor, username: str) -> dict:
-    """Get all discord channels that have posted messages for a specific twitter account."""
-    return await self.db.fetch(
-        "SELECT * FROM public.gettwitterchannels WHERE username = $1 AND posted IS TRUE",
-        username,
-    )
-
-
-@check_permission(permission_level=DEVELOPER)
-async def update_posted(requestor: Requestor, twitter_id, channel_ids, posted) -> dict:
-    """Change the channels posted to."""
-    for channel_id in channel_ids:
-        is_int64(channel_id)
-    return await self.db.execute(
-        "SELECT public.updatepostedtwitter($1, $2, $3)", twitter_id, channel_ids, posted
-    )
