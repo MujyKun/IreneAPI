@@ -278,20 +278,19 @@ from .twitch import (
 # Helper Functions for routes.
 
 helper_routes = {
-    "prefix/.GET": {"function": get_all_prefixes, "params": ["requestor"]},
-    "prefix/$guild_id.GET": {
+    "guild/prefix/.GET": {"function": get_all_prefixes, "params": ["requestor"]},
+    "guild/prefix/$guild_id.GET": {
         "function": get_prefixes,
         "params": ["requestor", "guild_id", "prefix"],
     },
-    "prefix/$guild_id.POST": {
+    "guild/prefix/$guild_id.POST": {
         "function": add_prefix,
         "params": ["requestor", "guild_id", "prefix"],
     },
-    "prefix/$guild_id.DELETE": {
+    "guild/prefix/$guild_id.DELETE": {
         "function": delete_prefix,
         "params": ["requestor", "guild_id", "prefix"],
     },
-    "prefix/$guild_id"
     "twitter/$twitter_id.GET": {
         "function": get_twitter_timeline,
         "params": ["requestor", "twitter_id"],
