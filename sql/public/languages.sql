@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS public.languages
 (
     languageid serial,
-    shortname character(5) UNIQUE,
+    shortname text UNIQUE,
     name text UNIQUE,
     PRIMARY KEY (languageid)
 );

@@ -1,5 +1,5 @@
 create or replace function public.addprefix(t_guild_id bigint, t_prefix text)
-    returns integer
+    returns void
     language plpgsql
 as
 $$

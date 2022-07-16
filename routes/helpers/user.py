@@ -22,12 +22,11 @@ async def get_all_users(requestor: Requestor) -> dict:
 
 @check_permission(permission_level=DEVELOPER)
 async def get_user(requestor: Requestor, user_id: int) -> dict:
-    """Get a user's information if they exist.
-
-    Pass in the user id as 0 to get all users.
-    """
+    """Get a user's information if they exist."""
     is_int64(user_id)
-    return await self.db.fetch_row("SELECT * FROM public.getuser($1)", user_id)
+    return await self.db.fetch_row(
+        "SELECT * FROM public.getusers WHERE userid = $1", user_id
+    )
 
 
 @check_permission(permission_level=DEVELOPER)

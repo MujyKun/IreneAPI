@@ -407,7 +407,19 @@ begin
     VALUES(t_name) returning positionid INTO t_position_id;
     return t_position_id;
 end;
-$$;create or replace function public.addproofreader(t_userid bigint)
+$$;create or replace function public.addprefix(t_guild_id bigint, t_prefix text)
+    returns void
+    language plpgsql
+as
+$$
+begin
+
+    INSERT INTO public.guildprefixes(guildid, prefix) VALUES(t_guild_id, t_prefix);
+end;
+$$;
+
+
+create or replace function public.addproofreader(t_userid bigint)
     returns void
     language plpgsql
 as
@@ -808,6 +820,16 @@ $$;
 async def add_fandom(requestor: Requestor, group_id, fandom_name) -> dict:
     """Add a fandom"""
     return await self.db.execute("SELECT * FROM groupmembers.addfandom($1, $2)", group_id, fandom_name)
+create or replace function public.deleteprefix(t_guild_id bigint, t_prefix text)
+    returns void
+    language plpgsql
+as
+$$
+begin
+
+    DELETE FROM public.guildprefixes WHERE guildid = t_guild_id AND prefix = t_prefix;
+end;
+$$;
 create or replace function public.deleteproofreader(t_userid bigint)
     returns void
     language plpgsql
