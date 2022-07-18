@@ -82,3 +82,4 @@ from .user import user
 from .guessinggame import gg as guessinggame
 from .unscramblegame import us as unscramblegame
 from .twitch import twitch
+from .wolfram import wolfram

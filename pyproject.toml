@@ -29,6 +29,7 @@ pre-commit = "2.19.0"
 quart-openapi = {version = "1.7.2", extras = ["doc"]}
 aiogoogle = "^3.1.1"
 peony-twitter = {extras = ["all"], version = "^2.1.2"}
+xmltodict = "^0.13.0"
 
 [tool.poetry.dev-dependencies]
 

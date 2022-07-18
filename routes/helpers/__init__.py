@@ -275,11 +275,14 @@ from .twitch import (
     get_posted,
 )
 
+from .wolfram import wolfram_query
+
 from .language import get_languages
 
 # Helper Functions for routes.
 
 helper_routes = {
+    "wolfram/.POST": {"function": wolfram_query, "params": ["requestor", "query"]},
     "language/.GET": {"function": get_languages, "params": ["requestor"]},
     "guild/prefix/.GET": {"function": get_all_prefixes, "params": ["requestor"]},
     "guild/prefix/$guild_id.GET": {

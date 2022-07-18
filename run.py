@@ -33,6 +33,7 @@ from routes import (
     user_status,
     twitch,
     unscramblegame,
+    wolfram,
 )
 from routes.helpers.errors import BaseError
 from quart_openapi import Pint, Resource
@@ -68,6 +69,7 @@ blueprints = [
     user_status,
     unscramblegame,
     twitch,
+    wolfram,
     websocket_blueprint,
 ]
 
