@@ -278,10 +278,28 @@ from .twitch import (
 from .wolfram import wolfram_query
 
 from .language import get_languages
+from .biasgame import generate_pvp, generate_bracket, get_winners, upsert_wins
 
 # Helper Functions for routes.
 
 helper_routes = {
+    "biasgame/winners.PUT": {
+        "function": upsert_wins,
+        "params": ["requestor", "user_id", "person_id"],
+    },
+    "biasgame/winners.POST": {
+        "function": get_winners,
+        "params": ["requestor", "user_id"],
+        "optional": ["limit"],
+    },
+    "biasgame/generate_bracket.POST": {
+        "function": generate_bracket,
+        "params": ["requestor", "game_info"],
+    },
+    "biasgame/generate_pvp.POST": {
+        "function": generate_pvp,
+        "params": ["requestor", "first_file_name", "second_file_name"],
+    },
     "wolfram/.POST": {"function": wolfram_query, "params": ["requestor", "query"]},
     "language/.GET": {"function": get_languages, "params": ["requestor"]},
     "guild/prefix/.GET": {"function": get_all_prefixes, "params": ["requestor"]},
