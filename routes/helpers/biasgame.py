@@ -23,7 +23,7 @@ from resources.keys import avatar_location, bias_game_location, image_host
 from random import randint
 
 
-DIR_FILE_LIMIT = 2
+DIR_FILE_LIMIT = 20000
 
 
 def blocking_remove_oldest_files():

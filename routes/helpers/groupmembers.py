@@ -233,8 +233,8 @@ async def add_person(
     call_count,
 ) -> dict:
     """Add a person."""
-    return await self.db.fetch_row(
-        "SELECT * FROM groupmembers.addperson($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+    results = await self.db.fetch_row(
+        "SELECT * FROM groupmembers.addperson($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
         date_id,
         name_id,
         former_name_id,
@@ -244,9 +244,22 @@ async def add_person(
         display_id,
         social_id,
         location_id,
-        tag_ids,
         blood_id,
         call_count,
+    )
+    if results:
+        t_results = results.get("results")
+        if t_results:
+            person_id = t_results["t_person_id"]
+            for tag_id in tag_ids:
+                await add_person_tag(requestor, tag_id, person_id)
+    return results
+
+
+@check_permission(permission_level=DEVELOPER)
+async def add_person_tag(requestor: Requestor, tag_id, person_id):
+    return await self.db.execute(
+        "SELECT * FROM groupmembers.addpersontag($1, $2)", tag_id, person_id
     )
 
 

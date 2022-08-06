@@ -10,9 +10,10 @@ declare
 begin
 
     INSERT INTO groupmembers.person(dateid, nameid, formernameid, gender, description, height, displayid, socialid,
-                                    locationid, tagids, bloodid, callcount)
+                                    locationid, bloodid, callcount)
     VALUES (t_dateid, t_nameid, t_formernameid, t_gender, t_description, t_height,
-            t_displayid, t_socialid, t_locationid, t_tagids, t_bloodid, t_callcount) returning personid INTO t_person_id;
+            t_displayid, t_socialid, t_locationid, t_bloodid, t_callcount) returning personid INTO t_person_id;
+
     return t_person_id;
 end;
 $$;
