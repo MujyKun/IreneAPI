@@ -7,6 +7,11 @@ ALTER TABLE groupmembers.groupaliases ADD CONSTRAINT groupaliases_groupid FOREIG
 ALTER TABLE groupmembers.grouptags ADD CONSTRAINT tags_groupid FOREIGN KEY (groupid) REFERENCES groupmembers.groups(groupid) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE groupmembers.fandom ADD CONSTRAINT fandom_groupid FOREIGN KEY (groupid) REFERENCES groupmembers.groups(groupid) ON DELETE CASCADE ON UPDATE CASCADE;
 
+ALTER TABLE groupmembers.grouptags DROP CONSTRAINT IF EXISTS tags_tag_id;
+ALTER TABLE groupmembers.persontags DROP CONSTRAINT IF EXISTS p_tags_tag_id;
+ALTER TABLE groupmembers.grouptags ADD CONSTRAINT tags_tag_id FOREIGN KEY (tagid) REFERENCES groupmembers.tag(tagid) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE groupmembers.persontags ADD CONSTRAINT p_tags_tag_id FOREIGN KEY (tagid) REFERENCES groupmembers.tag(tagid) ON DELETE CASCADE ON UPDATE CASCADE;
+
 ALTER TABLE groupmembers.automedia DROP CONSTRAINT IF EXISTS automedia_channelid;
 ALTER TABLE blackjack.games DROP CONSTRAINT IF EXISTS games_channelid;
 ALTER TABLE groupmembers.automedia ADD CONSTRAINT automedia_channelid FOREIGN KEY (channelid) REFERENCES public.channels(channelid) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -159,4 +164,5 @@ ALTER TABLE public.users DROP CONSTRAINT IF EXISTS users_language;
 ALTER TABLE public.languagepacks DROP CONSTRAINT IF EXISTS pack_language;
 ALTER TABLE public.users ADD CONSTRAINT users_language FOREIGN KEY (languageid) REFERENCES public.languages(languageid) ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE public.languagepacks ADD CONSTRAINT pack_language FOREIGN KEY (languageid) REFERENCES public.languages(languageid) ON DELETE SET NULL ON UPDATE CASCADE;
+
 

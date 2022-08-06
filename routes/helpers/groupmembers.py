@@ -203,7 +203,7 @@ async def add_group(
     tag_ids,
 ) -> dict:
     """Add a group."""
-    return await self.db.fetch_row(
+    results = await self.db.fetch_row(
         "SELECT * FROM groupmembers.addgroup($1, $2, $3, $4, $5, $6, $7, $8)",
         group_name,
         date_id,
@@ -214,6 +214,13 @@ async def add_group(
         social_id,
         tag_ids,
     )
+    if results:
+        t_results = results.get("results")
+        if t_results:
+            group_id = t_results["t_group_id"]
+            for tag_id in tag_ids:
+                await add_group_tag(requestor, tag_id, group_id)
+    return results
 
 
 @check_permission(permission_level=DEVELOPER)
@@ -260,6 +267,13 @@ async def add_person(
 async def add_person_tag(requestor: Requestor, tag_id, person_id):
     return await self.db.execute(
         "SELECT * FROM groupmembers.addpersontag($1, $2)", tag_id, person_id
+    )
+
+
+@check_permission(permission_level=DEVELOPER)
+async def add_group_tag(requestor: Requestor, tag_id, group_id):
+    return await self.db.execute(
+        "SELECT * FROM groupmembers.addgrouptag($1, $2)", tag_id, group_id
     )
 
 

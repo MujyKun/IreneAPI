@@ -6,6 +6,6 @@ $$
 begin
 
     INSERT INTO groupmembers.fandom(groupid, name)
-    VALUES(t_groupid, t_name);
+    VALUES(t_groupid, t_name) ON CONFLICT DO NOTHING;
 end;
 $$;

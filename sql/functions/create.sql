@@ -180,7 +180,7 @@ begin
     return t_gg_id;
 end;
 $$;create or replace function groupmembers.addgroup(t_name text, t_dateid integer, t_description text, t_companyid integer,
-                                                 t_displayid integer, t_website text, t_socialid integer, t_tagids integer[])
+                                                 t_displayid integer, t_website text, t_socialid integer)
     returns integer
     language plpgsql
 as
@@ -189,8 +189,8 @@ declare
     t_group_id integer;
 begin
 
-    INSERT INTO groupmembers.groups(name, dateid, description, companyid, displayid, website, socialid, tagids)
-    VALUES(t_name, t_dateid, t_description, t_companyid, t_displayid, t_website, t_socialid, t_tagids) returning groupid INTO t_group_id;
+    INSERT INTO groupmembers.groups(name, dateid, description, companyid, displayid, website, socialid)
+    VALUES(t_name, t_dateid, t_description, t_companyid, t_displayid, t_website, t_socialid) returning groupid INTO t_group_id;
     return t_group_id;
 end;
 $$;create or replace function groupmembers.addgroupalias(t_alias text, t_groupid integer, t_guildid bigint)
@@ -207,7 +207,15 @@ begin
     return t_alias_id;
 end;
 $$;
-create or replace function public.addguild(
+create or replace function groupmembers.addgrouptag(t_tag_id integer, t_group_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    INSERT INTO groupmembers.grouptags(tagid, groupid) VALUES (t_tag_id, t_group_id) ON CONFLICT DO NOTHING;
+end;
+$$;create or replace function public.addguild(
             t_guildid bigint,
             t_name text,
             t_emojicount integer,
@@ -375,9 +383,10 @@ declare
 begin
 
     INSERT INTO groupmembers.person(dateid, nameid, formernameid, gender, description, height, displayid, socialid,
-                                    locationid, tagids, bloodid, callcount)
+                                    locationid, bloodid, callcount)
     VALUES (t_dateid, t_nameid, t_formernameid, t_gender, t_description, t_height,
-            t_displayid, t_socialid, t_locationid, t_tagids, t_bloodid, t_callcount) returning personid INTO t_person_id;
+            t_displayid, t_socialid, t_locationid, t_bloodid, t_callcount) returning personid INTO t_person_id;
+
     return t_person_id;
 end;
 $$;create or replace function groupmembers.addpersonalias(t_alias text, t_personid integer, t_guildid bigint)
@@ -394,7 +403,15 @@ begin
     return t_alias_id;
 end;
 $$;
-create or replace function groupmembers.addposition(t_name text)
+create or replace function groupmembers.addpersontag(t_tag_id integer, t_person_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    INSERT INTO groupmembers.persontags(tagid, personid) VALUES (t_tag_id, t_person_id) ON CONFLICT DO NOTHING;
+end;
+$$;create or replace function groupmembers.addposition(t_name text)
     returns integer
     language plpgsql
 as
