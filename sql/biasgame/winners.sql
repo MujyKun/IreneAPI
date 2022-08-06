@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS biasgame.winners
     personid integer,
     userid bigint,
     wins integer,
-    PRIMARY KEY (personid)
+    CONSTRAINT bg_personid_userid PRIMARY KEY (personid, userid)
 );
 
 ALTER TABLE biasgame.winners

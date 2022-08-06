@@ -43,12 +43,14 @@ ALTER TABLE public.roles ADD CONSTRAINT roles_guildid FOREIGN KEY (guildid) REFE
 ALTER TABLE groupmembers.personaliases DROP CONSTRAINT IF EXISTS personaliases_personid;
 ALTER TABLE groupmembers.affiliation DROP CONSTRAINT IF EXISTS affiliation_personid;
 ALTER TABLE biasgame.winners DROP CONSTRAINT IF EXISTS winners_personid;
+ALTER TABLE biasgame.winners DROP CONSTRAINT IF EXISTS winners_userid;
 ALTER TABLE blackjack.customcards DROP CONSTRAINT IF EXISTS customcards_personid;
 ALTER TABLE groupmembers.persontags DROP CONSTRAINT IF EXISTS tags_personid;
 ALTER TABLE groupmembers.personaliases ADD CONSTRAINT personaliases_personid FOREIGN KEY (personid) REFERENCES groupmembers.person(personid) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE groupmembers.affiliation ADD CONSTRAINT affiliation_personid FOREIGN KEY (personid) REFERENCES groupmembers.person(personid) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE groupmembers.persontags ADD CONSTRAINT tags_personid FOREIGN KEY (personid) REFERENCES groupmembers.person(personid) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE biasgame.winners ADD CONSTRAINT winners_personid FOREIGN KEY (personid) REFERENCES groupmembers.person(personid) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE biasgame.winners ADD CONSTRAINT winners_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE blackjack.customcards ADD CONSTRAINT customcards_personid FOREIGN KEY (personid) REFERENCES groupmembers.person(personid) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE groupmembers.groups DROP CONSTRAINT IF EXISTS group_companyid;
