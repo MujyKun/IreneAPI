@@ -95,15 +95,15 @@ async def _generate_media(
     is_int64(min_faces)
     is_int64(max_faces)
 
-    args = {object_id, min_faces, max_faces, nsfw, enabled}
+    args = (object_id, min_faces, max_faces, nsfw, enabled)
     query = (
         f"SELECT * FROM groupmembers.getmedia WHERE {object_id_type}id = $1 AND faces > $2 AND faces < $3 "
         "AND nsfw = $4 AND enabled = $5"
     )
     if file_type:
-        args.add(file_type)
+        args.__add__(file_type)
         query += " AND filetype = $6"
-    query += "ORDER BY RAND() LIMIT 1"
+    query += "ORDER BY RANDOM() LIMIT 1"
     media_info = await self.db.fetch_row(query, *args)
     return await download_and_get_image_host_url(media_info)
 
