@@ -35,8 +35,8 @@ class InvalidLogin(BaseError):
 class BadRequest(BaseError):
     """Raised when there is a bad request (missing information or bad input)"""
 
-    def __init__(self):
+    def __init__(self, callback_id=None):
         super(BadRequest, self).__init__(
             status_code=400,
-            message=f"Bad Request. Please follow the documentation for login at {'...'}",
+            message=f"Bad Request for CallBack ID: {callback_id}. Please follow the documentation at {'...'}",
         )

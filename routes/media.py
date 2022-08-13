@@ -76,3 +76,29 @@ class Medias(Resource):
             enabled=request.args.get("enabled"),
             is_nsfw=request.args.get("is_nsfw"),
         )
+
+
+@media.route("affiliations")
+@media.doc()
+class MediaAff(Resource):
+    async def get(self):
+        """Get all media ids that belong to a list of affiliations
+
+        Use this route to get all media ids that belong to a list of affiliations.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.get_media_by_affiliations(
+            requestor, request.args.get("affiliation_ids"), request.args.get("limit")
+        )
+
+
+@media.route("download/<int:media_id>")
+@media.doc(
+    params={
+        "media_id": "Media ID to manage.",
+    }
+)
+class MediaDownload(Resource):
+    async def get(self, media_id):
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.get_image_host_url(requestor, media_id)

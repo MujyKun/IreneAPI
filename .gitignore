@@ -10,3 +10,4 @@ venv/
 *.pickle
 idol/*
 sql/functions/create.sql
+*service_account.json

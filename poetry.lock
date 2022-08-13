@@ -19,7 +19,7 @@ python-versions = ">=3.6,<4.0"
 
 [[package]]
 name = "aiogoogle"
-version = "3.2.1"
+version = "4.3.0"
 description = "Async Google API client"
 category = "main"
 optional = false
@@ -33,8 +33,8 @@ google-auth = "*"
 tonyg-rfc3339 = "*"
 
 [package.extras]
-curio_asks = ["asks", "curio"]
-trio_asks = ["asks", "trio"]
+trio_asks = ["trio", "asks"]
+curio_asks = ["curio", "asks"]
 
 [[package]]
 name = "aiohttp"
@@ -1053,7 +1053,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "cc6d4e51bd7416996741876fcb53996981783294aab3117d9c51fdbac4cef1f1"
+content-hash = "4d597c45d651fc3e215a795eb079670a9c5f7410739baf3da0642f6b0f495b2d"
 
 [metadata.files]
 aiodns = []
@@ -1061,10 +1061,7 @@ aiofiles = [
     {file = "aiofiles-0.8.0-py3-none-any.whl", hash = "sha256:7a973fc22b29e9962d0897805ace5856e6a566ab1f0c8e5c91ff6c866519c937"},
     {file = "aiofiles-0.8.0.tar.gz", hash = "sha256:8334f23235248a3b2e83b2c3a78a22674f39969b96397126cc93664d9a901e59"},
 ]
-aiogoogle = [
-    {file = "aiogoogle-3.2.1-py3-none-any.whl", hash = "sha256:dae99fb6e6fef0a8ec5eb38a66fb406f7dccca0eac92f3ba1a956118befc0f7e"},
-    {file = "aiogoogle-3.2.1.tar.gz", hash = "sha256:b2adc8f41f267d00264de1077ad4c46522f97faf27a9ca34279f2cae5f43c8f8"},
-]
+aiogoogle = []
 aiohttp = [
     {file = "aiohttp-3.8.1-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:1ed0b6477896559f17b9eaeb6d38e07f7f9ffe40b9f0f9627ae8b9926ae260a8"},
     {file = "aiohttp-3.8.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:7dadf3c307b31e0e61689cbf9e06be7a867c563d5a63ce9dca578f956609abf8"},

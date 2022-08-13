@@ -1,3 +1,4 @@
+import concurrent.futures
 from typing import List
 
 from . import (
@@ -15,6 +16,10 @@ from models import Requestor
 from resources import drive
 from resources.keys import person_folder, image_host
 from datetime import datetime
+
+
+DIR_FILE_LIMIT = 25000
+_new_photo_counter = 0
 
 
 @check_permission(permission_level=SUPER_PATRON)
@@ -84,6 +89,7 @@ async def _generate_media(
     with string manipulation and can be subject to SQL Injection.
 
     NOTE: object_id_type can also support the input of "media", but is suited for "person", "affiliation", or "group".
+    as a specific media id cannot be filtered.
     """
     is_int64(object_id)
     is_int64(min_faces)
@@ -99,13 +105,65 @@ async def _generate_media(
         query += " AND filetype = $6"
     query += "ORDER BY RAND() LIMIT 1"
     media_info = await self.db.fetch_row(query, *args)
+    return await download_and_get_image_host_url(media_info)
+
+
+@check_permission(permission_level=SUPER_PATRON)
+async def get_image_host_url(requestor: Requestor, media_id: int):
+    is_int64(media_id)
+    media_info = await self.db.fetch_row(
+        "SELECT * FROM groupmembers.getmedia WHERE mediaid = $1", media_id
+    )
+    return await download_and_get_image_host_url(media_info)
+
+
+def blocking_remove_oldest_files():
+    """Remove the oldest files in the person directory if it surpasses the file limit."""
+    from os import listdir, unlink
+    from os.path import getctime
+
+    files = listdir(person_folder)
+    if len(files) < DIR_FILE_LIMIT:
+        return
+
+    webp_files = [
+        f"{person_folder}{file_name}"
+        for file_name in files
+        if file_name.endswith(".webp")
+    ]
+    sorted_by_oldest_files = sorted(webp_files, key=getctime)
+    _ = [
+        unlink(file_path)
+        for file_path in sorted_by_oldest_files[0 : DIR_FILE_LIMIT // 2]
+    ]
+
+
+async def download_and_get_image_host_url(media_info):
+    """
+    Download and get the image host's url.
+    """
     if not media_info["results"]:
         return media_info
 
+    media_id = media_info["results"]["mediaid"]
+    file_type = media_info["results"]["filetype"]
+    if file_type and file_type in ["jpeg", "png", "jpg", "webp"]:
+        file_path = f"{person_folder}{media_id}.webp"
+    else:
+        file_path = f"{person_folder}{media_id}.{file_type}"
     g_drive_id = drive.get_id_from_url(media_info["results"]["link"])
-    await drive.download_file(g_drive_id, person_folder)
-    # https://images.irenebot.com/00000000
+    await drive.download_file(g_drive_id, file_path)
+
+    # https://images.irenebot.com/$media_id
     media_info["results"]["host"] = f"{image_host}{media_info['results']['mediaid']}"
+
+    # check every 50% of the dir file limit as we remove half.
+    global _new_photo_counter
+    if _new_photo_counter > DIR_FILE_LIMIT * 0.5:
+        _new_photo_counter = 0
+        with concurrent.futures.ThreadPoolExecutor() as pool:
+            future = pool.submit(blocking_remove_oldest_files)
+    _new_photo_counter += 1
     return media_info
 
 
@@ -134,7 +192,7 @@ async def generate_media_person(
 @check_permission(permission_level=SUPER_PATRON)
 async def generate_media_group(
     requestor: Requestor,
-    person_id: int,
+    group_id: int,
     min_faces: int = 1,
     max_faces: int = 999,
     file_type=None,
@@ -143,7 +201,7 @@ async def generate_media_group(
 ) -> dict:
     """Generate media for a group."""
     return await _generate_media(
-        person_id,
+        group_id,
         min_faces,
         max_faces,
         file_type,
@@ -156,7 +214,7 @@ async def generate_media_group(
 @check_permission(permission_level=SUPER_PATRON)
 async def generate_media_affiliation(
     requestor: Requestor,
-    person_id: int,
+    affiliation_id: int,
     min_faces: int = 1,
     max_faces: int = 999,
     file_type=None,
@@ -165,7 +223,7 @@ async def generate_media_affiliation(
 ) -> dict:
     """Generate media for an affiliation."""
     return await _generate_media(
-        person_id,
+        affiliation_id,
         min_faces,
         max_faces,
         file_type,
@@ -488,6 +546,16 @@ async def get_media(requestor: Requestor, media_id: int) -> dict:
 async def get_all_media(requestor: Requestor) -> dict:
     """Get all media information."""
     return await self.db.fetch("SELECT * FROM groupmembers.getmedia")
+
+
+@check_permission(permission_level=DEVELOPER)
+async def get_media_by_affiliations(requestor: Requestor, affiliation_ids, limit=None):
+    """Get all medias that belong to certain affiliations."""
+    return await self.db.fetch(
+        "SELECT mediaid FROM groupmembers.getmedia WHERE affiliationid = any($1) ORDER BY RANDOM() LIMIT $2",
+        affiliation_ids,
+        limit,
+    )
 
 
 @check_permission(permission_level=DEVELOPER)

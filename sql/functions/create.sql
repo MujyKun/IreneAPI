@@ -163,7 +163,7 @@ $$
 begin
 
     INSERT INTO groupmembers.fandom(groupid, name)
-    VALUES(t_groupid, t_name);
+    VALUES(t_groupid, t_name) ON CONFLICT DO NOTHING;
 end;
 $$;create or replace function guessinggame.addgg(t_dateid integer, t_media_ids integer[], t_status_ids integer[],
                                                     t_mode_id integer, t_difficulty_id integer, t_is_nsfw bool)
@@ -300,6 +300,25 @@ begin
     ELSE
         UPDATE public.guildprefixes SET prefix = t_prefix WHERE guildid = t_guildid;
     END IF;
+end;
+$$;create or replace function interactions.addinteractionmedia(t_url text, type_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    INSERT INTO interactions.media(url, typeid)
+    VALUES(t_url, type_id) ON CONFLICT DO NOTHING;
+end;
+$$;create or replace function interactions.addinteractiontype(t_name text)
+    returns void
+    language plpgsql
+as
+$$
+begin
+
+    INSERT INTO interactions.interactiontypes(name)
+    VALUES(t_name) ON CONFLICT DO NOTHING;
 end;
 $$;create or replace function groupmembers.addlocation(t_country text, t_city text)
     returns integer

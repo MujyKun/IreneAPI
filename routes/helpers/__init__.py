@@ -173,6 +173,7 @@ from .groupmembers import (
     get_location,
     get_media,
     get_all_media,
+    get_media_by_affiliations,
     get_person_alias,
     get_person_aliases,
     get_group_aliases,
@@ -226,6 +227,7 @@ from .groupmembers import (
     generate_media_group,
     generate_media_person,
     generate_media_affiliation,
+    get_image_host_url,
     upsert_media_difficulty,
 )
 
@@ -283,6 +285,10 @@ from .biasgame import generate_pvp, generate_bracket, get_winners, upsert_wins
 # Helper Functions for routes.
 
 helper_routes = {
+    "media/download/$media_id.GET": {
+        "function": get_image_host_url,
+        "params": ["requestor", "media_id"],
+    },
     "biasgame/winners.PUT": {
         "function": upsert_wins,
         "params": ["requestor", "user_id", "person_id"],
@@ -518,6 +524,11 @@ helper_routes = {
     "location/$location_id.DELETE": {
         "function": delete_location,
         "params": ["requestor", "location_id"],
+    },
+    "media/affiliations.GET": {
+        "function": get_media_by_affiliations,
+        "params": ["requestor", "affiliation_ids"],
+        "optional": ["limit"],
     },
     "media/.GET": {"function": get_all_media, "params": ["requestor"]},
     "media/.POST": {
