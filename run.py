@@ -121,13 +121,16 @@ async def index():
 
 loop = get_event_loop()
 try:
-    # connect to db.
-    loop.run_until_complete(db.connect())
+    # instantiate google drive
+    loop.run_until_complete(drive.create())
 
     # update helper usage of the DB.
     from routes import self
 
     self.db = db
+
+    # connect to db.
+    loop.run_until_complete(db.connect())
 
     # create first user token for usage.
     # from routes.helpers.api import add_token
@@ -139,17 +142,15 @@ try:
     # private_token = "private_key"  # change accordingly.
     # loop.run_until_complete(add_token(requestor=god_requestor, user_id=user_id, unhashed_token=private_token, access_id=OWNER.id))
 
-    # instantiate google drive
-    loop.run_until_complete(drive.create())
-
     # loop.run_until_complete(app.run_task(port=api_port))
 
-    # from hypercorn.config import Config
-    # from hypercorn.asyncio import serve
+    from hypercorn.config import Config
+    from hypercorn.asyncio import serve
+
     #
-    # config = Config()
-    # config.bind = f"127.0.0.1:{api_port}"
-    # loop.run_until_complete(serve(app, config))
+    config = Config()
+    config.bind = f"127.0.0.1:{api_port}"
+    loop.run_until_complete(serve(app, config))
 except KeyboardInterrupt:
     # cancel all tasks lingering
     ...

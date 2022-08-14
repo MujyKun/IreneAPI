@@ -40,8 +40,10 @@ class DbConnection:
     async def execute_sql_file(self, file_name: str) -> str:
         """Read and execute the queries in a SQL file.
 
-        :param file_name: str File name to read and execute.
-        :returns str: Code that cannot be executed.
+        :param file_name: str
+            File name to read and execute.
+        :returns str:
+            Code that cannot be executed.
         """
         try:
 
