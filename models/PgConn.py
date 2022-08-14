@@ -64,16 +64,3 @@ class PgConnection(DbConnection):
 
     async def _create_pool(self, **login_payload):
         self._pool = await asyncpg.create_pool(command_timeout=60, **login_payload)
-
-    async def _connect_to_other_database(self, **login_payload):
-        self.old_pool = await asyncpg.create_pool(command_timeout=60, **login_payload)
-
-        async with self.old_pool.acquire() as conn:
-            # groupmembers
-            all_aliases = await conn.fetch("SELECT * FROM groupmembers.aliases")
-            data_mods = await conn.fetch("SELECT * FROM groupmembers.datamods")
-            groups = await conn.fetch("SELECT * FROM groupmembers.groups")
-            idols = await conn.fetch("SELECT * FROM groupmembers.member")
-            idol_to_groups = await conn.fetch("SELECT * FROM groupmembers.idoltogroup")
-            restricted = await conn.fetch("SELECT * FROM groupmembers.restricted")
-            image_links = await conn.fetch("SELECT * FROM groupmembers.imagelinks")

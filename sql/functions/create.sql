@@ -852,10 +852,6 @@ begin
     DELETE FROM groupmembers.position WHERE positionid = t_position_id;
 end;
 $$;
-@check_permission(permission_level=DEVELOPER)
-async def add_fandom(requestor: Requestor, group_id, fandom_name) -> dict:
-    """Add a fandom"""
-    return await self.db.execute("SELECT * FROM groupmembers.addfandom($1, $2)", group_id, fandom_name)
 create or replace function public.deleteprefix(t_guild_id bigint, t_prefix text)
     returns void
     language plpgsql

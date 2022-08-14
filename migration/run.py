@@ -2,7 +2,6 @@ from typing import Optional, List
 
 import psycopg2
 from dotenv import load_dotenv
-from psycopg2 import errors
 from time import perf_counter as clock
 
 """
