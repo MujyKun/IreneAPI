@@ -25,7 +25,7 @@ from .errors import LackingPermissions, BadRequest
 def is_int64(value: int):
     """Confirm if an integer is in range of int64 to prevent overflow."""
     if value is None or (-9223372036854775808 > value or value > 9223372036854775807):
-        raise BadRequest
+        raise BadRequest(None, f"{value} is not int64 or is NoneType.")
 
 
 # PRE DEFINED ACCESS

@@ -66,7 +66,9 @@ async def process_ws_data(socket: WebSocketSession, data: dict) -> dict:
             helper_function_args[param] = data[param]
 
         if len(helper["params"]) != len(helper_function_args):
-            raise BadRequest(callback_id)
+            raise BadRequest(
+                callback_id, "arguments do not match number of function parameters"
+            )
 
         # optional arguments
         optional_params = helper.get("optional")

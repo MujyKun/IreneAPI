@@ -31,7 +31,7 @@ async def login(
             await get_token(requestor=god_access_requestor, user_id=user_id)
         )["results"]["gettoken"]
         if not expected_token:
-            raise BadRequest
+            raise BadRequest(None, "No token was found for your user.")
 
         login_success = check_hashed_token(token.replace("Bearer ", ""), expected_token)
 
@@ -50,7 +50,7 @@ async def login(
                 return wss
             return Requestor(user_id, Access(permission_level))
     except Exception as e:
-        raise BadRequest
+        raise BadRequest(None, e)
 
     # if handle_websocket:
     # await websocket.close(code=error_code, reason=error_reason)
