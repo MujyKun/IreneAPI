@@ -154,7 +154,7 @@ if __name__ == "__main__":
         # instantiate google drive
         loop.run_until_complete(drive.create())
 
-        # loop.run_until_complete(app.run_task(port=api_port))
+        loop.run_until_complete(app.run_task(port=api_port))
         # from hypercorn.config import Config
         # from hypercorn.asyncio import serve
         #

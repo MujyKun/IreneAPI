@@ -20,6 +20,11 @@ CREATE DATABASE bot WITH OWNER = postgres ENCODING = 'UTF8' CONNECTION LIMIT = -
 7) After the first run, all tables should have been created. Unfortunately due to parsing issues and since ORM is not being used,  
 functions must be created manually and a file ``/sql/functions/create.sql`` will be created 
 after the first run which you may execute. The parsing issues will be fixed at a later time.
+8) To run the SQL files, you can use `psql -U postgres -d bot -f create.sql` when in the appropriate directory (sql/functions).  
+9) To run the API with a setup configuration & poetry, use one of the following:
+   1) `poetry run python -m hypercorn --config .\hypercorn.toml run:app`
+   2) `poetry run python3 -m hypercorn --config .\hypercorn.toml run:app`
+   3) `poetry run python3 -m hypercorn --bind '0.0.0.0:5454' --workers=25 run:app`  
 
 
 ## Contribute
