@@ -141,6 +141,15 @@ if __name__ == "__main__":
 
         self.db = db
 
+        # create first user token for usage.
+        from routes.helpers.api import add_token
+        from routes.helpers import GOD, OWNER
+
+        user_id = 169401247374376960
+        private_token = "private_key"  # change accordingly.
+
+        # loop.run_until_complete(add_token(requestor=GOD, user_id=user_id, unhashed_token=private_token, access_id=OWNER.id))
+
         # instantiate google drive
         loop.run_until_complete(drive.create())
 
