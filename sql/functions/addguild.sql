@@ -66,6 +66,6 @@ begin
             t_rolecount,
             t_shardid,
             t_createdate,
-            t_hasbot);
+            t_hasbot) ON CONFLICT (guildid) DO NOTHING;
 end;
 $$;
