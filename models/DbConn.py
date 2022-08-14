@@ -37,19 +37,20 @@ class DbConnection:
         await self.update_db_structure()
         print(f"Connected to Database {self._db_name} as {self._db_user}.")
 
-    async def execute_sql_file(self, file_name: str) -> str:
+    async def execute_sql_file(self, file_path: str, use_terminal=False) -> str:
         """Read and execute the queries in a SQL file.
 
-        :param file_name: str
+        :param file_path: str
             File name to read and execute.
+        :param use_terminal: bool
+            Whether to use the terminal for auto executing create files.
         :returns str:
             Code that cannot be executed.
         """
         try:
-
-            async with aiofiles.open(file_name, mode="r") as file:
+            async with aiofiles.open(file_path, mode="r") as file:
                 data = await file.read()
-                if "functions" in file_name.lower():
+                if "functions" in file_path.lower() or "views" in file_path.lower():
                     return data
 
                 for query in data.split(";"):
@@ -61,7 +62,7 @@ class DbConnection:
                             f"If a relation has changed, update it manually. - {query}"
                         )
         except FileNotFoundError:
-            print(f"Could not find {file_name} for SQL execution.")
+            print(f"Could not find {file_path} for SQL execution.")
         return ""
 
     async def execute(self, query: str, *args, **kwargs):
@@ -88,39 +89,57 @@ class DbConnection:
         :param login_payload: The login payload to pass into the concrete class.
         """
 
-    async def update_db_structure(self):
+    async def update_db_structure(self, use_terminal=True):
         """Attempt to create/update the DB structure."""
         sql_folder_name = "sql"
         create_file_name = "create.sql"
-        inexecutable_queries = ""
-        execute_later = ["metadata", "constraints", "views"]
+        inexecutable_function_queries = ""
+        inexecutable_view_queries = ""
+        execute_later = ["metadata", "constraints"]
         for file in listdir(sql_folder_name):
             if file in execute_later:
-                # process metadata at the end
                 continue
 
             if isdir(f"{sql_folder_name}/{file}"):
                 # run the create files first.
-                if file != "functions":
+                if file not in ["functions", "views"]:
                     create_file = f"{sql_folder_name}/{file}/{create_file_name}"
-                    inexecutable_queries += await self.execute_sql_file(create_file)
+                    inexecutable_function_queries += await self.execute_sql_file(
+                        create_file
+                    )
 
                 for t_file in listdir(f"{sql_folder_name}/{file}"):
                     if t_file != create_file_name:
-                        inexecutable_queries += await self.execute_sql_file(
+                        data = await self.execute_sql_file(
                             f"{sql_folder_name}/{file}/{t_file}"
                         )
+                        if file == "functions":
+                            inexecutable_function_queries += data
+                        elif file == "views":
+                            inexecutable_view_queries += data
             else:
                 if file != create_file_name:
-                    inexecutable_queries += await self.execute_sql_file(
+                    inexecutable_function_queries += await self.execute_sql_file(
                         f"{sql_folder_name}/{file}"
                     )
-
-        await self.execute_sql_file(f"{sql_folder_name}/metadata/{create_file_name}")
-        await self.execute_sql_file(f"{sql_folder_name}/constraints/{create_file_name}")
-        await self.execute_sql_file(f"{sql_folder_name}/views/{create_file_name}")
 
         async with aiofiles.open(
             f"{sql_folder_name}/functions/{create_file_name}", "w"
         ) as manual_file:
-            await manual_file.write(inexecutable_queries)
+            await manual_file.write(inexecutable_function_queries)
+
+        async with aiofiles.open(
+            f"{sql_folder_name}/views/{create_file_name}", "w"
+        ) as manual_file:
+            await manual_file.write(inexecutable_view_queries)
+
+        await self.execute_sql_file(
+            f"{sql_folder_name}/metadata/{create_file_name}", use_terminal=True
+        )
+        await self.execute_sql_file(
+            f"{sql_folder_name}/constraints/{create_file_name}", use_terminal=True
+        )
+        await self.execute_sql_file(
+            f"{sql_folder_name}/views/{create_file_name}", use_terminal=True
+        )
+        # await self.execute_sql_file(f"{sql_folder_name}/functions/{create_file_name}", use_terminal=True)
