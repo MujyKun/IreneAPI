@@ -30,7 +30,6 @@ async def login(
         expected_token = (
             await get_token(requestor=god_access_requestor, user_id=user_id)
         )["results"]["gettoken"]
-
         if not expected_token:
             raise BadRequest
 

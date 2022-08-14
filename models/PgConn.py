@@ -63,4 +63,6 @@ class PgConnection(DbConnection):
             return self.records_to_dict(response)
 
     async def _create_pool(self, **login_payload):
-        self._pool = await asyncpg.create_pool(command_timeout=60, **login_payload)
+        self._pool = await asyncpg.create_pool(
+            command_timeout=60, max_size=100, **login_payload
+        )

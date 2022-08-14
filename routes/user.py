@@ -1,5 +1,3 @@
-import asyncio
-
 from quart import Blueprint, request
 from quart_openapi import PintBlueprint, Resource
 from . import login
@@ -166,15 +164,15 @@ class UserSuperPatronStatus(Resource):
         return await helper.get_user_super_patron(requestor, user_id)
 
     async def post(self, user_id: int):
-        """Add a patron.
+        """Add a super patron.
 
-        Use this route to add the patron status of a user.
+        Use this route to add the super patron status of a user.
         """
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.add_super_patron(requestor, user_id)
 
     async def delete(self, user_id: int):
-        """Unban a user.
+        """Remove the super patron status a user.
 
         Use this route to remove the super patron status of a user.
         """

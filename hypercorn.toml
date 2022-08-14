@@ -1,2 +1,4 @@
-workers=25
+workers=3
 bind='0.0.0.0:5454'
+debug=true
+accesslog="hypercorn.log"
