@@ -147,9 +147,8 @@ if __name__ == "__main__":
 
         god_requestor = Requestor(-1, GOD)
 
-        user_id = 169401247374376960
+        user_id = 429779375072870400
         private_token = "private_key"  # change accordingly.
-
         # loop.run_until_complete(add_token(requestor=god_requestor, user_id=user_id, unhashed_token=private_token, access_id=OWNER.id))
 
         # instantiate google drive

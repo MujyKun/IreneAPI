@@ -20,7 +20,7 @@ async def add_token(
     """Add an API token for a user."""
     is_int64(user_id)
     await self.db.execute(
-        "SELECT public.addtoken($1, '{$2}', $3)",
+        "SELECT public.addtoken($1, $2, $3)",
         user_id,
         hash_token(unhashed_token),
         access_id,
