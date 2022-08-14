@@ -32,6 +32,7 @@ peony-twitter = {extras = ["all"], version = "^2.1.2"}
 xmltodict = "^0.13.0"
 aiofiles = "^0.8.0"
 Pillow = "^9.2.0"
+Werkzeug = "2.0.2"
 
 [tool.poetry.dev-dependencies]
 
