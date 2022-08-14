@@ -519,3 +519,43 @@ INSERT INTO public.apiaccess(accessid, name) VALUES (-1, 'God'), (0, 'Owner'), (
 
 INSERT INTO modes(modeid, name) VALUES(1, 'Normal'), (2, 'Group');
 INSERT INTO difficulty(difficultyid, name) VALUES(1, 'easy'), (2, 'medium'), (3, 'hard')
+
+
+INSERT INTO public.languagepacks(languageid, label, message) VALUES
+(8,'error_limit_rounds','Your max rounds must be in between :1$MIN ROUNDS$1: and :2$MAX ROUNDS$2:'),
+(8,'error_difficulty_options','Your difficulty must be one of the options: :1$OPTIONS$1:'),
+(8,'error_gender_options','Your gender choice needs to be one of the options: :1$OPTIONS$1:'),
+(8,'error_timeout_options','Your timeout must be in between :1$MIN TIMEOUT$1: and :2$MAX TIMEOUT$2: seconds.'),
+(8,'error_invalid_input','Your input does not work.'),
+(8,'start_us','Starting Unscramble Game with `:1$MAX ROUNDS$1:`, a timeout of `:2$TIMEOUT$2:` seconds per round, a difficulty of `:3$DIFFICULTY$3:`, and with the gender selected as `:4$GENDER$4:`."'),
+(8,'error_nsfw_options','Your NSFW choice must be `:1$CHOICE$1:` or `:2$CHOICE$2:`.'),
+(8,'start_gg','Starting :1$GAME TYPE$1:Guessing Game with `:2$ROUNDS$2:` rounds, a timeout of `:3$TIMEOUT$3:` seconds per round, a difficulty of `:4$DIFFICULTY$4:`, with the gender selected as `:5$GENDER$5:`, and `:6$NSFW SELECTION$6:` contain NSFW content.  "'),
+(8,'toggle_gg_filter','Your guessing game filter (including groups) is now :1$STATUS$1:.'),
+(8,'error_gg_filter_selection','No :1$OBJECT TYPE$1: exists with that ID.'),
+(8,'view_gg_filter','Your GG Filter for :1$OBJECT TYPE$1: is now: :2$LIST ITEMS$2:'),
+(8,'error_twitter_username','That username does not exist on Twitter.'),
+(8,'twitter_subscribed',':1$CHANNEL$1: is now subscribed to :2$USERNAME$2: on Twitter.'),
+(8,'twitter_list','These are the Twitter subscriptions in :1$GUILD$1: :2$SUBSCRIPTIONS$2:'),
+(8,'twitter_unsubscribed',':1$CHANNEL$1: is no longer subscribed to :2$USERNAME$2:.'),
+(8,'twitch_list','These are the Twitch subscriptions in :1$GUILD$1: :2$SUBSCRIPTIONS$2:'),
+(8,'error_twitch_username','That username does not exist on Twitch.'),
+(8,'twitch_subscribed',':1$CHANNEL$1: is now subscribed to :2$USERNAME$2: on Twitch.'),
+(8,'twitch_unsubscribed',':1$CHANNEL$1: is no longer subscribed to :2$USERNAME$2:.'),
+(8,'error_division_by_zero','It is not possible to divide by zero.'),
+(8,'error_wolfram_patron','"In order to use this feature, you must be a supporter/patron of the bot."'),
+(8,'wolfram_query','**Input:** :1$QUERY$1:\n**Result:** :2$QUERY$2:'),
+(8,'wolfram_no_results','WolframAlpha did not return a result for that query.'),
+(8,'biasgame_not_enough','There are not enough players to fill this BiasGame.'),
+(8,'error_bracket_size','Your bracket size must be one of the following numbers: :1$OPTIONS$1:.'),
+(8,'start_bg','Starting BiasGame with a bracket size of `:1$BRACKET SIZE$1:` and with the gender selected as `:2$GENDER$2:`.'),
+(8,'list_bg','BiasGame Results for <@:1$USER ID$1:>:\n :2$RESULTS$2:'),
+(8,'stop_games','Stopping all games that you host.'),
+(8,'already_in_game','You are already in a game. Use the command `stopgames` to force-quit all your games.'),
+(8,'correct_answer_gg','The correct answer was :1$STAGE NAME$1: from :2$GROUP NAME$2:'),
+(8,'incorrect_answer_gg','No one guessed correctly.'),
+(8,'winner_gg_msg',':1$USERNAME$1: won the round.'),
+(8,'all_answers_gg','Possible answers: :1$CORRECT ANSWERS$1:'),
+(8,'correct_answer_ggg','The correct answer was :1$GROUP NAME$1:'),
+(8,'final_scores_games','The final scores are:\n\n:1$SCORES$1:'),
+(8,'game_finished_no_scores','The Game has finished! No one has received a point in the Game.'),
+(8,'become_a_patron_limited','Further usage of this function requires patron status from https://www.patreon.com/mujykun');
