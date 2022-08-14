@@ -360,20 +360,6 @@ protobuf = ">=3.15.0,<5.0.0dev"
 grpc = ["grpcio (>=1.0.0,<2.0.0dev)"]
 
 [[package]]
-name = "gunicorn"
-version = "20.1.0"
-description = "WSGI HTTP Server for UNIX"
-category = "main"
-optional = false
-python-versions = ">=3.5"
-
-[package.extras]
-eventlet = ["eventlet (>=0.24.1)"]
-gevent = ["gevent (>=1.4.0)"]
-setproctitle = ["setproctitle"]
-tornado = ["tornado (>=0.2)"]
-
-[[package]]
 name = "h11"
 version = "0.13.0"
 description = "A pure-Python, bring-your-own-I/O implementation of HTTP/1.1"
@@ -1066,7 +1052,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "6fe98ff18fd28c4073883bc87ae36602767f38e0cbba53c27a8d2984a4cfdb83"
+content-hash = "e40a7355007e50042a6255bbb9879a3b9f016fc072bfd06eeddfd39614b18a5a"
 
 [metadata.files]
 aiodns = []
@@ -1292,7 +1278,6 @@ google-auth-oauthlib = [
     {file = "google_auth_oauthlib-0.4.4-py2.py3-none-any.whl", hash = "sha256:0e92aacacfb94978de3b7972cf4b0f204c3cd206f74ddd0dc0b31e91164e6317"},
 ]
 googleapis-common-protos = []
-gunicorn = []
 h11 = [
     {file = "h11-0.13.0-py3-none-any.whl", hash = "sha256:8ddd78563b633ca55346c8cd41ec0af27d3c79931828beffb46ce70a379e7442"},
     {file = "h11-0.13.0.tar.gz", hash = "sha256:70813c1135087a248a4d38cc0e1a0181ffab2188141a93eaf567940c3957ff06"},
