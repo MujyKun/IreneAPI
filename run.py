@@ -149,6 +149,7 @@ if __name__ == "__main__":
         from hypercorn.asyncio import serve
 
         config = Config()
+        config.workers = 25
         config.bind = f"127.0.0.1:{api_port}"
         asyncio_run(serve(app, config))
 
