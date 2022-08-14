@@ -1,5 +1,5 @@
 # noinspection PyUnresolvedReferences, PyPackageRequirements
-from asyncio import get_event_loop
+from asyncio import get_event_loop, run as asyncio_run
 from quart import Quart, render_template, Response
 from models import PgConnection
 
@@ -144,7 +144,13 @@ if __name__ == "__main__":
         # instantiate google drive
         loop.run_until_complete(drive.create())
 
-        loop.run_until_complete(app.run_task(port=api_port))
+        # loop.run_until_complete(app.run_task(port=api_port))
+        from hypercorn.config import Config
+        from hypercorn.asyncio import serve
+
+        config = Config()
+        config.bind = f"127.0.0.1:{api_port}"
+        asyncio_run(serve(app, config))
 
     except KeyboardInterrupt:
         # cancel all tasks lingering

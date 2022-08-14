@@ -391,8 +391,9 @@ begin
     END IF;
 end;
 $$;create or replace function groupmembers.addperson(t_dateid integer, t_nameid integer, t_formernameid integer,
-                                                  t_gender character(1), t_description text, t_height integer, t_displayid integer, t_socialid integer,
-                                                  t_locationid integer, t_tagids integer[], t_bloodid integer, t_callcount integer)
+                                                  t_gender character(1), t_description text, t_height integer,
+                                                  t_displayid integer, t_socialid integer, t_locationid integer,
+                                                  t_bloodid integer, t_callcount integer)
     returns integer
     language plpgsql
 as
@@ -851,8 +852,7 @@ $$
 begin
     DELETE FROM groupmembers.position WHERE positionid = t_position_id;
 end;
-$$;
-create or replace function public.deleteprefix(t_guild_id bigint, t_prefix text)
+$$;create or replace function public.deleteprefix(t_guild_id bigint, t_prefix text)
     returns void
     language plpgsql
 as
