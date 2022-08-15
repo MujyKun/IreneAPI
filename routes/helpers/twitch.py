@@ -68,17 +68,15 @@ async def unsubscribe_from_twitch_channel(
 
 @check_permission(permission_level=DEVELOPER)
 async def subscribe_to_twitch_channel(
-    requestor: Requestor, username, guild_id, channel_id, role_id=None
+    requestor: Requestor, username, channel_id, role_id=None
 ) -> dict:
     """Subscribe to a twitch channel."""
-    is_int64(guild_id)
     is_int64(channel_id)
     if role_id:
         is_int64(role_id)
     return await self.db.execute(
-        "SELECT * FROM public.subscribetotwitch($1, $2, $3, $4)",
+        "SELECT * FROM public.subscribetotwitch($1, $2, $3)",
         username,
-        guild_id,
         channel_id,
         role_id,
     )

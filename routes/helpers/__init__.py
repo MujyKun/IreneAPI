@@ -376,7 +376,7 @@ helper_routes = {
     },
     "twitch/$username.POST": {
         "function": subscribe_to_twitch_channel,
-        "params": ["requestor", "username", "guild_id", "channel_id"],
+        "params": ["requestor", "username", "channel_id"],
         "optional": ["role_id"],
     },
     "twitch/$username.DELETE": {

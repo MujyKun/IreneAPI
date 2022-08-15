@@ -46,7 +46,6 @@ class TwitchChannel(Resource):
         return await helper.subscribe_to_twitch_channel(
             requestor,
             username=username,
-            guild_id=request.args.get("guild_id"),
             channel_id=request.args.get("channel_id"),
             role_id=request.args.get("role_id"),
         )
