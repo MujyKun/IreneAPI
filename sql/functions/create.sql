@@ -553,24 +553,14 @@ begin
         VALUES(t_accountid, t_username);
     END IF;
 end;
-$$;
-create or replace function public.addtwittersubscription(t_accountid bigint, t_channelid bigint, t_roleid bigint,
-        t_posted bool)
+$$;create or replace function public.addtwittersubscription(t_accountid bigint, t_channelid bigint, t_roleid bigint)
     returns void
     language plpgsql
 as
 $$
-declare
-    t_already_exists integer;
 begin
-    SELECT COUNT(*) INTO t_already_exists
-        FROM public.twitterfollowage
-        WHERE t_accountid = accountid AND t_channelid = channelid;
-
-    IF t_already_exists = 0 THEN
-        INSERT INTO public.twitterfollowage(accountid, channelid, roleid, posted)
-        VALUES(t_accountid, t_channelid, t_roleid, t_posted);
-    END IF;
+    INSERT INTO public.twitterfollowage(accountid, channelid, roleid)
+        VALUES(t_accountid, t_channelid, t_roleid) ON CONFLICT DO NOTHING;
 end;
 $$;
 create or replace function unscramblegame.addus(t_dateid integer, t_status_ids integer[], t_mode_id integer,
@@ -1184,16 +1174,15 @@ begin
     INSERT INTO public.apiusage(userid, func, response, args, kwargs)
     VALUES(t_userid, t_func, t_response, t_args, t_kwargs);
 end;
-$$;create or replace function public.subscribetotwitch(t_username text, t_guild_id bigint, t_channel_id bigint,
-            t_role_id bigint)
+$$;create or replace function public.subscribetotwitch(t_username text, t_channel_id bigint, t_role_id bigint)
     returns void
     language plpgsql
 as
 $$
 begin
 
-    INSERT INTO public.twitchfollowage(username, guildid, channelid, posted, roleid) VALUES(t_username,
-                                                                t_guild_id, t_channel_id, False, t_role_id);
+    INSERT INTO public.twitchfollowage(username, channelid, posted, roleid) VALUES(t_username, t_channel_id,
+                                                                                   False, t_role_id);
 end;
 $$;create or replace function public.toggleggfilter(t_userid bigint, active bool)
     returns void

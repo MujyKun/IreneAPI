@@ -68,11 +68,10 @@ async def add_twitter_subscription(
         is_int64(role_id)
 
     return await self.db.execute(
-        "SELECT public.addtwittersubscription($1, $2, $3, $4)",
+        "SELECT public.addtwittersubscription($1, $2, $3)",
         twitter_id,
         channel_id,
         role_id,
-        False,
     )
 
 

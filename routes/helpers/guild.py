@@ -65,6 +65,14 @@ async def add_guild(
     has_bot: bool,
 ):
     """Add a guild."""
+    try:
+        _date = datetime.strptime(
+            create_date.replace("+00:00", ""), "%Y-%m-%d %H:%M:%S.%f"
+        )
+    except Exception as e:
+        _date = datetime.strptime(
+            create_date.replace("+00:00", ""), "%Y-%m-%d %H:%M:%S"
+        )
     return await self.db.execute(
         "SELECT public.addguild($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, "
         "$15, $16, $17, $18, $19, $20, $21)",
@@ -87,7 +95,7 @@ async def add_guild(
         member_count,
         role_count,
         shard_id,
-        datetime.strptime(create_date.replace("+00:00", ""), "%Y-%m-%d %H:%M:%S.%f"),
+        _date,
         has_bot,
     )
 
