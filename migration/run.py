@@ -1,3 +1,5 @@
+import os.path
+import shutil
 from typing import Optional, List
 
 import psycopg2
@@ -9,6 +11,14 @@ Migrate DB Data from IreneV1 to IreneV2
 
 Must have already created the new database.
 """
+
+MIGRATE = False
+AVATARS_AND_BANNERS = False  # Whether to move already existing avatars and banners and switch them to the new IDs.
+avatar_location = "/var/www/images.irenebot/public_html/avatar"  # set avatar location
+banner_location = (
+    "/var/www/images.irenebot/public_html/avatar/banner"  # set banner location
+)
+image_host = "https://images.irenebot.com/"
 
 
 class BaseEntity:
@@ -475,6 +485,7 @@ def migrate():
     groups = print_time(migrate_groups, "Create new Groups.", "<2 Seconds")
     print_time(create_affs, "Create affiliations and media", "6 Minutes", idols, groups)
     new_db.commit()
+    return {"idols": idols, "groups": groups}
 
 
 def create_affs(idols, groups):
@@ -500,6 +511,63 @@ def migrate_groups():
     o_cursor.execute("SELECT * FROM groupmembers.groups")
     groups = o_cursor.fetchall()
     return [Group(*group) for group in groups]
+
+
+def handle_avatars_and_banners(groups=False):
+    if not groups:
+        folder_name = "person"
+        sql_ = "SELECT p.personid, d.avatar, d.banner, d.displayid FROM groupmembers.person p LEFT JOIN groupmembers.display d ON d.displayid = p.displayid WHERE AVATAR IS NOT NULL OR BANNER IS NOT NULL"
+    else:
+        folder_name = "group"
+        sql_ = "SELECT g.groupid, d.avatar, d.banner, d.displayid FROM groupmembers.groups g LEFT JOIN groupmembers.display d ON d.displayid = g.displayid WHERE AVATAR IS NOT NULL OR BANNER IS NOT NULL"
+
+    n_cursor.execute(sql_)
+    display_data = n_cursor.fetchall()
+    for object_id, avatar_url, banner_url, display_id in display_data:
+        file_name = f"{object_id}.webp"
+        if avatar_url:
+            original_file_name = get_file_name_from_url(avatar_url)
+            avatar_folder_loc = f"{avatar_location}/{folder_name}"
+            new_avatar_loc = f"{avatar_folder_loc}/{file_name}"
+            avatar_url = f"{image_host}avatar/{folder_name}/{file_name}"
+            copy_file(f"{avatar_location}/{original_file_name}", new_avatar_loc)
+            n_cursor.execute(
+                "UPDATE groupmembers.display SET avatar = %s WHERE displayid = %s",
+                (avatar_url, display_id),
+            )
+        if banner_url:
+            original_file_name = get_file_name_from_url(banner_url)
+            banner_folder_loc = f"{banner_location}/{folder_name}"
+            new_banner_loc = f"{banner_folder_loc}/{file_name}"
+            banner_url = f"{image_host}banner/{folder_name}/{file_name}"
+            copy_file(f"{banner_location}/{original_file_name}", new_banner_loc)
+            n_cursor.execute(
+                "UPDATE groupmembers.display SET banner = %s WHERE displayid = %s",
+                (banner_url, display_id),
+            )
+    new_db.commit()
+
+
+def copy_file(file_location, new_file_path):
+    if os.path.isfile(file_location):
+        shutil.copy(file_location, new_file_path)
+
+
+def get_file_name_from_url(url: str):
+    if not url:
+        return None
+
+    slash_loc = url.rindex("/")
+    return url[slash_loc + 1 : :]
+
+
+def get_id_from_url(url: str):
+    if not url:
+        return None
+
+    slash_loc = url.rindex("/")
+    underscore_loc = url.rindex("_")
+    return url[slash_loc + 1 : underscore_loc]
 
 
 if __name__ == "__main__":
@@ -528,4 +596,8 @@ if __name__ == "__main__":
     o_cursor = old_db.cursor()
     n_cursor = new_db.cursor()
 
-    migrate()
+    if MIGRATE:
+        data = migrate()
+    if AVATARS_AND_BANNERS:
+        handle_avatars_and_banners()
+        handle_avatars_and_banners(groups=True)
