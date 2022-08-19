@@ -14,6 +14,9 @@ Must have already created the new database.
 
 MIGRATE = False
 AVATARS_AND_BANNERS = True  # Whether to move already existing avatars and banners and switch them to the new IDs.
+DELETE_NON_GOOGLE_DRIVE = (
+    True  # Whether to delete image urls not related to google drive.
+)
 avatar_location = "/var/www/images.irenebot/public_html/avatar"  # set avatar location
 banner_location = "/var/www/images.irenebot/public_html/banner"  # set banner location
 image_host = "https://images.irenebot.com/"
@@ -572,6 +575,12 @@ def get_file_name_from_url(url: str):
     return url[slash_loc + 1 : :]
 
 
+def handle_non_google_drive():
+    n_cursor.execute(
+        "DELETE FROM groupmembers.media WHERE link NOT LIKE 'https://drive.google.com/%'"
+    )
+
+
 if __name__ == "__main__":
     load_dotenv()
     from os import getenv
@@ -603,3 +612,5 @@ if __name__ == "__main__":
     if AVATARS_AND_BANNERS:
         handle_avatars_and_banners()
         handle_avatars_and_banners(groups=True)
+    if DELETE_NON_GOOGLE_DRIVE:
+        handle_non_google_drive()
