@@ -15,9 +15,7 @@ Must have already created the new database.
 MIGRATE = False
 AVATARS_AND_BANNERS = True  # Whether to move already existing avatars and banners and switch them to the new IDs.
 avatar_location = "/var/www/images.irenebot/public_html/avatar"  # set avatar location
-banner_location = (
-    "/var/www/images.irenebot/public_html/avatar/banner"  # set banner location
-)
+banner_location = "/var/www/images.irenebot/public_html/banner"  # set banner location
 image_host = "https://images.irenebot.com/"
 
 
@@ -515,10 +513,10 @@ def migrate_groups():
 
 def make_avatar_and_banner_folders():
     directories = [
-        banner_location + "person",
-        banner_location + "group",
-        avatar_location + "person",
-        avatar_location + "group",
+        banner_location + "/person",
+        banner_location + "/group",
+        avatar_location + "/person",
+        avatar_location + "/group",
     ]
     for directory in directories:
         if not os.path.isdir(directory):
