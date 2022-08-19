@@ -13,7 +13,7 @@ Must have already created the new database.
 """
 
 MIGRATE = False
-AVATARS_AND_BANNERS = False  # Whether to move already existing avatars and banners and switch them to the new IDs.
+AVATARS_AND_BANNERS = True  # Whether to move already existing avatars and banners and switch them to the new IDs.
 avatar_location = "/var/www/images.irenebot/public_html/avatar"  # set avatar location
 banner_location = (
     "/var/www/images.irenebot/public_html/avatar/banner"  # set banner location
