@@ -513,7 +513,20 @@ def migrate_groups():
     return [Group(*group) for group in groups]
 
 
+def make_avatar_and_banner_folders():
+    directories = [
+        banner_location + "person",
+        banner_location + "group",
+        avatar_location + "person",
+        avatar_location + "group",
+    ]
+    for directory in directories:
+        if not os.path.isdir(directory):
+            os.mkdir(directory)
+
+
 def handle_avatars_and_banners(groups=False):
+    make_avatar_and_banner_folders()
     if not groups:
         folder_name = "person"
         sql_ = "SELECT p.personid, d.avatar, d.banner, d.displayid FROM groupmembers.person p LEFT JOIN groupmembers.display d ON d.displayid = p.displayid WHERE AVATAR IS NOT NULL OR BANNER IS NOT NULL"
