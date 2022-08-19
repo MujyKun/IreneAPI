@@ -80,6 +80,7 @@ def blocking_merge_images(merge_name, first_loc, second_loc):
 
 
 def blocking_generate_bracket(game_info: dict):
+    person_loc = avatar_location + "person/"
     num_of_rounds = len(game_info)
     if num_of_rounds < 3:
         # TODO: exception
@@ -109,9 +110,9 @@ def blocking_generate_bracket(game_info: dict):
                 bracket_counter += 2
                 final_winner = pvp["winner"]
                 with Image.open(
-                    f"{avatar_location}{fp}_IDOL.png"
+                    f"{person_loc}{fp}.webp"
                 ) as first_person_img, Image.open(
-                    f"{avatar_location}{sp}_IDOL.png"
+                    f"{person_loc}{sp}.webp"
                 ) as second_person_image:
                     first_person_img, second_person_image = resize_images(
                         first_person_img,
@@ -130,28 +131,40 @@ def blocking_generate_bracket(game_info: dict):
         p_info = _stored_bracket_positions[bracket_counter]
         file_name = f"t_{randint(10000,50000)}_{randint(10000,50000)}.webp"
         final_bracket_path = f"{bias_game_location}{file_name}"
-        with Image.open(f"{avatar_location}{final_winner}_IDOL.png") as p_image:
+        with Image.open(f"{person_loc}{final_winner}.webp") as p_image:
             p_image = p_image.resize(p_info["img_size"])
             bracket.paste(p_image, p_info["pos"])
             bracket.save(final_bracket_path)
             return image_host + f"bias_game/{file_name}"
 
 
+async def get_id_from_url(url: str):
+    if not url:
+        return None
+
+    slash_loc = url.rindex("/")
+    underscore_loc = url.rindex(".")
+    return url[slash_loc + 1 : underscore_loc]
+
+
+async def get_file_name_from_url(url: str):
+    if not url:
+        return None
+
+    slash_loc = url.rindex("/")
+    return url[slash_loc + 1 : :]
+
+
 @check_permission(permission_level=DEVELOPER)
 async def generate_pvp(
-    requestor: Requestor, first_file_name: str, second_file_name: str
+    requestor: Requestor, first_image_url: str, second_image_url: str
 ):
     """Generate a PvP image for the bias game."""
+    merge_name = f"{await get_id_from_url(first_image_url)}_{await get_id_from_url(second_image_url)}.webp"
+    base_loc = avatar_location + "person/"
+    first_file_location = base_loc + await get_file_name_from_url(first_image_url)
+    second_file_location = base_loc + await get_file_name_from_url(second_image_url)
     with concurrent.futures.ThreadPoolExecutor() as pool:
-        merge_name = (
-            first_file_name[: first_file_name.find(".")]
-            + "_"
-            + second_file_name[: second_file_name.find(".")]
-            + ".webp"
-        )
-
-        first_file_location = avatar_location + first_file_name
-        second_file_location = avatar_location + second_file_name
         future = pool.submit(
             blocking_merge_images, merge_name, first_file_location, second_file_location
         )

@@ -572,15 +572,6 @@ def get_file_name_from_url(url: str):
     return url[slash_loc + 1 : :]
 
 
-def get_id_from_url(url: str):
-    if not url:
-        return None
-
-    slash_loc = url.rindex("/")
-    underscore_loc = url.rindex("_")
-    return url[slash_loc + 1 : underscore_loc]
-
-
 if __name__ == "__main__":
     load_dotenv()
     from os import getenv

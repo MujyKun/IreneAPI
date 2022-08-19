@@ -304,7 +304,7 @@ helper_routes = {
     },
     "biasgame/generate_pvp.POST": {
         "function": generate_pvp,
-        "params": ["requestor", "first_file_name", "second_file_name"],
+        "params": ["requestor", "first_image_url", "second_image_url"],
     },
     "wolfram/.POST": {"function": wolfram_query, "params": ["requestor", "query"]},
     "language/.GET": {"function": get_languages, "params": ["requestor"]},

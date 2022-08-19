@@ -17,8 +17,8 @@ class BiasGame(Resource):
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.generate_pvp(
             requestor,
-            request.args.get("first_file_name"),
-            request.args.get("second_file_name"),
+            request.args.get("first_image_url"),
+            request.args.get("second_image_url"),
         )
 
 
