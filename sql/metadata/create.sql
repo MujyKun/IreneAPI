@@ -559,4 +559,5 @@ INSERT INTO public.languagepacks(languageid, label, message) VALUES
 (8,'final_scores_games','The final scores are:\n\n:1$SCORES$1:'),
 (8,'game_finished_no_scores','The Game has finished! No one has received a point in the Game.'),
 (8,'become_a_patron_limited','Further usage of this function requires patron status from https://www.patreon.com/mujykun'),
-(8,'us_question','The name I want you to unscramble is :1$QUESTION$1:');
+(8,'us_question','The name I want you to unscramble is :1$QUESTION$1:'),
+(8,'no_results','There are no results for that selection.');
