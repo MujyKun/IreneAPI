@@ -100,7 +100,9 @@ SELECT
         DISTINCT (gp.guildid),
         (SELECT array_agg(t_gp.prefix)
         FROM public.guildprefixes t_gp WHERE gp.guildid = t_gp.guildid) as prefixes
-FROM public.guildprefixes gp;CREATE OR REPLACE VIEW groupmembers.getsocials AS
+FROM public.guildprefixes gp;CREATE OR REPLACE VIEW public.getresponses AS
+    SELECT responseid, response FROM public.eightball;
+CREATE OR REPLACE VIEW groupmembers.getsocials AS
     SELECT socialid, twitter, youtube, melon, instagram, vlive, spotify, fancafe, facebook, tiktok
     FROM groupmembers.socialmedia;CREATE OR REPLACE VIEW getsuperpatrons AS
 SELECT sp.userid FROM public.superpatron sp

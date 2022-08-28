@@ -1,9 +1,9 @@
 INSERT INTO groupmembers.bloodtypes(name)
-VALUES ('O'), ('A'), ('B'), ('AB');
+VALUES ('O'), ('A'), ('B'), ('AB') ON CONFLICT DO NOTHING;
 
 INSERT INTO groupmembers.position(name)
 VALUES ('Leader'), ('Vocalist'), ('Lead Vocalist'), ('Main Vocalist'), ('Dancer'), ('Main Dancer'), ('Lead Dancer'),
-       ('Sub Vocalist'), ('Former'), ('Rapper'), ('Lead Rapper'), ('Main Rapper');
+       ('Sub Vocalist'), ('Former'), ('Rapper'), ('Lead Rapper'), ('Main Rapper') ON CONFLICT DO NOTHING;
 
 
 INSERT INTO blackjack.cardvalues(id, name, value) VALUES
@@ -58,9 +58,9 @@ INSERT INTO blackjack.cardvalues(id, name, value) VALUES
   (49,'Ten of Clubs',10),
   (50,'Jack of Clubs',10),
   (51,'Queen of Clubs',10),
-  (52,'King of Clubs',10);
+  (52,'King of Clubs',10) ON CONFLICT DO NOTHING;
 
-INSERT INTO interactions.interactiontypes(name) VALUES ('stepon'), ('stab'), ('choke'), ('pullhair'), ('cuddle'), ('pat'), ('punch'), ('spit'), ('lick'), ('hug'), ('kiss'), ('slap');
+INSERT INTO interactions.interactiontypes(name) VALUES ('stepon'), ('stab'), ('choke'), ('pullhair'), ('cuddle'), ('pat'), ('punch'), ('spit'), ('lick'), ('hug'), ('kiss'), ('slap') ON CONFLICT DO NOTHING;
 
 
 INSERT INTO public.timezones(name, shortname) VALUES ('Europe/Andorra', 'ca'),
@@ -477,7 +477,7 @@ INSERT INTO public.timezones(name, shortname) VALUES ('Europe/Andorra', 'ca'),
                                                      ('Indian/Mayotte', 'fr-YT'),
                                                      ('Africa/Johannesburg', 'zu'),
                                                      ('Africa/Lusaka', 'en-ZM'),
-                                                     ('Africa/Harare', 'en-ZW');
+                                                     ('Africa/Harare', 'en-ZW') ON CONFLICT DO NOTHING;
 
 INSERT INTO public.languages(shortname, name) VALUES ('af', 'Afrikaans'),
                                                      ('ar', 'Arabic'),
@@ -513,12 +513,45 @@ INSERT INTO public.languages(shortname, name) VALUES ('af', 'Afrikaans'),
                                                      ('uk', 'Ukrainian'),
                                                      ('ur-PK', 'Urdu'),
                                                      ('vi', 'Vietnamese'),
-                                                     ('zh-CN', 'Chinese');
+                                                     ('zh-CN', 'Chinese') ON CONFLICT DO NOTHING;
 
-INSERT INTO public.apiaccess(accessid, name) VALUES (-1, 'God'), (0, 'Owner'), (1, 'Developer'), (2, 'Super Patron'), (3, 'Friend'), (4, 'User');
+INSERT INTO public.apiaccess(accessid, name) VALUES (-1, 'God'), (0, 'Owner'), (1, 'Developer'), (2, 'Super Patron'), (3, 'Friend'), (4, 'User') ON CONFLICT DO NOTHING;
 
-INSERT INTO modes(modeid, name) VALUES(1, 'Normal'), (2, 'Group');
-INSERT INTO difficulty(difficultyid, name) VALUES(1, 'easy'), (2, 'medium'), (3, 'hard');
+INSERT INTO modes(modeid, name) VALUES(1, 'Normal'), (2, 'Group') ON CONFLICT DO NOTHING;
+INSERT INTO difficulty(difficultyid, name) VALUES(1, 'easy'), (2, 'medium'), (3, 'hard') ON CONFLICT DO NOTHING;
+
+
+INSERT INTO public.eightball(responseid, response) VALUES
+      (1, 'It is certain.'),
+      (2, 'It is decidedly so.'),
+      (3, 'Without a doubt.'),
+      (4, 'Yes - definitely.'),
+      (5, 'You may rely on it.'),
+      (6, 'As I see it, yes.'),
+      (7, 'Most likely.'),
+      (8, 'Outlook good.'),
+      (9, 'Yes.'),
+      (10, 'Signs point to yes.'),
+      (11, ':thumbsup:'),
+      (12, 'Well, duh'),
+      (13, 'Of course, that was a stupid question.'),
+      (14, 'Reply hazy, try again.'),
+      (15, 'Ask again later.'),
+      (16, 'Better not tell you now.'),
+      (17, 'Cannot predict now.'),
+      (18, 'Concentrate and ask again.'),
+      (19, 'Why the fuck are you asking me you dumb rat.'),
+      (20, 'You should already know this you 바보.'),
+      (21, 'Do not count on it.'),
+      (22, 'My reply is no.'),
+      (23, 'My sources say no.'),
+      (24, 'Outlook not so good.'),
+      (25, 'Very doubtful.'),
+      (26, ':thumbsdown:'),
+      (27, 'Are you kidding?'),
+      (28, 'Do not bet on it.'),
+      (29, 'Forget about it.'),
+      (30, 'It is just not meant to be.') ON CONFLICT DO NOTHING;
 
 
 INSERT INTO public.languagepacks(languageid, label, message) VALUES
@@ -562,4 +595,14 @@ INSERT INTO public.languagepacks(languageid, label, message) VALUES
 (8,'us_question','The name I want you to unscramble is :1$QUESTION$1:'),
 (8,'no_results','There are no results for that selection.'),
 (8,'choose_options','**Possible Choices**: :1$CHOICES$1:\n**Selection**: :2$SELECTION$2:'),
-(8,'8ball_response','**Question:** :1$PROMPT$1:\n**Answer:** :2$ANSWER$2:');
+(8,'8ball_add_response','`:1$RESPONSE$1:` has been added as an 8ball response.'),
+(8,'8ball_delete_response','`:1$RESPONSE ID$1:` has been deleted as an 8ball response.'),
+(8,'8ball_list_response','Here is a list of 8ball responses:\n`:1$RESPONSES$1:`'),
+(8,'media_not_found','`:1$MEDIA ID$1:` could not be found as a media id.'),
+(8,'media_who_is','`:1$MEDIA ID$1:` belongs to :2$RESULT$2:.'),
+(8,'8ball_response','**Question:** :1$PROMPT$1:\n**Answer:** :2$ANSWER$2:') ON CONFLICT DO NOTHING;
+
+SELECT setval('public.eightball_responseid_seq', (SELECT MAX(responseid) FROM public.eightball)+1);
+SELECT setval('public.apiaccess_accessid_seq', (SELECT MAX(accessid) FROM public.apiaccess)+1);
+SELECT setval('public.modes_modeid_seq', (SELECT MAX(modeid) FROM public.modes)+1);
+SELECT setval('public.difficulty_difficultyid_seq', (SELECT MAX(difficultyid) FROM public.difficulty)+1);

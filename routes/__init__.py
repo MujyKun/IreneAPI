@@ -113,5 +113,5 @@ blueprints = [
     unscramblegame,
     wolfram,
     biasgame,
-    eightball,
+    eight_ball,
 ]

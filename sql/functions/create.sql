@@ -471,7 +471,21 @@ begin
         VALUES(t_userid);
     END IF;
 end;
-$$;create or replace function groupmembers.addsocials(t_twitter text, t_youtube text, t_melon text, t_instagram text,
+$$;create or replace function public.addresponse(t_response text)
+    returns integer
+    language plpgsql
+as
+$$
+declare
+    t_response_id integer;
+begin
+
+    INSERT INTO public.eightball(response)
+    VALUES(t_response) returning responseid INTO t_response_id;
+    return t_response_id;
+end;
+$$;
+create or replace function groupmembers.addsocials(t_twitter text, t_youtube text, t_melon text, t_instagram text,
     t_vlive text, t_spotify text, t_fancafe text, t_facebook text, t_tiktok text)
     returns integer
     language plpgsql
@@ -859,6 +873,14 @@ as
 $$
 begin
     DELETE FROM public.proofreader WHERE userid = t_userid;
+end;
+$$;create or replace function public.deleteresponse(t_response_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM public.eightball WHERE responseid = t_response_id;
 end;
 $$;create or replace function groupmembers.deletesocial(t_social_id integer)
     returns void
