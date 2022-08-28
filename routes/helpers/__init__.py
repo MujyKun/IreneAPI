@@ -282,9 +282,27 @@ from .wolfram import wolfram_query
 from .language import get_languages
 from .biasgame import generate_pvp, generate_bracket, get_winners, upsert_wins
 
+from .eightball import get_responses, get_response, add_response, delete_response
+
 # Helper Functions for routes.
 
 helper_routes = {
+    "8ball/$response_id.GET": {
+        "function": get_response,
+        "params": ["requestor", "response_id"],
+    },
+    "8ball/$response_id.DELETE": {
+        "function": delete_response,
+        "params": ["requestor", "response_id"],
+    },
+    "8ball/.GET": {
+        "function": get_responses,
+        "params": ["requestor"],
+    },
+    "8ball/.POST": {
+        "function": add_response,
+        "params": ["requestor", "response"],
+    },
     "media/download/$media_id.GET": {
         "function": get_image_host_url,
         "params": ["requestor", "media_id"],

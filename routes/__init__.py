@@ -83,3 +83,35 @@ from .unscramblegame import us as unscramblegame
 from .twitch import twitch
 from .biasgame import biasgame
 from .wolfram import wolfram
+from .eightball import eight_ball
+
+
+blueprints = [
+    affiliation,
+    bloodtype,
+    company,
+    date,
+    display,
+    fandom,
+    group,
+    groupalias,
+    guild,
+    location,
+    media,
+    name,
+    person,
+    personalias,
+    position,
+    social,
+    tag,
+    twitter,
+    channel,
+    user,
+    guessinggame,
+    user_status,
+    twitch,
+    unscramblegame,
+    wolfram,
+    biasgame,
+    eightball,
+]

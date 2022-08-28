@@ -8,34 +8,7 @@ from resources.keys import postgres_options, api_port
 from resources import drive
 
 from ws import websocket_blueprint
-from routes import (
-    affiliation,
-    bloodtype,
-    company,
-    date,
-    display,
-    fandom,
-    group,
-    groupalias,
-    guild,
-    location,
-    media,
-    name,
-    person,
-    personalias,
-    position,
-    social,
-    tag,
-    twitter,
-    channel,
-    user,
-    guessinggame,
-    user_status,
-    twitch,
-    unscramblegame,
-    wolfram,
-    biasgame,
-)
+from routes import blueprints as _blueprints
 from routes.helpers.errors import BaseError
 from quart_openapi import Pint, Resource
 from quart_openapi import Swagger
@@ -43,36 +16,8 @@ from resources.twitter import Twitter
 
 app = Pint(__name__, title="IreneAPI", contact_email="mujy@irenebot.com", version="2.0")
 swagger = Swagger(app)
+blueprints = _blueprints + [websocket_blueprint]  # do not override.
 
-blueprints = [
-    affiliation,
-    bloodtype,
-    company,
-    date,
-    display,
-    fandom,
-    group,
-    groupalias,
-    guild,
-    location,
-    media,
-    name,
-    person,
-    personalias,
-    position,
-    social,
-    tag,
-    twitter,
-    channel,
-    user,
-    guessinggame,
-    user_status,
-    unscramblegame,
-    twitch,
-    wolfram,
-    biasgame,
-    websocket_blueprint,
-]
 
 # print(app.config['SERVER_NAME'])
 # app.config['SERVER_NAME'] = "api.irenebot.com"
