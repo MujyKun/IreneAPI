@@ -76,6 +76,10 @@ def check_permission(permission_level: Access):
             if isinstance(requestor, Requestor):
                 if requestor.access.id <= permission_level.id:
                     # approved access
+                    callback_id = kwargs.get("callback_id")
+                    if callback_id:
+                        kwargs.pop("callback_id")
+
                     response = await func(*args, **kwargs)
                     # log access
                     try:
@@ -85,6 +89,8 @@ def check_permission(permission_level: Access):
                             kwargs.pop("unhashed_token")
                         if kwargs.get("requestor"):
                             kwargs.pop("requestor")
+                        if callback_id:
+                            kwargs["callback_id"] = callback_id
                         await log(
                             requestor=requestor,
                             function_name=func.__name__,

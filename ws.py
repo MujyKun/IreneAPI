@@ -79,6 +79,7 @@ async def process_ws_data(socket: WebSocketSession, data: dict) -> dict:
 
         # NOTE: we will not raise a bad request for problems with optional parameters.
         # breakpoint()
+        helper_function_args["callback_id"] = callback_id
         result = await helper["function"](**helper_function_args)
 
         if not result:
