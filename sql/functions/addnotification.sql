@@ -1,5 +1,5 @@
-create or replace function public.addnotification(t_guildid integer,
-                                t_userid integer, t_phrase text)
+create or replace function public.addnotification(t_guildid bigint,
+                                t_userid bigint, t_phrase text)
     returns integer
     language plpgsql
 as

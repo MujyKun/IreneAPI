@@ -600,6 +600,11 @@ INSERT INTO public.languagepacks(languageid, label, message) VALUES
 (8,'8ball_list_response','Here is a list of 8ball responses:\n`:1$RESPONSES$1:`'),
 (8,'media_not_found','`:1$MEDIA ID$1:` could not be found as a media id.'),
 (8,'media_who_is','`:1$MEDIA ID$1:` belongs to :2$RESULT$2:.'),
+(8, 'noti_already_exists', 'That phrase already exists as one of your notification phrases.'),
+(8, 'noti_does_not_exist', 'That phrase does not exist as one of your notification phrases.'),
+(8, 'noti_added', 'That phrase is now one of your notification phrases.'),
+(8, 'noti_removed', 'That phrase has been removed from your notification phrases if it existed.'),
+(8, 'noti_list', 'This is a list of your notification phrases in this server:\n:1$PHRASES$1: '),
 (8,'8ball_response','**Question:** :1$PROMPT$1:\n**Answer:** :2$ANSWER$2:') ON CONFLICT DO NOTHING;
 
 SELECT setval('public.eightball_responseid_seq', (SELECT MAX(responseid) FROM public.eightball)+1);

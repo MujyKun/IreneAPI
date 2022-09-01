@@ -61,7 +61,8 @@ CREATE OR REPLACE VIEW groupmembers.getlocations AS
             groupmembers.affiliation a on m.affiliationid = a.affiliationid
             LEFT JOIN guessinggame.difficulty d on d.mediaid = m.mediaid;
 CREATE OR REPLACE VIEW groupmembers.getnames AS
-    SELECT nameid, firstname, lastname FROM groupmembers.name;CREATE OR REPLACE VIEW getpatrons AS
+    SELECT nameid, firstname, lastname FROM groupmembers.name;CREATE OR REPLACE VIEW public.getnotifications AS
+    SELECT notiid, guildid, userid, phrase FROM public.notifications;CREATE OR REPLACE VIEW getpatrons AS
 SELECT p.userid FROM public.patron p
 UNION DISTINCT
 SELECT sp.userid FROM public.superpatron sp

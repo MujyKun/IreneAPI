@@ -375,6 +375,20 @@ begin
     VALUES(t_firstname, t_lastname) returning nameid INTO t_name_id;
     return t_name_id;
 end;
+$$;create or replace function public.addnotification(t_guildid bigint,
+                                t_userid bigint, t_phrase text)
+    returns integer
+    language plpgsql
+as
+$$
+declare
+    t_noti_id integer;
+begin
+
+    INSERT INTO public.notifications(guildid, userid, phrase)
+    VALUES(t_guildid, t_userid, t_phrase) returning notiid INTO t_noti_id;
+    return t_noti_id;
+end;
 $$;create or replace function public.addpatron(t_userid bigint)
     returns void
     language plpgsql
@@ -821,7 +835,15 @@ begin
     DELETE FROM groupmembers.name WHERE nameid = t_name_id;
 end;
 $$;
-create or replace function public.deletepatron(t_userid bigint)
+create or replace function public.deletenotification(t_noti_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM public.notifications WHERE notiid = t_noti_id;
+end;
+$$;create or replace function public.deletepatron(t_userid bigint)
     returns void
     language plpgsql
 as

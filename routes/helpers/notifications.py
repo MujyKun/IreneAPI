@@ -17,7 +17,7 @@ from models import Requestor
 @check_permission(permission_level=DEVELOPER)
 async def get_noti(requestor: Requestor, noti_id: int):
     is_int64(noti_id)
-    return await self.db.fetch(
+    return await self.db.fetch_row(
         "SELECT * FROM public.getnotifications WHERE notiid = $1", noti_id
     )
 
@@ -39,7 +39,7 @@ async def add_notification(
 ):
     is_int64(guild_id)
     is_int64(user_id)
-    return await self.db.execute(
+    return await self.db.fetch_row(
         "SELECT * FROM public.addnotification($1, $2, $3)",
         guild_id,
         user_id,
