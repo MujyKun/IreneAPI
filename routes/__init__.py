@@ -84,6 +84,7 @@ from .twitch import twitch
 from .biasgame import biasgame
 from .wolfram import wolfram
 from .eightball import eight_ball
+from .notifications import noti
 
 
 blueprints = [
@@ -114,4 +115,5 @@ blueprints = [
     wolfram,
     biasgame,
     eight_ball,
+    noti,
 ]
