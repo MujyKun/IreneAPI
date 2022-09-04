@@ -50,7 +50,8 @@ SELECT
        hasbot,
         (SELECT array_agg(t_gp.prefix)
         FROM public.guildprefixes t_gp WHERE g.guildid = t_gp.guildid) AS prefixes
-FROM public.guilds g;CREATE OR REPLACE VIEW public.getlanguages AS
+FROM public.guilds g;CREATE OR REPLACE VIEW interactions.getinteractions AS
+    SELECT m.typeid, url, name FROM interactions.media m LEFT JOIN interactions.interactiontypes it ON m.typeid = it.typeid;CREATE OR REPLACE VIEW public.getlanguages AS
     SELECT l.languageid, l.shortname, l.name,
            (SELECT json_agg(row_to_json(lp)) FROM public.languagepacks lp WHERE lp.languageid = l.languageid) AS pack
     FROM public.languages l;

@@ -301,6 +301,16 @@ begin
         UPDATE public.guildprefixes SET prefix = t_prefix WHERE guildid = t_guildid;
     END IF;
 end;
+$$;create or replace function interactions.addinteraction(t_type_id integer, t_url text)
+    returns void
+    language plpgsql
+as
+$$
+begin
+
+    INSERT INTO interactions.media(url, typeid)
+    VALUES(t_url, t_type_id) ON CONFLICT DO NOTHING;
+end;
 $$;create or replace function interactions.addinteractionmedia(t_url text, type_id integer)
     returns void
     language plpgsql
@@ -311,14 +321,17 @@ begin
     VALUES(t_url, type_id) ON CONFLICT DO NOTHING;
 end;
 $$;create or replace function interactions.addinteractiontype(t_name text)
-    returns void
+    returns integer
     language plpgsql
 as
 $$
+declare
+    t_type_id integer;
 begin
 
     INSERT INTO interactions.interactiontypes(name)
-    VALUES(t_name) ON CONFLICT DO NOTHING;
+    VALUES(t_name) returning typeid INTO t_type_id;
+    return t_type_id;
 end;
 $$;create or replace function groupmembers.addlocation(t_country text, t_city text)
     returns integer
@@ -799,7 +812,24 @@ begin
     DELETE FROM public.guilds WHERE guildid = t_guildid;
 end;
 $$;
-create or replace function groupmembers.deletelocation(t_location_id integer)
+create or replace function interactions.deleteinteraction(t_type_id integer, t_url text)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM interactions.media WHERE url=t_url AND typeid=t_type_id;
+end;
+$$;create or replace function interactions.deleteinteractiontype(t_type_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM interactions.media WHERE typeid = t_type_id;
+    DELETE FROM interactions.interactiontypes WHERE typeid = t_type_id;
+end;
+$$;create or replace function groupmembers.deletelocation(t_location_id integer)
     returns void
     language plpgsql
 as

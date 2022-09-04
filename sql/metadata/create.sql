@@ -605,6 +605,19 @@ INSERT INTO public.languagepacks(languageid, label, message) VALUES
 (8, 'noti_added', 'That phrase is now one of your notification phrases.'),
 (8, 'noti_removed', 'That phrase has been removed from your notification phrases if it existed.'),
 (8, 'noti_list', 'This is a list of your notification phrases in this server:\n:1$PHRASES$1: '),
+(8, 'noti_list', 'This is a list of your notification phrases in this server:\n:1$PHRASES$1: '),
+(8, 'noti_list', 'This is a list of your notification phrases in this server:\n:1$PHRASES$1: '),
+(8, 'interaction_type_exists', 'That interaction type already exists.'),
+(8, 'interaction_type_does_not_exist', 'That interaction type does not exist.'),
+(8, 'interaction_type_added', 'That interaction type has been added.'),
+(8, 'interaction_type_deleted', 'That interaction type has been deleted.'),
+(8, 'interaction_added', 'That interaction has been added.'),
+(8, 'interaction_does_not_exist', 'That interaction does not exist.'),
+(8, 'interaction_already_exists', 'That interaction already exists'),
+(8, 'interaction_deleted', 'That interaction has been deleted.'),
+(8, 'interaction_no_results', 'No results exist for that interaction.'),
+(8, 'no_self_harm', ':1$BOT NAME$1: does not support self harm.'),
+(8, 'ping', 'My ping is currently :1$LATENCY$1:ms'),
 (8,'8ball_response','**Question:** :1$PROMPT$1:\n**Answer:** :2$ANSWER$2:') ON CONFLICT DO NOTHING;
 
 SELECT setval('public.eightball_responseid_seq', (SELECT MAX(responseid) FROM public.eightball)+1);

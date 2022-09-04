@@ -291,10 +291,34 @@ from .biasgame import generate_pvp, generate_bracket, get_winners, upsert_wins
 from .eightball import get_responses, get_response, add_response, delete_response
 
 from .notifications import get_noti, get_notifications, delete_noti, add_notification
+from .interactions import (
+    get_interactions,
+    add_interaction,
+    add_interaction_type,
+    delete_interaction,
+    delete_interaction_type,
+)
 
 # Helper Functions for routes.
 
 helper_routes = {
+    "interactions/.GET": {"function": get_interactions, "params": ["requestor"]},
+    "interactions/.POST": {
+        "function": add_interaction,
+        "params": ["requestor", "type_id", "url"],
+    },
+    "interactions/.DELETE": {
+        "function": delete_interaction,
+        "params": ["requestor", "type_id", "url"],
+    },
+    "interactions/type.POST": {
+        "function": add_interaction_type,
+        "params": ["requestor", "name"],
+    },
+    "interactions/type.DELETE": {
+        "function": delete_interaction_type,
+        "params": ["requestor", "type_id"],
+    },
     "noti/$noti_id.GET": {"function": get_noti, "params": ["requestor", "noti_id"]},
     "noti/$noti_id.DELETE": {
         "function": delete_noti,

@@ -85,6 +85,7 @@ from .biasgame import biasgame
 from .wolfram import wolfram
 from .eightball import eight_ball
 from .notifications import noti
+from .interactions import interactions as interactions_blueprint
 
 
 blueprints = [
@@ -116,4 +117,5 @@ blueprints = [
     biasgame,
     eight_ball,
     noti,
+    interactions_blueprint,
 ]
