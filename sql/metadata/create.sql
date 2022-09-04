@@ -618,7 +618,10 @@ INSERT INTO public.languagepacks(languageid, label, message) VALUES
 (8, 'interaction_no_results', 'No results exist for that interaction.'),
 (8, 'no_self_harm', ':1$BOT NAME$1: does not support self harm.'),
 (8, 'ping', 'My ping is currently :1$LATENCY$1:ms'),
+(8, 'messages_cleared', 'Cleared :1$NUMBER OF MESSAGES$1: messages.'),
+(8, 'not_in_range', 'The amount must be in a range from :1$MIN$1: to :2$MAX$2:'),
 (8,'8ball_response','**Question:** :1$PROMPT$1:\n**Answer:** :2$ANSWER$2:') ON CONFLICT DO NOTHING;
+
 
 SELECT setval('public.eightball_responseid_seq', (SELECT MAX(responseid) FROM public.eightball)+1);
 SELECT setval('public.apiaccess_accessid_seq', (SELECT MAX(accessid) FROM public.apiaccess)+1);
