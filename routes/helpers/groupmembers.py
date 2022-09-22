@@ -155,7 +155,14 @@ async def download_and_get_image_host_url(media_info):
     await drive.download_file(g_drive_id, file_path)
 
     # https://images.irenebot.com/$media_id
-    media_info["results"]["host"] = f"{image_host}{media_info['results']['mediaid']}"
+    if file_type == "gif":
+        media_info["results"][
+            "host"
+        ] = f"{image_host}idol/{media_info['results']['mediaid']}.gif"
+    else:
+        media_info["results"][
+            "host"
+        ] = f"{image_host}{media_info['results']['mediaid']}"
 
     # check every 50% of the dir file limit as we remove half.
     global _new_photo_counter
