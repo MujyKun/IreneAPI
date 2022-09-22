@@ -13,5 +13,7 @@ SELECT
     WHERE gt.groupid = g.groupid),
    (SELECT array_agg(aliasid) AS aliasids
     FROM groupmembers.groupaliases ga
-    WHERE ga.groupid = g.groupid)
-FROM groupmembers.groups g;
+    WHERE ga.groupid = g.groupid),
+    coalesce(media.mediacount, 0) AS mediacount
+FROM groupmembers.groups g LEFT OUTER JOIN groupmembers.getgroupmediacount media ON g.groupid = media.groupid;
+

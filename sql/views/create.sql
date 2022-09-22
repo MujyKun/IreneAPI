@@ -9,7 +9,8 @@ FROM public.channels c;CREATE OR REPLACE VIEW groupmembers.getcompanies AS
     SELECT displayid, avatar, banner FROM groupmembers.display;CREATE OR REPLACE VIEW groupmembers.getfandoms AS
     SELECT groupid, name FROM groupmembers.fandom;CREATE OR REPLACE VIEW guessinggame.getggs AS
     SELECT gameid, dateid, mediaids, statusids, modeid, difficultyid, isnsfw FROM guessinggame.games;CREATE OR REPLACE VIEW groupmembers.getgroupaliases AS
-    SELECT aliasid, alias, groupid, guildid FROM groupmembers.groupaliases;CREATE OR REPLACE VIEW groupmembers.getgroups AS
+    SELECT aliasid, alias, groupid, guildid FROM groupmembers.groupaliases;CREATE OR REPLACE VIEW groupmembers.getgroupmediacount AS
+    SELECT COUNT(*) AS mediacount, media.groupid FROM groupmembers.getmedia media GROUP BY media.groupid;CREATE OR REPLACE VIEW groupmembers.getgroups AS
 SELECT
        g.groupid,
        g.name,
@@ -24,8 +25,11 @@ SELECT
     WHERE gt.groupid = g.groupid),
    (SELECT array_agg(aliasid) AS aliasids
     FROM groupmembers.groupaliases ga
-    WHERE ga.groupid = g.groupid)
-FROM groupmembers.groups g;CREATE OR REPLACE VIEW public.getguilds AS
+    WHERE ga.groupid = g.groupid),
+    coalesce(media.mediacount, 0) AS mediacount
+FROM groupmembers.groups g LEFT OUTER JOIN groupmembers.getgroupmediacount media ON g.groupid = media.groupid;
+
+CREATE OR REPLACE VIEW public.getguilds AS
 SELECT
        guildid,
        name,
@@ -76,27 +80,31 @@ SELECT mod.userid FROM public.mods mod
 UNION DISTINCT
 SELECT dmod.userid FROM public.datamods dmod
 ORDER BY userid DESC;CREATE OR REPLACE VIEW groupmembers.getpersonaliases AS
-    SELECT aliasid, alias, personid, guildid FROM groupmembers.personaliases;CREATE OR REPLACE VIEW groupmembers.getpersons AS
+    SELECT aliasid, alias, personid, guildid FROM groupmembers.personaliases;CREATE OR REPLACE VIEW groupmembers.getpersonmediacount AS
+    SELECT COUNT(*) AS mediacount, media.personid FROM groupmembers.getmedia media GROUP BY media.personid;
+CREATE OR REPLACE VIEW groupmembers.getpersons AS
     SELECT
-        p.personid,
-        p.dateid,
-        p.nameid,
-        p.formernameid,
-        p.displayid,
-        p.socialid,
-        p.locationid,
-        p.bloodid,
-        gender,
-        description,
-        height,
-        callcount,
-       (SELECT array_agg(pt.tagid) AS tagids
-            FROM groupmembers.persontags pt
-            WHERE pt.personid = p.personid),
-       (SELECT array_agg(aliasid) AS aliasids
-            FROM groupmembers.personaliases pa
-            WHERE pa.personid = p.personid)
-       FROM groupmembers.person p;CREATE OR REPLACE VIEW groupmembers.getpositions AS
+    p.personid,
+    p.dateid,
+    p.nameid,
+    p.formernameid,
+    p.displayid,
+    p.socialid,
+    p.locationid,
+    p.bloodid,
+    gender,
+    description,
+    height,
+    callcount,
+   (SELECT array_agg(pt.tagid) AS tagids
+        FROM groupmembers.persontags pt
+        WHERE pt.personid = p.personid),
+   (SELECT array_agg(aliasid) AS aliasids
+        FROM groupmembers.personaliases pa
+        WHERE pa.personid = p.personid),
+   coalesce(media.mediacount, 0) AS mediacount
+   FROM groupmembers.person p LEFT OUTER JOIN groupmembers.getpersonmediacount media ON p.personid = media.personid;
+CREATE OR REPLACE VIEW groupmembers.getpositions AS
     SELECT positionid, name FROM groupmembers.position;CREATE OR REPLACE VIEW public.getprefixes AS
 SELECT
         DISTINCT (gp.guildid),

@@ -119,7 +119,13 @@ async def get_twitter_channels_by_guild(requestor: Requestor, guild_id: int) -> 
 async def get_timeline(requestor: Requestor, twitter_id: int):
     """
     Get the timeline of an account.
+
+    Will return None if there is no access to a user.
     """
     full_info = await twitter.get_user_timeline(user_id=twitter_id)
-    timeline_data = full_info.get("data")
-    return {"results": timeline_data}
+    data = []
+    if full_info.get("errors"):
+        data = full_info["errors"][0]
+    elif full_info.get("data"):
+        data = full_info["data"]
+    return {"results": data}
