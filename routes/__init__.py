@@ -86,6 +86,7 @@ from .wolfram import wolfram
 from .eightball import eight_ball
 from .notifications import noti
 from .interactions import interactions as interactions_blueprint
+from .misc import urban
 
 
 blueprints = [
@@ -118,4 +119,5 @@ blueprints = [
     eight_ball,
     noti,
     interactions_blueprint,
+    urban
 ]

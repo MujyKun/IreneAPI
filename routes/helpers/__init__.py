@@ -299,9 +299,12 @@ from .interactions import (
     delete_interaction_type,
 )
 
+from .misc import get_urban_definitions
+
 # Helper Functions for routes.
 
 helper_routes = {
+    "urban/.POST": {"function": get_urban_definitions, "params": ["requestor", "phrase"]},
     "interactions/.GET": {"function": get_interactions, "params": ["requestor"]},
     "interactions/.POST": {
         "function": add_interaction,
