@@ -625,6 +625,8 @@ INSERT INTO public.languagepacks(languageid, label, message) VALUES
 (8, 'no_emojis_found', 'No emojis were found.'),
 (8, 'invalid_range', 'There was an invalid range specified. The start number may be higher than the end number.'),
 (8, 'random_number', 'Your random number between :1$START NUMBER$1: and :2$END NUMBER$2: is: :3$RESULT$3:'),
+(8, 'urban_result', 'Phrase: :1$PHRASE$1:\nDefinition Number: :2$DEFINITION NUMBER$2:\nDefinition: :3$DEFINITION$3:'),
+(8, 'no_urban_result', 'That phrase and definition number did not provide any results.'),
 (8,'8ball_response','**Question:** :1$PROMPT$1:\n**Answer:** :2$ANSWER$2:') ON CONFLICT DO NOTHING;
 
 

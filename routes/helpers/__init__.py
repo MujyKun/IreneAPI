@@ -304,7 +304,7 @@ from .misc import get_urban_definitions
 # Helper Functions for routes.
 
 helper_routes = {
-    "misc/urban/.POST": {"function": get_urban_definitions, "params": ["requestor", "phrase"]},
+    "misc/urban.POST": {"function": get_urban_definitions, "params": ["requestor", "phrase"]},
     "interactions/.GET": {"function": get_interactions, "params": ["requestor"]},
     "interactions/.POST": {
         "function": add_interaction,

@@ -16,5 +16,5 @@ from resources import urban
 @check_permission(permission_level=SUPER_PATRON)
 async def get_urban_definitions(requestor: Requestor, phrase: str) -> dict:
     """Get urban dictionary definitions."""
-    return await urban.query(phrase)
+    return {"results": await urban.query(phrase)}
 
