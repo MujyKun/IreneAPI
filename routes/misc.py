@@ -9,11 +9,11 @@ import routes.helpers.api as api_helper
 from models import Requestor
 from .helpers import BadRequest, is_int64, USER, GOD
 
-urban = PintBlueprint("urban", __name__, url_prefix="/urban/")
+misc = PintBlueprint("misc", __name__, url_prefix="/misc/")
 
 
-@urban.route("/")
-@urban.doc(
+@misc.route("urban/")
+@misc.doc(
 )
 class Urban(Resource):
     async def post(self):
