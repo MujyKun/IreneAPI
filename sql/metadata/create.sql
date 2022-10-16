@@ -620,6 +620,11 @@ INSERT INTO public.languagepacks(languageid, label, message) VALUES
 (8, 'ping', 'My ping is currently :1$LATENCY$1:ms'),
 (8, 'messages_cleared', 'Cleared :1$NUMBER OF MESSAGES$1: messages.'),
 (8, 'not_in_range', 'The amount must be in a range from :1$MIN$1: to :2$MAX$2:'),
+(8, 'no_banner', 'There is no banner found.'),
+(8, 'nice_try_cheater', 'Nice Try Cheater! You are currently in a game!'),
+(8, 'no_emojis_found', 'No emojis were found.'),
+(8, 'invalid_range', 'There was an invalid range specified. The start number may be higher than the end number.'),
+(8, 'random_number', 'Your random number between :1$START NUMBER$1: and :2$END NUMBER$2: is: :3$RESULT$3:'),
 (8,'8ball_response','**Question:** :1$PROMPT$1:\n**Answer:** :2$ANSWER$2:') ON CONFLICT DO NOTHING;
 
 

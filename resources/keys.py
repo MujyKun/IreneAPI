@@ -51,6 +51,7 @@ top_gg_webhook_key = os.getenv("TOP_GG_WEBHOOK")
 
 patreon_url = os.getenv("PATREON_LINK")
 
+urban_key = os.getenv("URBAN_KEY")
 
 twitter_account_id = os.getenv("TWITTER_ACCOUNT_ID")
 twitter_username = os.getenv("TWITTER_USERNAME")
