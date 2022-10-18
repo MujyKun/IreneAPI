@@ -19,32 +19,46 @@ from PIL import Image
 from models import Requestor
 
 from resources.keys import avatar_location, bias_game_location, image_host
+from dataclasses import dataclass
 
 from random import randint
-
 
 DIR_FILE_LIMIT = 20000
 
 
-def blocking_remove_oldest_files():
-    """Remove the oldest files in the bias game directory if it surpasses the file limit."""
-    from os import listdir
-    from os.path import getctime
+@dataclass()
+class FileManager:
+    files_added = 0
 
-    files = listdir(bias_game_location)
-    if len(files) < DIR_FILE_LIMIT:
-        return
+    def handle_oldest_files(self):
+        """Remove the oldest files in the bias game directory if it surpasses the file limit.
 
-    webp_files = [
-        f"{bias_game_location}{file_name}"
-        for file_name in files
-        if file_name.endswith(".webp")
-    ]
-    sorted_by_oldest_files = sorted(webp_files, key=getctime)
-    _ = [
-        os.unlink(file_path)
-        for file_path in sorted_by_oldest_files[0 : DIR_FILE_LIMIT // 2]
-    ]
+        This is a time costing function if executed entirely. Is triggered every 1000 files added.
+        """
+        self.files_added += 1
+        if self.files_added % 1000 != 0:
+            return
+
+        from os import listdir
+        from os.path import getctime
+
+        files = listdir(bias_game_location)
+        if len(files) < DIR_FILE_LIMIT:
+            return
+
+        webp_files = [
+            f"{bias_game_location}{file_name}"
+            for file_name in files
+            if file_name.endswith(".webp")
+        ]
+        sorted_by_oldest_files = sorted(webp_files, key=getctime)
+        _ = [
+            os.unlink(file_path)
+            for file_path in sorted_by_oldest_files[0: DIR_FILE_LIMIT // 2]
+        ]
+
+
+file_manager = FileManager()
 
 
 def blocking_merge_images(merge_name, first_loc, second_loc):
@@ -54,10 +68,10 @@ def blocking_merge_images(merge_name, first_loc, second_loc):
     if os.path.exists(final_saved_path):
         return image_url
     else:
-        blocking_remove_oldest_files()
+        file_manager.handle_oldest_files()
 
     with Image.open(f"images/versus.png") as versus_image, Image.open(
-        first_loc
+            first_loc
     ) as first_idol_image, Image.open(second_loc) as second_idol_image:
         # define the dimensions
         idol_image_width = 150
@@ -110,7 +124,7 @@ def blocking_generate_bracket(game_info: dict):
                 bracket_counter += 2
                 final_winner = pvp["winner"]
                 with Image.open(
-                    f"{person_loc}{fp}.webp"
+                        f"{person_loc}{fp}.webp"
                 ) as first_person_img, Image.open(
                     f"{person_loc}{sp}.webp"
                 ) as second_person_image:
@@ -129,7 +143,7 @@ def blocking_generate_bracket(game_info: dict):
                     )
 
         p_info = _stored_bracket_positions[bracket_counter]
-        file_name = f"t_{randint(10000,50000)}_{randint(10000,50000)}.webp"
+        file_name = f"t_{randint(10000, 50000)}_{randint(10000, 50000)}.webp"
         final_bracket_path = f"{bias_game_location}{file_name}"
         with Image.open(f"{person_loc}{final_winner}.webp") as p_image:
             p_image = p_image.resize(p_info["img_size"])
@@ -144,7 +158,7 @@ async def get_id_from_url(url: str):
 
     slash_loc = url.rindex("/")
     underscore_loc = url.rindex(".")
-    return url[slash_loc + 1 : underscore_loc]
+    return url[slash_loc + 1: underscore_loc]
 
 
 async def get_file_name_from_url(url: str):
@@ -152,12 +166,12 @@ async def get_file_name_from_url(url: str):
         return None
 
     slash_loc = url.rindex("/")
-    return url[slash_loc + 1 : :]
+    return url[slash_loc + 1::]
 
 
 @check_permission(permission_level=DEVELOPER)
 async def generate_pvp(
-    requestor: Requestor, first_image_url: str, second_image_url: str
+        requestor: Requestor, first_image_url: str, second_image_url: str
 ):
     """Generate a PvP image for the bias game."""
     merge_name = f"{await get_id_from_url(first_image_url)}_{await get_id_from_url(second_image_url)}.webp"
