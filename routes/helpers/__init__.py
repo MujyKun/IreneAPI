@@ -591,7 +591,7 @@ helper_routes = {
     "media/affiliations.GET": {
         "function": get_media_by_affiliations,
         "params": ["requestor", "affiliation_ids"],
-        "optional": ["limit"],
+        "optional": ["limit", "count_only"],
     },
     "media/.GET": {"function": get_all_media, "params": ["requestor"]},
     "media/.POST": {

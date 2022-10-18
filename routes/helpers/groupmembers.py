@@ -556,10 +556,14 @@ async def get_all_media(requestor: Requestor) -> dict:
 
 
 @check_permission(permission_level=DEVELOPER)
-async def get_media_by_affiliations(requestor: Requestor, affiliation_ids, limit=None):
+async def get_media_by_affiliations(requestor: Requestor, affiliation_ids, limit=None, count_only=False):
     """Get all medias that belong to certain affiliations."""
+    return_val = "mediaid"
+    if count_only:
+        return_val = f"COUNT({return_val})"
+
     return await self.db.fetch(
-        "SELECT mediaid FROM groupmembers.getmedia WHERE affiliationid = any($1) ORDER BY RANDOM() LIMIT $2",
+        f"SELECT {return_val} FROM groupmembers.getmedia WHERE affiliationid = any($1) ORDER BY RANDOM() LIMIT $2",
         affiliation_ids,
         limit,
     )
