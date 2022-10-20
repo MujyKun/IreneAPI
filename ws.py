@@ -28,7 +28,7 @@ async def process_active_ws(wss):
 
 @websocket_blueprint.websocket("/ws_site")
 async def ws_site():
-    """Some frameworks (such as TS) cannot add extra headers,
+    """Some frameworks (such as axios or fetch) cannot add extra headers,
     so a workaround is created by accepting the websocket connection early."""
     await websocket.accept()
     login_data = await websocket.receive_json()
