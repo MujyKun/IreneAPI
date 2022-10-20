@@ -2,12 +2,11 @@ import asyncio
 from typing import Union
 
 from quart import Blueprint, request
-from quart_openapi import PintBlueprint, Resource
+from quart_openapi import PintBlueprint
+from . import Resource
+
 from . import login
 import routes.helpers.groupmembers as helper
-import routes.helpers.api as api_helper
-from models import Requestor
-from .helpers import BadRequest, is_int64, USER, GOD
 
 affiliation = PintBlueprint("affiliation", __name__, url_prefix="/affiliation/")
 

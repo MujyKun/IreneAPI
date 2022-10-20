@@ -792,6 +792,17 @@ werkzeug = ">=2.0.0"
 dotenv = ["python-dotenv"]
 
 [[package]]
+name = "quart-cors"
+version = "0.5.0"
+description = "A Quart extension to provide Cross Origin Resource Sharing, access control, support."
+category = "main"
+optional = false
+python-versions = ">=3.7.0"
+
+[package.dependencies]
+Quart = ">=0.15"
+
+[[package]]
 name = "quart-openapi"
 version = "1.7.2"
 description = "Framework for Quart to add swagger generation to routes and restful resources"
@@ -1052,7 +1063,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "e40a7355007e50042a6255bbb9879a3b9f016fc072bfd06eeddfd39614b18a5a"
+content-hash = "20df49f4d6a37c13207d452f81701997055427062bebf9e4595a5ca33779ba2e"
 
 [metadata.files]
 aiodns = []
@@ -1454,6 +1465,7 @@ quart = [
     {file = "Quart-0.17.0-py3-none-any.whl", hash = "sha256:69480e7384935feff1f50293a8cb70c5d31f568af94ed792d043bb368b50bd50"},
     {file = "Quart-0.17.0.tar.gz", hash = "sha256:2cf213d8b83fa701a83e3b3125e9102a937cefd1e97e9583f22ee2fa79139640"},
 ]
+quart-cors = []
 quart-openapi = []
 requests = [
     {file = "requests-2.28.1-py3-none-any.whl", hash = "sha256:8fefa2a1a1365bf5520aac41836fbee479da67864514bdb821f31ce07ce65349"},

@@ -1,5 +1,7 @@
 from quart import Blueprint, request
-from quart_openapi import PintBlueprint, Resource
+from quart_openapi import PintBlueprint
+from . import Resource
+
 from . import login
 import routes.helpers.user as helper
 import routes.helpers.api as api_helper
@@ -12,13 +14,13 @@ user = PintBlueprint("user", __name__, url_prefix="/user/")
 @user.route("")
 @user.doc()
 class Users(Resource):
-    async def get(self, user_id: int):
+    async def get(self):
         """Get the information about all users
 
         Use this route to get all user information. A login is still needed.
         """
         requestor = await login(headers=request.headers, data=request.args)
-        return await helper.get_all_users(requestor, user_id)
+        return await helper.get_all_users(requestor)
 
 
 @user.route("toggleggfilter/<int:user_id>")

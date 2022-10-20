@@ -1,5 +1,6 @@
 from passlib.context import CryptContext
 
+
 # API Tokens are hashed in the DB and should at no point ever be read as plain text.
 token_context = CryptContext(
     schemes=["pbkdf2_sha256"],

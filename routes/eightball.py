@@ -1,5 +1,7 @@
 from quart import Blueprint, request
-from quart_openapi import PintBlueprint, Resource
+from quart_openapi import PintBlueprint
+from . import Resource
+
 from . import login
 import routes.helpers.eightball as helper
 import routes.helpers.api as api_helper

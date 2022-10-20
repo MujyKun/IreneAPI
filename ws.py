@@ -8,17 +8,7 @@ from routes.helpers.errors import BadRequest
 websocket_blueprint = Blueprint("ws", __name__)
 
 
-@websocket_blueprint.websocket("/ws")
-async def ws():
-    """Create a WebSocket connection."""
-    wss = await login(websocket.headers, data=websocket.args, handle_websocket=True)
-
-    if not wss:
-        # failed to log in.
-        return
-
-    await websocket.accept()
-
+async def process_active_ws(wss):
     try:
         while True:
             # client must send in their requests.
@@ -34,6 +24,41 @@ async def ws():
         existing_ws.pop(wss.wss_id)
     else:
         connected_websockets.pop(wss.user_id)
+
+
+@websocket_blueprint.websocket("/ws_site")
+async def ws_site():
+    """Some frameworks (such as TS) cannot add extra headers,
+    so a workaround is created by accepting the websocket connection early."""
+    await websocket.accept()
+    login_data = await websocket.receive_json()
+    token = login_data.get("Authorization")
+    user_id = login_data.get("user_id")
+    if not (token and user_id):
+        return
+
+    # remove any other data the user sent.
+    t_headers = {'Authorization': token}
+    t_args = {'user_id': user_id}
+    wss = await login(t_headers, data=t_args, handle_websocket=True)
+    if not wss:
+        # failed to log in
+        return
+
+    await process_active_ws(wss)
+
+
+@websocket_blueprint.websocket("/ws")
+async def ws():
+    """Create a WebSocket connection. Generalized for apps and being able to send a bearer token."""
+    wss = await login(websocket.headers, data=websocket.args, handle_websocket=True)
+
+    if not wss:
+        # failed to log in.
+        return
+
+    await websocket.accept()
+    await process_active_ws(wss)
 
 
 async def process_ws_data(socket: WebSocketSession, data: dict) -> dict:

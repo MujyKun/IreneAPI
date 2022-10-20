@@ -1,6 +1,8 @@
 # noinspection PyUnresolvedReferences, PyPackageRequirements
 from asyncio import get_event_loop
-from quart import Quart, render_template, Response
+
+import quart
+from quart import Quart, render_template, Response, make_response
 from models import PgConnection
 
 # noinspection PyUnresolvedReferences, PyPackageRequirements
@@ -8,16 +10,17 @@ from resources.keys import postgres_options, api_port
 from resources import drive
 
 from ws import websocket_blueprint
-from routes import blueprints as _blueprints
+from routes import blueprints as _blueprints, cors_handler
 from routes.helpers.errors import BaseError
-from quart_openapi import Pint, Resource
 from quart_openapi import Swagger
-from resources.twitter import Twitter
+from quart_cors import cors
+from models import Pint
+
 
 app = Pint(__name__, title="IreneAPI", contact_email="mujy@irenebot.com", version="2.0")
+app = cors(app)
 swagger = Swagger(app)
 blueprints = _blueprints + [websocket_blueprint]  # do not override.
-
 
 # print(app.config['SERVER_NAME'])
 # app.config['SERVER_NAME'] = "api.irenebot.com"
@@ -28,10 +31,13 @@ db = PgConnection(**postgres_options)
 
 
 @app.errorhandler(BaseError)
+# @crossdomain(origin=individual_route_cross_domain_origin)
 async def handle_custom(error):
-    return Response(
-        response=str(error), status=error.status_code, content_type="application/json"
-    )
+    # handler = await cors_handler(swagger.as_dict)
+    handler = await cors_handler(make_response)
+    response = await handler(str(error), error.status_code)
+    response.content_type = "application/json"
+    return response
 
 
 @app.route("/docs")
@@ -54,12 +60,14 @@ async def docs():
       - Bearer Token: []
       - User ID: []
     """
-    return swagger.as_dict()
+    handler = await cors_handler(swagger.as_dict)
+    return await handler()
 
 
 @app.route("/")
 async def index():
-    return await render_template("index.html")
+    handler = await cors_handler(render_template)
+    return await handler("index.html")
 
 
 # if __name__ == '__main__':
