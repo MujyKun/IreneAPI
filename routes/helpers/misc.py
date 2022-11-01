@@ -17,4 +17,3 @@ from resources import urban
 async def get_urban_definitions(requestor: Requestor, phrase: str) -> dict:
     """Get urban dictionary definitions."""
     return {"results": await urban.query(phrase)}
-

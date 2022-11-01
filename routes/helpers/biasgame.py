@@ -54,7 +54,7 @@ class FileManager:
         sorted_by_oldest_files = sorted(webp_files, key=getctime)
         _ = [
             os.unlink(file_path)
-            for file_path in sorted_by_oldest_files[0: DIR_FILE_LIMIT // 2]
+            for file_path in sorted_by_oldest_files[0 : DIR_FILE_LIMIT // 2]
         ]
 
 
@@ -71,7 +71,7 @@ def blocking_merge_images(merge_name, first_loc, second_loc):
         file_manager.handle_oldest_files()
 
     with Image.open(f"images/versus.png") as versus_image, Image.open(
-            first_loc
+        first_loc
     ) as first_idol_image, Image.open(second_loc) as second_idol_image:
         # define the dimensions
         idol_image_width = 150
@@ -124,7 +124,7 @@ def blocking_generate_bracket(game_info: dict):
                 bracket_counter += 2
                 final_winner = pvp["winner"]
                 with Image.open(
-                        f"{person_loc}{fp}.webp"
+                    f"{person_loc}{fp}.webp"
                 ) as first_person_img, Image.open(
                     f"{person_loc}{sp}.webp"
                 ) as second_person_image:
@@ -158,7 +158,7 @@ async def get_id_from_url(url: str):
 
     slash_loc = url.rindex("/")
     underscore_loc = url.rindex(".")
-    return url[slash_loc + 1: underscore_loc]
+    return url[slash_loc + 1 : underscore_loc]
 
 
 async def get_file_name_from_url(url: str):
@@ -166,12 +166,12 @@ async def get_file_name_from_url(url: str):
         return None
 
     slash_loc = url.rindex("/")
-    return url[slash_loc + 1::]
+    return url[slash_loc + 1 : :]
 
 
 @check_permission(permission_level=DEVELOPER)
 async def generate_pvp(
-        requestor: Requestor, first_image_url: str, second_image_url: str
+    requestor: Requestor, first_image_url: str, second_image_url: str
 ):
     """Generate a PvP image for the bias game."""
     merge_name = f"{await get_id_from_url(first_image_url)}_{await get_id_from_url(second_image_url)}.webp"

@@ -87,3 +87,27 @@ class AffiliationMedia(Resource):
         kwargs = helper.get_media_kwargs(requestor, request.args)
         kwargs["affiliation_id"] = affiliation_id
         return await helper.generate_media_group(**kwargs)
+
+
+@affiliation.route("automedia")
+@affiliation.doc()
+class AutoMedia(Resource):
+    async def get(self):
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.get_auto_media(requestor)
+
+    async def post(self):
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.add_auto_media(
+            requestor,
+            request.args.get("channel_id"),
+            request.args.get("affiliation_id"),
+        )
+
+    async def delete(self):
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.remove_auto_media(
+            requestor,
+            request.args.get("channel_id"),
+            request.args.get("affiliation_id"),
+        )

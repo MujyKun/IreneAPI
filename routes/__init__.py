@@ -18,9 +18,16 @@ from quart import current_app, make_response, request
 
 
 # pylint: disable=too-many-arguments
-def crossdomain(origin: str = None, methods: Iterable[str] = None, headers: Union[str, Iterable[str]] = None,
-                expose_headers: Union[str, Iterable[str]] = None, max_age: Union[int, timedelta] = 21600,
-                attach_to_all: bool = True, automatic_options: bool = True, credentials: bool = False) -> Callable:
+def crossdomain(
+    origin: str = None,
+    methods: Iterable[str] = None,
+    headers: Union[str, Iterable[str]] = None,
+    expose_headers: Union[str, Iterable[str]] = None,
+    max_age: Union[int, timedelta] = 21600,
+    attach_to_all: bool = True,
+    automatic_options: bool = True,
+    credentials: bool = False,
+) -> Callable:
     """Decorator for `CORS <https://fetch.spec.whatwg.org/#http-cors-protocol>`_ adapted from
     http://flask.pocoo.org/snippets/56/
 
@@ -51,13 +58,13 @@ def crossdomain(origin: str = None, methods: Iterable[str] = None, headers: Unio
     This would allow Cross Origin requests to make get requests to '/foobar'.
     """
     if methods is not None:
-        methods = ', '.join(sorted(x.upper() for x in methods))
+        methods = ", ".join(sorted(x.upper() for x in methods))
     if headers is not None and not isinstance(headers, str):
-        headers = ', '.join(x.upper() for x in headers)
+        headers = ", ".join(x.upper() for x in headers)
     if expose_headers is not None and not isinstance(expose_headers, str):
-        expose_headers = ', '.join(x.upper() for x in expose_headers)
+        expose_headers = ", ".join(x.upper() for x in expose_headers)
     if not isinstance(origin, str):
-        origin = ', '.join(origin)
+        origin = ", ".join(origin)
     if isinstance(max_age, timedelta):
         max_age = max_age.total_seconds()
 
@@ -65,29 +72,33 @@ def crossdomain(origin: str = None, methods: Iterable[str] = None, headers: Unio
         if methods is not None:
             return methods
 
-        options_resp = await current_app.make_default_options_response(overwritten=False)
-        return options_resp.headers['allow']
+        options_resp = await current_app.make_default_options_response(
+            overwritten=False
+        )
+        return options_resp.headers["allow"]
 
     def decorator(func):
         async def wrapped_function(*args, **kwargs):
-            if automatic_options and request.method == 'OPTIONS':
-                resp = await current_app.make_default_options_response(overwritten=False)
+            if automatic_options and request.method == "OPTIONS":
+                resp = await current_app.make_default_options_response(
+                    overwritten=False
+                )
             else:
                 resp = await make_response(await func(*args, **kwargs))
-            if not attach_to_all and request.method != 'OPTIONS':
+            if not attach_to_all and request.method != "OPTIONS":
                 return resp
 
             hdrs = resp.headers
 
-            hdrs['Access-Control-Allow-Origin'] = origin
-            hdrs['Access-Control-Allow-Methods'] = await get_methods()
-            hdrs['Access-Control-Max-Age'] = str(max_age)
+            hdrs["Access-Control-Allow-Origin"] = origin
+            hdrs["Access-Control-Allow-Methods"] = await get_methods()
+            hdrs["Access-Control-Max-Age"] = str(max_age)
             if credentials:
-                hdrs['Access-Control-Allow-Credentials'] = 'true'
+                hdrs["Access-Control-Allow-Credentials"] = "true"
             if headers is not None:
-                hdrs['Access-Control-Allow-Headers'] = headers
+                hdrs["Access-Control-Allow-Headers"] = headers
             if expose_headers is not None:
-                hdrs['Access-Control-Expose-Headers'] = expose_headers
+                hdrs["Access-Control-Expose-Headers"] = expose_headers
             return resp
 
         func.provide_automatic_options = False
@@ -115,8 +126,8 @@ class Resource(NoCorsResource):
     async def dispatch_request(self, *args, **kwargs):
         """Add Cors to each type of request in the resource."""
         handler = await cors_handler(getattr(self, request.method.lower(), None))
-        if handler is None and request.method == 'HEAD' or request.method == 'OPTIONS':
-            handler = getattr(self, 'get', None)
+        if handler is None and request.method == "HEAD" or request.method == "OPTIONS":
+            handler = getattr(self, "get", None)
         await self.validate_payload(handler)
         return await handler(*args, **kwargs)
 
@@ -132,7 +143,7 @@ connected_websockets: Dict[
 
 
 async def login(
-        headers, data, handle_websocket=False
+    headers, data, handle_websocket=False
 ) -> Union[WebSocketSession, Requestor]:
     """Log in.
 
@@ -234,5 +245,5 @@ blueprints = [
     eight_ball,
     noti,
     interactions_blueprint,
-    misc
+    misc,
 ]

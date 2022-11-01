@@ -34,7 +34,7 @@ class CustomQuartRule(QuartRule):
             merge_slashes=merge_slashes,
             host=host,
             websocket=websocket,
-            provide_automatic_options=provide_automatic_options
+            provide_automatic_options=provide_automatic_options,
         )
 
 
@@ -51,6 +51,7 @@ class Pint(PintApp):
             This is essential as it can avoid infinite recursion.
         """
         from quart.globals import _request_ctx_stack
+
         methods = _request_ctx_stack.top.url_adapter.allowed_methods()
         if overwritten:
             handler = await cors_handler(self.response_class)

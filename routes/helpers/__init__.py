@@ -236,6 +236,9 @@ from .groupmembers import (
     generate_media_affiliation,
     get_image_host_url,
     upsert_media_difficulty,
+    add_auto_media,
+    remove_auto_media,
+    get_auto_media,
 )
 
 from .userstatus import (
@@ -305,7 +308,19 @@ from .misc import get_urban_definitions
 # Helper Functions for routes.
 
 helper_routes = {
-    "misc/urban.POST": {"function": get_urban_definitions, "params": ["requestor", "phrase"]},
+    "affiliation/automedia.GET": {"function": get_auto_media, "params": ["requestor"]},
+    "affiliation/automedia.POST": {
+        "function": add_auto_media,
+        "params": ["requestor", "channel_id", "affiliation_id"],
+    },
+    "affiliation/automedia.DELETE": {
+        "function": remove_auto_media,
+        "params": ["requestor", "channel_id", "affiliation_id"],
+    },
+    "misc/urban.POST": {
+        "function": get_urban_definitions,
+        "params": ["requestor", "phrase"],
+    },
     "interactions/.GET": {"function": get_interactions, "params": ["requestor"]},
     "interactions/.POST": {
         "function": add_interaction,

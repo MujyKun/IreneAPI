@@ -38,8 +38,8 @@ async def ws_site():
         return
 
     # remove any other data the user sent.
-    t_headers = {'Authorization': token}
-    t_args = {'user_id': user_id}
+    t_headers = {"Authorization": token}
+    t_args = {"user_id": user_id}
     wss = await login(t_headers, data=t_args, handle_websocket=True)
     if not wss:
         # failed to log in

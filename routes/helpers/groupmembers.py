@@ -22,6 +22,32 @@ DIR_FILE_LIMIT = 25000
 _new_photo_counter = 0
 
 
+@check_permission(permission_level=DEVELOPER)
+async def add_auto_media(requestor: Requestor, channel_id: int, affiliation_id: int):
+    """Add auto media."""
+    is_int64(channel_id)
+    is_int64(affiliation_id)
+    return await self.db.execute(
+        "SELECT * FROM groupmembers.addautomedia($1, $2)", channel_id, affiliation_id
+    )
+
+
+@check_permission(permission_level=DEVELOPER)
+async def remove_auto_media(requestor: Requestor, channel_id: int, affiliation_id: int):
+    """Remove auto media."""
+    is_int64(channel_id)
+    is_int64(affiliation_id)
+    return await self.db.execute(
+        "SELECT * FROM groupmembers.deleteautomedia($1, $2)", channel_id, affiliation_id
+    )
+
+
+@check_permission(permission_level=DEVELOPER)
+async def get_auto_media(requestor: Requestor):
+    """Get all auto media."""
+    return await self.db.fetch("SELECT * FROM groupmembers.getautomedia")
+
+
 @check_permission(permission_level=SUPER_PATRON)
 async def get_person(requestor: Requestor, person_id: int) -> dict:
     """Get a person's information if they exist."""
@@ -556,7 +582,9 @@ async def get_all_media(requestor: Requestor) -> dict:
 
 
 @check_permission(permission_level=DEVELOPER)
-async def get_media_by_affiliations(requestor: Requestor, affiliation_ids, limit=None, count_only=False):
+async def get_media_by_affiliations(
+    requestor: Requestor, affiliation_ids, limit=None, count_only=False
+):
     """Get all medias that belong to certain affiliations."""
     return_val = "mediaid"
     if count_only:
