@@ -23,12 +23,13 @@ _new_photo_counter = 0
 
 
 @check_permission(permission_level=DEVELOPER)
-async def add_auto_media(requestor: Requestor, channel_id: int, affiliation_id: int):
+async def add_auto_media(requestor: Requestor, channel_id: int, affiliation_id: int, hours_after: int):
     """Add auto media."""
     is_int64(channel_id)
     is_int64(affiliation_id)
+    is_int64(hours_after)
     return await self.db.execute(
-        "SELECT * FROM groupmembers.addautomedia($1, $2)", channel_id, affiliation_id
+        "SELECT * FROM groupmembers.addautomedia($1, $2, $3)", channel_id, affiliation_id, hours_after
     )
 
 

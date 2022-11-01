@@ -102,6 +102,7 @@ class AutoMedia(Resource):
             requestor,
             request.args.get("channel_id"),
             request.args.get("affiliation_id"),
+            request.args.get("hours_after")
         )
 
     async def delete(self):

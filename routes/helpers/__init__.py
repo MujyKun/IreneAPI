@@ -311,7 +311,7 @@ helper_routes = {
     "affiliation/automedia.GET": {"function": get_auto_media, "params": ["requestor"]},
     "affiliation/automedia.POST": {
         "function": add_auto_media,
-        "params": ["requestor", "channel_id", "affiliation_id"],
+        "params": ["requestor", "channel_id", "affiliation_id", "hours_after"],
     },
     "affiliation/automedia.DELETE": {
         "function": remove_auto_media,
