@@ -630,6 +630,8 @@ INSERT INTO public.languagepacks(languageid, label, message) VALUES
 (8, 'distance_too_long', 'You cannot compare phrases of that length.'),
 (8, 'distance_measured', 'The search phrase has :1$DISTANCE$1: similarity with the target phrase.'),
 (8, 'no_urban_result', 'That phrase and definition number did not provide any results.'),
+(8, 'no_media_results', 'There is no media available for your game. Try changing your selection or toggling your filter.'),
+(8, 'no_aff_results', 'There are no available affiliations for your game. Try changing your selection or toggling your filter.'),
 (8,'8ball_response','**Question:** :1$PROMPT$1:\n**Answer:** :2$ANSWER$2:') ON CONFLICT DO NOTHING;
 
 
