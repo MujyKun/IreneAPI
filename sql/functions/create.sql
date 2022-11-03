@@ -28,14 +28,14 @@ end;
 $$;
 
 
-create or replace function groupmembers.addautomedia(t_channel_id bigint, t_personids integer[])
+create or replace function groupmembers.addautomedia(t_channel_id bigint, t_aff_id integer, t_hours_after integer)
     returns void
     language plpgsql
 as
 $$
 begin
-    INSERT INTO groupmembers.automedia(channelid, personids)
-    VALUES(t_channel_id, t_personids);
+    INSERT INTO groupmembers.automedia(channelid, affiliationid, hoursafter)
+    VALUES(t_channel_id, t_aff_id, t_hours_after) ON CONFLICT DO NOTHING;
 end;
 $$;create or replace function groupmembers.addbloodtype(t_name text)
     returns integer
@@ -707,7 +707,15 @@ begin
     DELETE FROM groupmembers.affiliation WHERE affiliationid = t_affiliation_id;
 end;
 $$;
-create or replace function groupmembers.deletebloodtype(t_blood_id integer)
+create or replace function groupmembers.deleteautomedia(t_channel_id bigint, t_aff_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM groupmembers.automedia WHERE channelid = t_channel_id AND affiliationid = t_aff_id;
+end;
+$$;create or replace function groupmembers.deletebloodtype(t_blood_id integer)
     returns void
     language plpgsql
 as

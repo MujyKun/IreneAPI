@@ -632,6 +632,10 @@ INSERT INTO public.languagepacks(languageid, label, message) VALUES
 (8, 'no_urban_result', 'That phrase and definition number did not provide any results.'),
 (8, 'no_media_results', 'There is no media available for your game. Try changing your selection or toggling your filter.'),
 (8, 'no_aff_results', 'There are no available affiliations for your game. Try changing your selection or toggling your filter.'),
+(8, 'auto_media_added', ':1$AFFILIATION ID$1: will now automatically send in <#:2$CHANNEL ID$2:>'),
+(8, 'auto_media_removed', ':1$AFFILIATION ID$1: will no longer automatically send in <#:2$CHANNEL ID$2:>'),
+(8, 'auto_media_list', 'Here are the results for <#:1$CHANNEL ID$1:>:\nAffiliation ID | Frequency\n:2$RESULTS$2:'),
+(8, 'affiliation_does_not_exist', 'The Affiliation ID :1$AFFILIATION ID$1: does not exist.'),
 (8,'8ball_response','**Question:** :1$PROMPT$1:\n**Answer:** :2$ANSWER$2:') ON CONFLICT DO NOTHING;
 
 
