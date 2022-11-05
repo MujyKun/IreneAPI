@@ -73,9 +73,6 @@ class Drive:
         """
         actual_files = []
         for file in await self.get_files_in_folder(folder_id, parent_file=parent_file):
-            if file.id != "1Sv3t5tYRzrXUZN4WbwvSB0jhObA3Ytfs" and not parent_file:
-                continue
-
             if file.is_folder():
                 actual_files += await self.get_nested_files_in_folders(file.id, parent_file=file)
             else:
