@@ -27,11 +27,23 @@ after the first run which you may execute. The parsing issues will be fixed at a
    3) `poetry run python3 -m hypercorn --bind '0.0.0.0:5454' --workers=25 run:app`  
 
 
+### Adding Google Drive [These are instructions for a Google Workplace administrator account]
+1) [Create a service account](https://console.cloud.google.com/apis/api/drive.googleapis.com/).
+2) Create keys for the service account
+3) Download the keys as a json file.
+4) Rename the json file to `service_account.json` and put it in the root folder.
+5) Go to the [workplace admin console](https://admin.google.com/)
+6) Go to Main Menu -> Show More -> Security -> Access and data control -> API Controls
+7) Select `Manage Domain Wide Delegation` in the `Domain wide delegation` pane.
+8) Click `Add New` and enter the service account's Client ID. 
+9) In the OAuth scopes field, enter `https://www.googleapis.com/auth/drive` and then click Authorize.
+10) Edit the json file and add a key `subject` with the value of the user email you want to connect to. EX: ("subject": "mujy@irenebot.com")
+
 ## Contribute
 
-## Development Guide
+## Development Guidelines
 
-- The API will only query functions or views from the database. The views and functions may provide specific information and may leave out unnecessary information.   
+- The API will only query functions or views from the database. The views and functions may provide specific information and may leave out unnecessary information.  
 **Example:** 
 ```sql
 -- A table x has columns a, b, and c
@@ -53,5 +65,5 @@ SELECT * FROM y;
 -- Doing it this way will allow the API to remain consistent with 
 -- how it queries and returns data.
 
--- The only exception to this are dynamic internal functions (that must also be prefixed with an underscore).  
+-- The only exceptions to this are dynamic internal functions (that must also be prefixed with an underscore) and standalone applications.
 ```

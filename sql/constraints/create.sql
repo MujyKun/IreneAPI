@@ -72,9 +72,12 @@ ALTER TABLE groupmembers.groups ADD CONSTRAINT group_socialid FOREIGN KEY (socia
 ALTER TABLE groupmembers.person ADD CONSTRAINT person_socialid FOREIGN KEY (socialid) REFERENCES groupmembers.socialmedia(socialid) ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE groupmembers.media DROP CONSTRAINT IF EXISTS media_affiliationid;
+ALTER TABLE groupmembers.media DROP CONSTRAINT IF EXISTS media_url_affiliationid_no_dupes;
 ALTER TABLE groupmembers.automedia DROP CONSTRAINT IF EXISTS automedia_affid;
 ALTER TABLE groupmembers.media ADD CONSTRAINT media_affiliationid FOREIGN KEY (affiliationid) REFERENCES groupmembers.affiliation(affiliationid) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE groupmembers.media ADD CONSTRAINT media_url_affiliationid_no_dupes UNIQUE (link, affiliationid);
 ALTER TABLE groupmembers.automedia ADD CONSTRAINT automedia_affid FOREIGN KEY (affiliationid) REFERENCES groupmembers.affiliation(affiliationid) ON DELETE CASCADE ON UPDATE CASCADE;
+
 
 ALTER TABLE groupmembers.person DROP CONSTRAINT IF EXISTS person_nameid;
 ALTER TABLE groupmembers.person ADD CONSTRAINT person_nameid FOREIGN KEY (nameid) REFERENCES groupmembers.name(nameid) ON DELETE SET NULL ON UPDATE CASCADE;

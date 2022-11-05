@@ -1,5 +1,5 @@
 # noinspection PyPackageRequirements
-from .drive import Drive
+from .drive import Drive, File, convert_os_file_to_faces_dict
 from . import keys
 from .twitter import Twitter
 from .twitch import Twitch

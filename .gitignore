@@ -11,3 +11,4 @@ venv/
 idol/*
 sql/functions/create.sql
 *service_account.json
+*temp/

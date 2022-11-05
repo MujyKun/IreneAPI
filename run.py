@@ -1,7 +1,6 @@
 # noinspection PyUnresolvedReferences, PyPackageRequirements
 from asyncio import get_event_loop
 
-import quart
 from quart import Quart, render_template, Response, make_response
 from models import PgConnection
 
@@ -70,6 +69,15 @@ async def index():
     return await handler("index.html")
 
 
+async def create_first_user_token():
+    """create first user token for usage."""
+    from routes.helpers.api import add_token
+    from routes.helpers import GOD, OWNER, Requestor
+    god_requestor = Requestor(-1, GOD)
+    user_id = 169401247374376960  # change accordingly.
+    private_token = "private_key"  # change accordingly.
+    await add_token(requestor=god_requestor, user_id=user_id, unhashed_token=private_token, access_id=OWNER.id)
+
 # if __name__ == '__main__':
 
 loop = get_event_loop()
@@ -85,22 +93,13 @@ try:
     # connect to db.
     loop.run_until_complete(db.connect())
 
-    # create first user token for usage.
-    # from routes.helpers.api import add_token
-    # from routes.helpers import GOD, OWNER, Requestor
-    #
-    # god_requestor = Requestor(-1, GOD)
-    #
-    # user_id = 169401247374376960
-    # private_token = "private_key"  # change accordingly.
-    # loop.run_until_complete(add_token(requestor=god_requestor, user_id=user_id, unhashed_token=private_token, access_id=OWNER.id))
+    # loop.run_until_complete(create_first_user_token())
 
     # loop.run_until_complete(app.run_task(port=api_port))
 
     from hypercorn.config import Config
     from hypercorn.asyncio import serve
 
-    #
     config = Config()
     config.bind = f"127.0.0.1:{api_port}"
     loop.run_until_complete(serve(app, config))

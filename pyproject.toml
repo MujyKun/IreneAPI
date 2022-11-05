@@ -27,7 +27,7 @@ psycopg2-binary = "2.9.3"
 black = "22.6.0"
 pre-commit = "2.19.0"
 quart-openapi = {version = "1.7.2", extras = ["doc"]}
-aiogoogle = "4.3.0"
+aiogoogle = "^4.3.0"
 peony-twitter = {extras = ["all"], version = "^2.1.2"}
 xmltodict = "^0.13.0"
 aiofiles = "^0.8.0"
