@@ -78,10 +78,13 @@ class Drive:
         self.queue = asyncio.Queue()
 
         # 10 per second is the expected, but the time may be increased if there are ratelimit errors.
-        self.seconds_to_accomplish_max_requests = 2
+        self.seconds_to_accomplish_max_requests = 1
         self.max_requests_per_set_time = 10
         self.google: Optional[Google] = None
         asyncio.get_event_loop().create_task(self._queue_loop())
+
+    def print_queue_size(self):
+        print(f"Queue Size: {self.queue.qsize()}")
 
     async def _queue_loop(self):
         item: QueueItem
@@ -89,6 +92,8 @@ class Drive:
         while True:
             if not self.initialized:
                 await asyncio.sleep(3)
+
+            self.print_queue_size()
 
             awaitables = []
             items = []
@@ -99,13 +104,11 @@ class Drive:
 
             requests_in_time_frame += len(items)
 
-            if requests_in_time_frame >= self.max_requests_per_set_time:
+            if requests_in_time_frame >= self.max_requests_per_set_time or not awaitables:
                 await asyncio.sleep(self.seconds_to_accomplish_max_requests)
                 requests_in_time_frame = 0
-
-            if not awaitables:
-                await asyncio.sleep(0.5)
-                continue
+                if not awaitables:
+                    continue
 
             results = await asyncio.gather(*awaitables)
 
@@ -182,7 +185,6 @@ class Drive:
 
         tasks = []
 
-        print(f"Processing Folder ID -> {folder_id}")
         for file in await self.get_files_in_folder(folder_id, parent_file=parent_file):
             if file.is_folder():
                 tasks.append(self.get_nested_files_in_folders(file.id, parent_file=file))
@@ -203,6 +205,7 @@ class Drive:
         async with self.google as google:
             requests = google.drive.files.list(q=f"'{folder_id}' in parents", pageSize=1000)
             results = await self.get_results(google.as_service_account(requests))
+            print(f"Got files for {folder_id}")
         return File.create_many(results.get("files") or [], parent_file=parent_file)
 
 
