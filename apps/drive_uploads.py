@@ -103,6 +103,9 @@ async def save_results(results: List[tuple]):
     async with aiofiles.open(f"{TEMP_FILE_PATH}.json", "w") as fp:
         await fp.write(json.dumps(records))
 
+    await generate_media_summary(records)
+
+
 
 async def log(line: str):
     if not isdir(RESULTS_LOCATION_FOLDER):
@@ -171,6 +174,34 @@ async def handle_new_layout(file: File):
 
     # extract the affiliation ID from the file's full path and insert the media.
     ...
+
+
+async def generate_media_summary(results):
+    affiliations = (await groupmembers.get_affiliations(GOD))['results']
+    groups = (await groupmembers.get_groups(GOD))['results']
+    summary = []
+    for aff_id, media_count in results.items():
+        aff_id = int(aff_id)
+        for aff_idx, aff_info in affiliations.items():
+            t_aff_id = aff_info["affiliationid"]
+            # person_id = values["personid"]
+            t_group_id = aff_info["groupid"]
+            t_aff_stage_name = aff_info["stagename"]
+            if aff_id != t_aff_id:
+                continue
+
+            for group_idx, group_info in groups.items():
+                g_group_id = group_info["groupid"]
+                g_group_name = group_info["name"]
+                if g_group_id != t_group_id:
+                    continue
+
+                summary.append(f"Affiliation {aff_id} - {t_aff_stage_name} from {g_group_name} {t_group_id} -> {media_count} media.")
+
+    summary_string = "\n".join(summary)
+    async with aiofiles.open(f"{TEMP_FILE_PATH}.summary", "a") as fp:
+        await fp.write(f"{summary_string}")
+
 
 if __name__ == '__main__':
     loop = get_event_loop()
