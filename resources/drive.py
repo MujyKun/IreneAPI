@@ -15,6 +15,7 @@ SCOPES = ["https://www.googleapis.com/auth/drive"]
 
 class Google(Aiogoogle):
     """Context manager to auto discover the drive api and add manual open/closing."""
+
     def __init__(self, creds):
         super(Google, self).__init__(service_account_creds=creds)
         self.drive = None
@@ -67,7 +68,7 @@ def exc_handler(loop, context):
 
 
 class Drive:
-    def __init__(self):
+    def __init__(self, print_queue=False):
         """
         Controls the downloading, listing, and uploading of Google Drive files.
         """
@@ -76,6 +77,7 @@ class Drive:
         self.initialized = False
         self.__service_creds: Optional[ServiceAccountCreds] = None
         self.queue = asyncio.Queue()
+        self.print_queue = print_queue
 
         # 10 per second is the expected, but the time may be increased if there are ratelimit errors.
         self.seconds_to_accomplish_max_requests = 1
@@ -89,11 +91,26 @@ class Drive:
     async def _queue_loop(self):
         item: QueueItem
         requests_in_time_frame = 0
+        increment_queue_delay_when_empty = 0.25
+        empty_queue_sleep_time = 0
+        max_sleep_time = 5
         while True:
             if not self.initialized:
-                await asyncio.sleep(3)
+                await asyncio.sleep(0.5)
+                continue
 
-            self.print_queue_size()
+            if not self.queue.qsize():
+                await asyncio.sleep(empty_queue_sleep_time)
+                if empty_queue_sleep_time < max_sleep_time:
+                    empty_queue_sleep_time += increment_queue_delay_when_empty
+                continue
+
+            # we still sometimes face issues with some rate limits, so we will sleep our desired time earlier.
+            await asyncio.sleep(self.seconds_to_accomplish_max_requests)
+
+            empty_queue_sleep_time = 0
+            if self.print_queue:
+                self.print_queue_size()
 
             awaitables = []
             items = []
@@ -170,7 +187,8 @@ class Drive:
         """Get a folder ID based on the url."""
         return url.replace("https://drive.google.com/drive/folders/", "")
 
-    async def get_nested_files_in_folders(self, folder_id, parent_file=None, faces: Dict[str, int] = None):
+    async def get_nested_files_in_folders(self, folder_id, parent_file=None, faces: Dict[str, int] = None,
+                                          only_do: List[str] = None):
         """Process a Google Drive folder ID recursively and concurrently between sub-folders.
 
         :param folder_id: str
@@ -180,6 +198,9 @@ class Drive:
         :param faces: Dict[str, int]
             The drive full file path to the number of faces in the media.
             This can be retrieved by calling `convert_os_file_to_faces_dict`
+        :param only_do: List[str]
+            A list of folder or file ids that should only be done. Will ignore any others.
+            Is recommended if you do not want all nested folders.
         """
         actual_files = []
 
@@ -187,7 +208,17 @@ class Drive:
 
         for file in await self.get_files_in_folder(folder_id, parent_file=parent_file):
             if file.is_folder():
-                tasks.append(self.get_nested_files_in_folders(file.id, parent_file=file))
+                if only_do:
+                    # The two criteria for passing:
+                    # Must either be a file in the acceptable list,
+                    # have a parent with the id,
+                    file_id_not_in_list = file.id not in only_do
+                    file_has_parent_in_list = file.has_parent(only_do)
+                    # a ghost parent is an attribute not yet assigned.
+                    file_has_ghost_parent_in_list = False if not parent_file else parent_file.id in only_do
+                    if file_id_not_in_list and not (file_has_parent_in_list or file_has_ghost_parent_in_list):
+                        continue
+                tasks.append(self.get_nested_files_in_folders(file.id, parent_file=file, only_do=only_do))
             else:
                 actual_files.append(file)
 
@@ -205,7 +236,7 @@ class Drive:
         async with self.google as google:
             requests = google.drive.files.list(q=f"'{folder_id}' in parents", pageSize=1000)
             results = await self.get_results(google.as_service_account(requests))
-            print(f"Got files for {folder_id}")
+            # print(f"Got files for {folder_id}")
         return File.create_many(results.get("files") or [], parent_file=parent_file)
 
 
@@ -234,6 +265,16 @@ class File:
         names = [str(file) for file in self.get_all_parents()]
         names.reverse()
         return '/'.join(names) + f"/{str(self)}"
+
+    def is_parent(self, folder_id: str):
+        return any([parent_file.id for parent_file in self.get_all_parents()])
+
+    def has_parent(self, folder_ids: List[str]):
+        """If a file has one of the listed parents."""
+        for folder_id in folder_ids:
+            if self.is_parent(folder_id):
+                return True
+        return False
 
     @staticmethod
     def create_many(files: List[dict], parent_file):

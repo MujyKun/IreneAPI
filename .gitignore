@@ -12,3 +12,4 @@ idol/*
 sql/functions/create.sql
 *service_account.json
 *temp/
+face_logs.txt

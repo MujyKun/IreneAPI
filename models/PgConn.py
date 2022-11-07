@@ -64,5 +64,17 @@ class PgConnection(DbConnection):
 
     async def _create_pool(self, **login_payload):
         self._pool = await asyncpg.create_pool(
-            command_timeout=60, max_size=100, **login_payload
+            command_timeout=3600, max_size=500, **login_payload
         )
+
+    async def get_connection(self):
+        """Get a new pool connection.
+
+        This is a connection built manually.
+        It must be released/closed using the close_connection method.
+        """
+        return await self._pool.acquire()
+
+    async def close_connection(self, connection):
+        """Releases a connection."""
+        await self._pool.release(connection)

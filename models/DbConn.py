@@ -143,3 +143,15 @@ class DbConnection:
             f"{sql_folder_name}/views/{create_file_name}", use_terminal=True
         )
         # await self.execute_sql_file(f"{sql_folder_name}/functions/{create_file_name}", use_terminal=True)
+
+    async def get_connection(self):
+        """Get a new pool connection.
+
+        This is a connection built manually.
+        It must be released/closed using the close_connection method.
+        """
+        ...
+
+    async def close_connection(self, connection):
+        """Releases a connection."""
+        ...
