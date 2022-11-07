@@ -21,7 +21,7 @@ app_folder = normpath(dirname(realpath(__file__)))
 # handle different operating system paths
 if app_folder[-1] in ["/", "\\"]:
     app_folder = app_folder[:len(app_folder) - 1]
-app_folder = abspath(app_folder + r"\.." if '\\' in app_folder else '/..')
+app_folder = abspath(app_folder + r"\.." if '\\' in app_folder else app_folder + '/..')
 
 chdir(app_folder)
 sys.path.append(app_folder)  # required to properly import folders.
