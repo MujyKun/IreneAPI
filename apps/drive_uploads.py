@@ -8,16 +8,20 @@ Is supportive of both Irene V1 and V2.
 """
 import asyncio
 import json
-import os
 
 import aiofiles
 
-from os import chdir
+from os import chdir, mkdir, getcwd
 from os.path import normpath, dirname, realpath, isdir
 from typing import Optional, List
 
 # Set the working directory to the root folder.
-chdir(normpath(dirname(realpath(__file__))) + r'\..')
+
+app_folder = normpath(dirname(realpath(__file__)))
+if app_folder[-1] in ["/", "\\"]:
+    app_folder = app_folder[:len(app_folder) - 1]
+app_folder = app_folder + r"\.."
+chdir(app_folder)
 from asyncio import get_event_loop
 from resources import drive, File, convert_os_file_to_faces_dict
 from models import PgConnection, Requestor
@@ -79,7 +83,7 @@ async def process_files_to_db():
 async def save_results(results: List[tuple]):
     """Save the results to a json file."""
     if not isdir(RESULTS_LOCATION_FOLDER):
-        os.mkdir(RESULTS_LOCATION_FOLDER)
+        mkdir(RESULTS_LOCATION_FOLDER)
 
     records = {}
     for record in results:
@@ -98,7 +102,7 @@ async def save_results(results: List[tuple]):
 
 async def log(line: str):
     if not isdir(RESULTS_LOCATION_FOLDER):
-        os.mkdir(RESULTS_LOCATION_FOLDER)
+        mkdir(RESULTS_LOCATION_FOLDER)
 
     async with aiofiles.open(f"{TEMP_FILE_PATH}.log", "a") as fp:
         await fp.write(f"{line}\n")
