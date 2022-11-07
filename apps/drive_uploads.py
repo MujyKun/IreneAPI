@@ -11,17 +11,21 @@ import json
 
 import aiofiles
 
-from os import chdir, mkdir, getcwd
+from os import chdir, mkdir
 from os.path import normpath, dirname, realpath, isdir
 from typing import Optional, List
+import sys
 
 # Set the working directory to the root folder.
-
 app_folder = normpath(dirname(realpath(__file__)))
+# handle different operating system paths
 if app_folder[-1] in ["/", "\\"]:
     app_folder = app_folder[:len(app_folder) - 1]
-app_folder = app_folder + r"\.."
+app_folder = app_folder + r"\.." if '\\' in app_folder else '/..'
+
 chdir(app_folder)
+sys.path.append(app_folder)  # required to properly import folders.
+
 from asyncio import get_event_loop
 from resources import drive, File, convert_os_file_to_faces_dict
 from models import PgConnection, Requestor
