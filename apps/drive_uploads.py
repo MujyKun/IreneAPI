@@ -12,7 +12,7 @@ import json
 import aiofiles
 
 from os import chdir, mkdir
-from os.path import normpath, dirname, realpath, isdir
+from os.path import normpath, dirname, realpath, isdir, abspath
 from typing import Optional, List
 import sys
 
@@ -21,7 +21,7 @@ app_folder = normpath(dirname(realpath(__file__)))
 # handle different operating system paths
 if app_folder[-1] in ["/", "\\"]:
     app_folder = app_folder[:len(app_folder) - 1]
-app_folder = app_folder + r"\.." if '\\' in app_folder else '/..'
+app_folder = abspath(app_folder + r"\.." if '\\' in app_folder else '/..')
 
 chdir(app_folder)
 sys.path.append(app_folder)  # required to properly import folders.
