@@ -49,6 +49,9 @@ TEMP_FILE_PATH = f"{RESULTS_LOCATION_FOLDER}/{TEMP_FILE_NAME}"
 
 ALLOWED_FILE_TYPES = ["jpg", "png", "jpeg", "jfif", "mp4", "gif", "webm", "webp"]
 
+# A list of folder ids that get searched. Will exclude folder IDs not listed here (aside from the DRIVE_FOLDER_ID)
+ONLY_DO = []
+
 
 async def process_files_to_db():
     """Process the files to be added to the DB."""
@@ -57,7 +60,7 @@ async def process_files_to_db():
     affs = (await groupmembers.get_affiliations(GOD))['results']
     groups = (await groupmembers.get_groups(GOD))["results"]
     files = await drive.get_nested_files_in_folders(folder_id=DRIVE_FOLDER_ID, faces=faces,
-                                                    only_do=["1G1eZNhkkAvKB9XTnLRYePhXkVMkV4OSq"])
+                                                    only_do=ONLY_DO)
 
     await log(f"{perf_counter() - start}s to get {len(files)} nested files from folders.")
     tasks = []
