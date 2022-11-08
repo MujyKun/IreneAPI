@@ -27,7 +27,7 @@ chdir(app_folder)
 sys.path.append(app_folder)  # required to properly import folders.
 
 from asyncio import get_event_loop
-from resources import drive, File, convert_os_file_to_faces_dict
+from resources import Drive, File, convert_os_file_to_faces_dict
 from models import PgConnection, Requestor
 from resources.keys import postgres_options
 from time import perf_counter
@@ -208,9 +208,9 @@ if __name__ == '__main__':
     try:
         db = PgConnection(**postgres_options)
 
+        drive = Drive(print_queue=True, enable_queue=True)
         # instantiate google drive
         loop.run_until_complete(drive.create())
-        drive.print_queue = True
 
         # update helper usage of the DB.
         from routes import self

@@ -68,7 +68,7 @@ def exc_handler(loop, context):
 
 
 class Drive:
-    def __init__(self, print_queue=False):
+    def __init__(self, print_queue=False, enable_queue=False):
         """
         Controls the downloading, listing, and uploading of Google Drive files.
         """
@@ -83,7 +83,9 @@ class Drive:
         self.seconds_to_accomplish_max_requests = 1
         self.max_requests_per_set_time = 10
         self.google: Optional[Google] = None
-        asyncio.get_event_loop().create_task(self._queue_loop())
+        self.queue_enabled = enable_queue
+        if enable_queue:
+            asyncio.get_event_loop().create_task(self._queue_loop())
 
     def print_queue_size(self):
         print(f"Queue Size: {self.queue.qsize()}")
@@ -170,12 +172,18 @@ class Drive:
             requests = google.drive.files.get(
                 fileId=file_id, download_file=path, alt="media"
             )
-            results = await self.get_results((google.as_service_account(requests)))
+            if self.queue_enabled:
+                results = await self.get_results((google.as_service_account(requests)))
+            else:
+                results = await google.as_service_account(requests)
 
     async def upload_file(self, path):
         """Upload a file to google drive."""
         async with self.google as google:
-            await self.get_results(google.as_service_account(google.drive.files.create(upload_file=path)))
+            if self.queue_enabled:
+                await self.get_results(google.as_service_account(google.drive.files.create(upload_file=path)))
+            else:
+                await google.as_service_account(google.drive.files.create(upload_file=path))
 
     @staticmethod
     def get_id_from_url(url) -> str:
@@ -235,7 +243,10 @@ class Drive:
         """Get all files (including other folders) in a folder. """
         async with self.google as google:
             requests = google.drive.files.list(q=f"'{folder_id}' in parents", pageSize=1000)
-            results = await self.get_results(google.as_service_account(requests))
+            if self.queue_enabled:
+                results = await self.get_results(google.as_service_account(requests))
+            else:
+                results = await google.as_service_account(requests)
             # print(f"Got files for {folder_id}")
         return File.create_many(results.get("files") or [], parent_file=parent_file)
 
