@@ -18,7 +18,7 @@ from resources.keys import person_folder, image_host
 from datetime import datetime
 
 
-DIR_FILE_LIMIT = 25000
+DIR_FILE_LIMIT = 250000
 _new_photo_counter = 0
 
 
