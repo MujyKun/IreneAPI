@@ -53,12 +53,12 @@ patreon_url = os.getenv("PATREON_LINK")
 
 urban_key = os.getenv("URBAN_KEY")
 
-twitter_account_id = os.getenv("TWITTER_ACCOUNT_ID")
-twitter_username = os.getenv("TWITTER_USERNAME")
-twitter_consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
-twitter_consumer_secret = os.getenv("TWITTER_CONSUMER_SECRET")
-twitter_access_key = os.getenv("TWITTER_ACCESS_KEY")
-twitter_access_secret = os.getenv("TWITTER_ACCESS_SECRET")
+twitter_account_ids = os.getenv("TWITTER_ACCOUNT_IDS").split(",")
+twitter_usernames = os.getenv("TWITTER_USERNAMES").split(",")
+twitter_consumer_keys = os.getenv("TWITTER_CONSUMER_KEYS").split(",")
+twitter_consumer_secrets = os.getenv("TWITTER_CONSUMER_SECRETS").split(",")
+twitter_access_keys = os.getenv("TWITTER_ACCESS_KEYS").split(",")
+twitter_access_secrets = os.getenv("TWITTER_ACCESS_SECRETS").split(",")
 
 twitch_client_id = os.getenv("TWITCH_CLIENT_ID")
 twitch_client_secret = os.getenv("TWITCH_CLIENT_SECRET")

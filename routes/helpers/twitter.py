@@ -1,3 +1,4 @@
+import datetime
 from typing import Optional, Union
 
 from . import (
@@ -12,7 +13,17 @@ from . import (
     USER,
 )
 from models import Requestor
-from resources import twitter
+
+
+async def get_working_twitter_acc():
+    """Get a working twitter account if one exists."""
+    from resources import twitters
+    for idx, twitter_acc in enumerate(twitters):
+        if not twitter_acc.exceeded:
+            return twitter_acc
+        elif twitter_acc.exceeded and \
+                datetime.datetime.now() > twitter_acc.last_tried_at + datetime.timedelta(days=1):
+            return twitter_acc
 
 
 @check_permission(permission_level=DEVELOPER)
@@ -41,17 +52,22 @@ async def get_and_add_twitter_id(requestor: Requestor, username: str) -> dict:
         return {"results": {"twitter_id": response["results"]["t_accountid"]}}
 
     # make a call to twitter api.
-    twitter_id = await twitter.get_user_id(username=username)
+    twitter_acc = await get_working_twitter_acc()
+    if twitter_acc:
+        twitter_id = await twitter_acc.get_user_id(username=username)
 
-    if twitter_id:
-        await _add_twitter_account(requestor, twitter_id, username)
-        return {"results": {"twitter_id": twitter_id}}
+        if twitter_id:
+            await _add_twitter_account(requestor, twitter_id, username)
+            return {"results": {"twitter_id": twitter_id}}
     return {"results": None}
 
 
 @check_permission(permission_level=DEVELOPER)
 async def username_exists(requestor: Requestor, username: str) -> dict:
-    exists = bool(await twitter.get_user_id(username=username))
+    exists = False
+    twitter_acc = await get_working_twitter_acc()
+    if twitter_acc:
+        exists = bool(await twitter_acc.get_user_id(username=username))
     return {"results": exists}
 
 
@@ -122,7 +138,10 @@ async def get_timeline(requestor: Requestor, twitter_id: int):
 
     Will return None if there is no access to a user.
     """
-    full_info = await twitter.get_user_timeline(user_id=twitter_id)
+    full_info = dict()
+    twitter_acc = await get_working_twitter_acc()
+    if twitter_acc:
+        full_info = await twitter_acc.get_user_timeline(user_id=twitter_id)
     data = []
     if full_info.get("errors"):
         data = full_info["errors"][0]
