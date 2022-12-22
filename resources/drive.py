@@ -34,8 +34,8 @@ class Google(Aiogoogle):
             session = self._set_session()
             await session.__aenter__()
             self.drive = await self.discover(self.name, self.version)
-            return self
-        raise RuntimeError("Nesting context managers using the same Aiogoogle object is not allowed.")
+        return self
+        # raise RuntimeError("Nesting context managers using the same Aiogoogle object is not allowed.")
 
 
 @dataclass
