@@ -417,6 +417,7 @@ async def get_date(requestor: Requestor, date_id: int) -> dict:
     data = await self.db.fetch_row(
         "SELECT * FROM groupmembers.getdates WHERE dateid = $1", date_id
     )
+
     return await fix_dates(data, fetch_row=True)
 
 
@@ -437,7 +438,11 @@ async def fix_dates(fetched_results, fetch_row=False):
         end_date = row['enddate']
         str_start_date = str(start_date) if start_date else None
         str_end_date = str(end_date) if end_date else None
-        final_dates["results"].update({idx: {'dateid': date_id, 'startdate': str_start_date, 'enddate': str_end_date}})
+        finalized_row = {'dateid': date_id, 'startdate': str_start_date, 'enddate': str_end_date}
+        if not fetch_row:
+            final_dates["results"].update({idx: finalized_row})
+        else:
+            final_dates["results"] = finalized_row
     return final_dates
 
 
