@@ -636,6 +636,14 @@ INSERT INTO public.languagepacks(languageid, label, message) VALUES
 (8, 'auto_media_removed', ':1$AFFILIATION ID$1: will no longer automatically send in <#:2$CHANNEL ID$2:>'),
 (8, 'auto_media_list', 'Here are the results for <#:1$CHANNEL ID$1:>:\nAffiliation ID | Frequency\n:2$RESULTS$2:'),
 (8, 'affiliation_does_not_exist', 'The Affiliation ID :1$AFFILIATION ID$1: does not exist.'),
+(8, 'add_emoji_success', 'The emoji has been successfully added.'),
+(8, 'add_emoji_fail', 'The emoji could not be added.'),
+(8, 'invalid_url', 'The url was invalid.'),
+(8, 'max_emojis', 'Could not add emoji due to the maximum number of emojis reached.'),
+(8, 'emoji_size_reached', 'File cannot be larger than 256.0 kb. Please optimize the emoji here. :1$URL$1:'),
+(8, 'remind_success', 'I will remind you when the time comes!'),
+(8, 'reminder_description', 'This is a reminder to :1$REASON$1:.'),
+(8, 'reminder_deleted', 'That reminder has been deleted.'),
 (8,'8ball_response','**Question:** :1$PROMPT$1:\n**Answer:** :2$ANSWER$2:') ON CONFLICT DO NOTHING;
 
 

@@ -303,11 +303,16 @@ from .interactions import (
     delete_interaction_type,
 )
 
+from .reminders import add_reminder, delete_reminder, get_reminders
+
 from .misc import get_urban_definitions
 
 # Helper Functions for routes.
 
 helper_routes = {
+    "reminder/$remind_id.DELETE": {"function": delete_reminder, "params": ["requestor", "remind_id"]},
+    "reminder/.POST": {"function": add_reminder, "params": ["requestor", "user_id", "reason", "date_id"]},
+    "reminder/.GET": {"function": get_reminders, "params": ["requestor"]},
     "affiliation/automedia.GET": {"function": get_auto_media, "params": ["requestor"]},
     "affiliation/automedia.POST": {
         "function": add_auto_media,

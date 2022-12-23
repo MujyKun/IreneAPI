@@ -122,13 +122,13 @@ async def _generate_media(
     is_int64(min_faces)
     is_int64(max_faces)
 
-    args = (object_id, min_faces, max_faces, nsfw, enabled)
+    args: tuple = (object_id, min_faces, max_faces, nsfw, enabled)
     query = (
         f"SELECT * FROM groupmembers.getmedia WHERE {object_id_type}id = $1 AND faces > $2 AND faces < $3 "
         "AND nsfw = $4 AND enabled = $5"
     )
     if file_type:
-        args.__add__(file_type)
+        args = args.__add__((file_type,))
         query += " AND filetype = $6"
     query += "ORDER BY RANDOM() LIMIT 1"
     media_info = await self.db.fetch_row(query, *args)
@@ -414,15 +414,37 @@ async def delete_tag(requestor: Requestor, tag_id) -> dict:
 async def get_date(requestor: Requestor, date_id: int) -> dict:
     """Get a date's information."""
     is_int64(date_id)
-    return await self.db.fetch_row(
+    data = await self.db.fetch_row(
         "SELECT * FROM groupmembers.getdates WHERE dateid = $1", date_id
     )
+    return await fix_dates(data, fetch_row=True)
+
+
+async def fix_dates(fetched_results, fetch_row=False):
+    """Fix the dates that are sent over the network."""
+
+    # There is a weird middleman conversion issue when being sent across the network that causes
+    # python to assume the timestamp is actually in the local timezone and not by default GMT.
+    # So on the wrapper, it would attempt to automatically convert from the local timezone to GMT,
+    # when it is in fact already in GMT. This may be due to the fact that we are passing in a datetime object that
+    # was created by the database wrapper. To fix this, we reiterate through the results and convert the timestamps
+    # to a string to avoid the built-in datetime automatic conversions when sent across the network.
+    final_dates = {"results": dict()}
+    results_generator = fetched_results.get("results").values() if not fetch_row else [fetched_results.get("results")]
+    for idx, row in enumerate(results_generator):
+        date_id = row['dateid']
+        start_date = row['startdate']
+        end_date = row['enddate']
+        str_start_date = str(start_date) if start_date else None
+        str_end_date = str(end_date) if end_date else None
+        final_dates["results"].update({idx: {'dateid': date_id, 'startdate': str_start_date, 'enddate': str_end_date}})
+    return final_dates
 
 
 @check_permission(permission_level=USER)
 async def get_dates(requestor: Requestor) -> dict:
     """Get all date information."""
-    return await self.db.fetch("SELECT * FROM groupmembers.getdates")
+    return await fix_dates(await self.db.fetch("SELECT * FROM groupmembers.getdates"))
 
 
 @check_permission(permission_level=DEVELOPER)

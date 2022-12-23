@@ -498,6 +498,19 @@ begin
         VALUES(t_userid);
     END IF;
 end;
+$$;create or replace function public.addreminder(t_user_id bigint, t_reason text, t_date_id integer)
+    returns integer
+    language plpgsql
+as
+$$
+declare
+    t_remind_id integer;
+begin
+
+    INSERT INTO public.reminders(userid, reason, dateid)
+    VALUES(t_user_id, t_reason, t_date_id) returning id INTO t_remind_id;
+    return t_remind_id;
+end;
 $$;create or replace function public.addresponse(t_response text)
     returns integer
     language plpgsql
@@ -934,7 +947,16 @@ $$
 begin
     DELETE FROM public.proofreader WHERE userid = t_userid;
 end;
-$$;create or replace function public.deleteresponse(t_response_id integer)
+$$;create or replace function public.deletereminder(t_remind_id integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM public.reminders WHERE id = t_remind_id;
+end;
+$$;
+create or replace function public.deleteresponse(t_response_id integer)
     returns void
     language plpgsql
 as

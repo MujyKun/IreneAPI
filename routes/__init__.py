@@ -214,6 +214,7 @@ from .eightball import eight_ball
 from .notifications import noti
 from .interactions import interactions as interactions_blueprint
 from .misc import misc
+from .reminders import reminders as reminders_blueprint
 
 blueprints = [
     affiliation,
@@ -246,4 +247,5 @@ blueprints = [
     noti,
     interactions_blueprint,
     misc,
+    reminders_blueprint
 ]
