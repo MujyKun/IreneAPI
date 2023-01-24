@@ -85,7 +85,10 @@ async def subscribe_to_twitch_channel(
 @check_permission(permission_level=DEVELOPER)
 async def is_live(requestor: Requestor, usernames: List[str]) -> dict:
     """Check if a twitch account is live."""
-    live_dict = {}
+    # WARNING: Do not use dict comprehension here. Our twitch token is constantly refreshed,
+    # so we don't want the requests to go in too fast.
+    # live_dict = {user: await twitch_obj.check_live(user) for user in usernames}
+    live_dict = dict()
     for user in usernames:
         live_dict[user] = await twitch_obj.check_live(user)
     return {"results": live_dict}
