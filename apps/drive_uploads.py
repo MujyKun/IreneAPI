@@ -106,7 +106,6 @@ async def save_results(results: List[tuple]):
     await generate_media_summary(records)
 
 
-
 async def log(line: str):
     if not isdir(RESULTS_LOCATION_FOLDER):
         mkdir(RESULTS_LOCATION_FOLDER)

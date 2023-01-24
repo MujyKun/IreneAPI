@@ -644,6 +644,11 @@ INSERT INTO public.languagepacks(languageid, label, message) VALUES
 (8, 'remind_success', 'I will remind you when the time comes!'),
 (8, 'reminder_description', 'This is a reminder to :1$REASON$1:.'),
 (8, 'reminder_deleted', 'That reminder has been deleted.'),
+(8, 'choose_roles', 'Choose the roles you would like to add.'),
+(8, 'role_removed', 'You no longer have the role!'),
+(8, 'role_added', 'You now have the role!'),
+(8, 'role_not_found', 'That role was not found! Contact a server moderator.'),
+(8, 'no_permissions', 'I am lacking permissions to do that!'),
 (8,'8ball_response','**Question:** :1$PROMPT$1:\n**Answer:** :2$ANSWER$2:') ON CONFLICT DO NOTHING;
 
 

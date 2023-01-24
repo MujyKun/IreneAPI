@@ -498,6 +498,14 @@ begin
         VALUES(t_userid);
     END IF;
 end;
+$$;create or replace function public.addreactionrole(t_message_id bigint)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    INSERT INTO public.reactionroles(messageid) VALUES(t_message_id);
+end;
 $$;create or replace function public.addreminder(t_user_id bigint, t_reason text, t_date_id integer)
     returns integer
     language plpgsql

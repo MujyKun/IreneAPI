@@ -11,7 +11,7 @@ import routes.helpers.api as api_helper
 from models import Requestor
 from .helpers import BadRequest, is_int64, USER, GOD
 
-language = PintBlueprint("guild", __name__, url_prefix="/language/")
+language = PintBlueprint("language", __name__, url_prefix="/language/")
 
 
 @language.route("")
