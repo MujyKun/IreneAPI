@@ -11,7 +11,9 @@ import routes.helpers.api as api_helper
 from models import Requestor
 from .helpers import BadRequest, is_int64, USER, GOD
 
-reaction_roles = PintBlueprint("reaction_roles", __name__, url_prefix="/reaction_roles/")
+reaction_roles = PintBlueprint(
+    "reaction_roles", __name__, url_prefix="/reaction_roles/"
+)
 
 
 @reaction_roles.route("")

@@ -13,8 +13,12 @@ for idx, account_id in enumerate(keys.twitter_account_ids):
     consumer_secret = keys.twitter_consumer_secrets[idx]
     access_key = keys.twitter_access_keys[idx]
     access_secret = keys.twitter_access_secrets[idx]
-    _twitter = Twitter(consumer_key=consumer_key, consumer_secret=consumer_secret, access_token=access_key,
-                       access_token_secret=access_secret)
+    _twitter = Twitter(
+        consumer_key=consumer_key,
+        consumer_secret=consumer_secret,
+        access_token=access_key,
+        access_token_secret=access_secret,
+    )
     twitters.append(_twitter)
 
 

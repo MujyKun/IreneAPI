@@ -20,8 +20,8 @@ import sys
 app_folder = normpath(dirname(realpath(__file__)))
 # handle different operating system paths
 if app_folder[-1] in ["/", "\\"]:
-    app_folder = app_folder[:len(app_folder) - 1]
-app_folder = abspath(app_folder + r"\.." if '\\' in app_folder else app_folder + '/..')
+    app_folder = app_folder[: len(app_folder) - 1]
+app_folder = abspath(app_folder + r"\.." if "\\" in app_folder else app_folder + "/..")
 
 chdir(app_folder)
 sys.path.append(app_folder)  # required to properly import folders.
@@ -34,6 +34,7 @@ from time import perf_counter
 from datetime import datetime
 
 from routes.helpers import groupmembers, GOD as GOD_ACCESS
+
 GOD = Requestor(-1, GOD_ACCESS)
 
 # A face log file is expected to be in the format of {face count}-{full_file_path}
@@ -65,12 +66,15 @@ async def process_files_to_db():
     """Process the files to be added to the DB."""
     faces = await convert_os_file_to_faces_dict(PATH_TO_FACES) or None
     start = perf_counter()
-    affs = (await groupmembers.get_affiliations(GOD))['results']
+    affs = (await groupmembers.get_affiliations(GOD))["results"]
     groups = (await groupmembers.get_groups(GOD))["results"]
-    files = await drive.get_nested_files_in_folders(folder_id=DRIVE_FOLDER_ID, faces=faces,
-                                                    only_do=ONLY_DO)
+    files = await drive.get_nested_files_in_folders(
+        folder_id=DRIVE_FOLDER_ID, faces=faces, only_do=ONLY_DO
+    )
 
-    await log(f"{perf_counter() - start}s to get {len(files)} nested files from folders.")
+    await log(
+        f"{perf_counter() - start}s to get {len(files)} nested files from folders."
+    )
     tasks = []
     for file in files:
         if HANDLE_IRENE_V1:
@@ -123,8 +127,10 @@ async def handle_old_layout(file: File, affs, groups):
     if not group_folder or not person_folder:
         await log(f"No Person/Group folder found for {file.get_full_path()}")
         return args
-    stage_name = person_folder.name[person_folder.name.index("(") + 1: person_folder.name.rindex(")")].lower()
-    group_name = group_folder.name[0: group_folder.name.index("[")].lower()
+    stage_name = person_folder.name[
+        person_folder.name.index("(") + 1 : person_folder.name.rindex(")")
+    ].lower()
+    group_name = group_folder.name[0 : group_folder.name.index("[")].lower()
     group_name_no_spaces = group_name.replace(" ", "")
     for index, values in affs.items():
         aff_id = values["affiliationid"]
@@ -137,7 +143,10 @@ async def handle_old_layout(file: File, affs, groups):
 
         associated_group = None
         for group_index, group_info in groups.items():
-            if group_info["groupid"] == group_id or group_info["name"].replace(" ", "").lower() == group_name_no_spaces:
+            if (
+                group_info["groupid"] == group_id
+                or group_info["name"].replace(" ", "").lower() == group_name_no_spaces
+            ):
                 associated_group = group_info
 
         if not associated_group:
@@ -161,8 +170,10 @@ async def add_media_bulk(args: List[tuple]):
     Susceptible for SQL Injection. Do not use on external links.
     """
     values = [arg for arg in args if arg]
-    sql = "INSERT INTO groupmembers.media(link, faces, filetype, affiliationid, enabled, nsfw) " \
-          "VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT DO NOTHING"
+    sql = (
+        "INSERT INTO groupmembers.media(link, faces, filetype, affiliationid, enabled, nsfw) "
+        "VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT DO NOTHING"
+    )
     conn = await self.db.get_connection()
     await conn.executemany(sql, values)
     await self.db.close_connection(conn)
@@ -176,8 +187,8 @@ async def handle_new_layout(file: File):
 
 
 async def generate_media_summary(results):
-    affiliations = (await groupmembers.get_affiliations(GOD))['results']
-    groups = (await groupmembers.get_groups(GOD))['results']
+    affiliations = (await groupmembers.get_affiliations(GOD))["results"]
+    groups = (await groupmembers.get_groups(GOD))["results"]
     summary = []
     for aff_id, media_count in results.items():
         aff_id = int(aff_id)
@@ -195,14 +206,16 @@ async def generate_media_summary(results):
                 if g_group_id != t_group_id:
                     continue
 
-                summary.append(f"Affiliation {aff_id} - {t_aff_stage_name} from {g_group_name} {t_group_id} -> {media_count} media.")
+                summary.append(
+                    f"Affiliation {aff_id} - {t_aff_stage_name} from {g_group_name} {t_group_id} -> {media_count} media."
+                )
 
     summary_string = "\n".join(summary)
     async with aiofiles.open(f"{TEMP_FILE_PATH}.summary", "a") as fp:
         await fp.write(f"{summary_string}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     loop = get_event_loop()
     try:
         db = PgConnection(**postgres_options)

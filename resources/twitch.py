@@ -48,10 +48,14 @@ class Twitch:
                     broadcaster_login = streamer["broadcaster_login"]
                     display_name = streamer["display_name"]
                     is_live = streamer.get("is_live")
-                    if twitch_username.lower() in [
-                        broadcaster_login.lower(),
-                        display_name.lower(),
-                    ] and is_live:
+                    if (
+                        twitch_username.lower()
+                        in [
+                            broadcaster_login.lower(),
+                            display_name.lower(),
+                        ]
+                        and is_live
+                    ):
                         return True
             elif r.status == 401:
                 await self.reset_token()

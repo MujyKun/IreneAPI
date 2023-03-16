@@ -23,13 +23,18 @@ _new_photo_counter = 0
 
 
 @check_permission(permission_level=DEVELOPER)
-async def add_auto_media(requestor: Requestor, channel_id: int, affiliation_id: int, hours_after: int):
+async def add_auto_media(
+    requestor: Requestor, channel_id: int, affiliation_id: int, hours_after: int
+):
     """Add auto media."""
     is_int64(channel_id)
     is_int64(affiliation_id)
     is_int64(hours_after)
     return await self.db.execute(
-        "SELECT * FROM groupmembers.addautomedia($1, $2, $3)", channel_id, affiliation_id, hours_after
+        "SELECT * FROM groupmembers.addautomedia($1, $2, $3)",
+        channel_id,
+        affiliation_id,
+        hours_after,
     )
 
 
@@ -431,14 +436,22 @@ async def fix_dates(fetched_results, fetch_row=False):
     # was created by the database wrapper. To fix this, we reiterate through the results and convert the timestamps
     # to a string to avoid the built-in datetime automatic conversions when sent across the network.
     final_dates = {"results": dict()}
-    results_generator = fetched_results.get("results").values() if not fetch_row else [fetched_results.get("results")]
+    results_generator = (
+        fetched_results.get("results").values()
+        if not fetch_row
+        else [fetched_results.get("results")]
+    )
     for idx, row in enumerate(results_generator):
-        date_id = row['dateid']
-        start_date = row['startdate']
-        end_date = row['enddate']
+        date_id = row["dateid"]
+        start_date = row["startdate"]
+        end_date = row["enddate"]
         str_start_date = str(start_date) if start_date else None
         str_end_date = str(end_date) if end_date else None
-        finalized_row = {'dateid': date_id, 'startdate': str_start_date, 'enddate': str_end_date}
+        finalized_row = {
+            "dateid": date_id,
+            "startdate": str_start_date,
+            "enddate": str_end_date,
+        }
         if not fetch_row:
             final_dates["results"].update({idx: finalized_row})
         else:

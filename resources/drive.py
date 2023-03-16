@@ -116,14 +116,20 @@ class Drive:
 
             awaitables = []
             items = []
-            while not self.queue.empty() and len(awaitables) < self.max_requests_per_set_time:
+            while (
+                not self.queue.empty()
+                and len(awaitables) < self.max_requests_per_set_time
+            ):
                 item = await self.queue.get()
                 awaitables.append(item.awaitables)
                 items.append(item)
 
             requests_in_time_frame += len(items)
 
-            if requests_in_time_frame >= self.max_requests_per_set_time or not awaitables:
+            if (
+                requests_in_time_frame >= self.max_requests_per_set_time
+                or not awaitables
+            ):
                 await asyncio.sleep(self.seconds_to_accomplish_max_requests)
                 requests_in_time_frame = 0
                 if not awaitables:
@@ -181,9 +187,15 @@ class Drive:
         """Upload a file to google drive."""
         async with self.google as google:
             if self.queue_enabled:
-                await self.get_results(google.as_service_account(google.drive.files.create(upload_file=path)))
+                await self.get_results(
+                    google.as_service_account(
+                        google.drive.files.create(upload_file=path)
+                    )
+                )
             else:
-                await google.as_service_account(google.drive.files.create(upload_file=path))
+                await google.as_service_account(
+                    google.drive.files.create(upload_file=path)
+                )
 
     @staticmethod
     def get_id_from_url(url) -> str:
@@ -195,8 +207,13 @@ class Drive:
         """Get a folder ID based on the url."""
         return url.replace("https://drive.google.com/drive/folders/", "")
 
-    async def get_nested_files_in_folders(self, folder_id, parent_file=None, faces: Dict[str, int] = None,
-                                          only_do: List[str] = None):
+    async def get_nested_files_in_folders(
+        self,
+        folder_id,
+        parent_file=None,
+        faces: Dict[str, int] = None,
+        only_do: List[str] = None,
+    ):
         """Process a Google Drive folder ID recursively and concurrently between sub-folders.
 
         :param folder_id: str
@@ -223,10 +240,18 @@ class Drive:
                     file_id_not_in_list = file.id not in only_do
                     file_has_parent_in_list = file.has_parent(only_do)
                     # a ghost parent is an attribute not yet assigned.
-                    file_has_ghost_parent_in_list = False if not parent_file else parent_file.id in only_do
-                    if file_id_not_in_list and not (file_has_parent_in_list or file_has_ghost_parent_in_list):
+                    file_has_ghost_parent_in_list = (
+                        False if not parent_file else parent_file.id in only_do
+                    )
+                    if file_id_not_in_list and not (
+                        file_has_parent_in_list or file_has_ghost_parent_in_list
+                    ):
                         continue
-                tasks.append(self.get_nested_files_in_folders(file.id, parent_file=file, only_do=only_do))
+                tasks.append(
+                    self.get_nested_files_in_folders(
+                        file.id, parent_file=file, only_do=only_do
+                    )
+                )
             else:
                 actual_files.append(file)
 
@@ -240,9 +265,11 @@ class Drive:
         return actual_files
 
     async def get_files_in_folder(self, folder_id, parent_file=None):
-        """Get all files (including other folders) in a folder. """
+        """Get all files (including other folders) in a folder."""
         async with self.google as google:
-            requests = google.drive.files.list(q=f"'{folder_id}' in parents", pageSize=1000)
+            requests = google.drive.files.list(
+                q=f"'{folder_id}' in parents", pageSize=1000
+            )
             if self.queue_enabled:
                 results = await self.get_results(google.as_service_account(requests))
             else:
@@ -258,6 +285,7 @@ class File:
 
     A folder is also considered a file.
     """
+
     kind: str
     id: str
     name: str
@@ -275,7 +303,7 @@ class File:
     def get_full_path(self):
         names = [str(file) for file in self.get_all_parents()]
         names.reverse()
-        return '/'.join(names) + f"/{str(self)}"
+        return "/".join(names) + f"/{str(self)}"
 
     def is_parent(self, folder_id: str):
         return any([parent_file.id for parent_file in self.get_all_parents()])
@@ -372,7 +400,7 @@ async def convert_os_file_to_faces_dict(full_file_path):
                 continue
 
             face_count = line[:first_dash]
-            drive_file_path = line[first_dash + 1:]
+            drive_file_path = line[first_dash + 1 :]
             drive_file_path = drive_file_path.replace("\n", "")
             faces_dict[drive_file_path] = int(face_count)
         return faces_dict

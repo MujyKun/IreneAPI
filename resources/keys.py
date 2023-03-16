@@ -46,6 +46,7 @@ support_server_id = os.getenv("SUPPORT_SERVER_ID")
 support_server_link = os.getenv("SUPPORT_SERVER_LINK")
 bot_website = os.getenv("BOT_WEBSITE")
 image_host = os.getenv("IMAGE_HOST")
+github_url = os.getenv("GITHUB_LINK")
 
 top_gg_webhook_key = os.getenv("TOP_GG_WEBHOOK")
 

@@ -1,11 +1,18 @@
 # noinspection PyUnresolvedReferences, PyPackageRequirements
 from asyncio import get_event_loop
 
-from quart import Quart, render_template, Response, make_response
+from quart import Quart, render_template, Response, make_response, redirect
 from models import PgConnection
 
 # noinspection PyUnresolvedReferences, PyPackageRequirements
-from resources.keys import postgres_options, api_port
+from resources.keys import (
+    postgres_options,
+    api_port,
+    support_server_link,
+    bot_invite_link,
+    patreon_url,
+    github_url,
+)
 from resources import drive
 
 from ws import websocket_blueprint
@@ -14,7 +21,6 @@ from routes.helpers.errors import BaseError
 from quart_openapi import Swagger
 from quart_cors import cors
 from models import Pint
-
 
 app = Pint(__name__, title="IreneAPI", contact_email="mujy@irenebot.com", version="2.0")
 app = cors(app)
@@ -69,14 +75,120 @@ async def index():
     return await handler("index.html")
 
 
+@app.route("/discord")
+async def support_server_redirect():
+    return redirect(support_server_link)
+
+
+@app.route("/invite")
+async def invite_bot_redirect():
+    return redirect(bot_invite_link)
+
+
+@app.route("/patreon")
+async def patreon_redirect():
+    return redirect(patreon_url)
+
+
+@app.route("/github")
+async def github_redirect():
+    return redirect(github_url)
+
+
+@app.route("/commands")
+async def commands():
+    return {
+        "Slash Commands": [
+            {
+                "name": "GroupMembers",
+                "commands": [
+                    {
+                        "name": "/kick",
+                        "description": "Kicks a member from the group.",
+                        "syntax": "/kick (user)",
+                        "permissionsNeeded": "Admin",
+                        "notes": "Can only be used by an admin.",
+                    },
+                    {
+                        "name": "/mute",
+                        "description": "Mutes a member for a certain period of time.",
+                        "syntax": "...",
+                        "permissionsNeeded": "Moderator",
+                        "notes": "Can only be used by a moderator or higher.",
+                    },
+                ],
+            },
+            {
+                "name": "Moderator",
+                "commands": [
+                    {
+                        "name": "/ban",
+                        "description": "Bans a member from the group.",
+                        "syntax": "...",
+                        "permissionsNeeded": "Moderator",
+                        "notes": "Can only be used by a moderator or higher.",
+                    }
+                ],
+            },
+            {
+                "name": "Interactions",
+                "commands": [
+                    {
+                        "name": "/greet",
+                        "description": "Greets a new member when they join the group.",
+                        "syntax": "...",
+                        "permissionsNeeded": "Member",
+                        "notes": "Can only be used by a member.",
+                    }
+                ],
+            },
+        ],
+        "Message Commands": [
+            {
+                "name": "General",
+                "commands": [
+                    {
+                        "name": "!help",
+                        "description": "Displays a list of available commands.",
+                        "syntax": "...",
+                        "permissionsNeeded": "None",
+                        "notes": "Can be used by anyone.",
+                    }
+                ],
+            }
+        ],
+        "Prefix Commands": [
+            {
+                "name": "Moderator",
+                "commands": [
+                    {
+                        "name": "*kick",
+                        "description": "Kicks a member from the group.",
+                        "syntax": "...",
+                        "permissionsNeeded": "Admin",
+                        "notes": "Can only be used by an admin.",
+                    }
+                ],
+            }
+        ],
+    }
+
+
 async def create_first_user_token():
     """create first user token for usage."""
     from routes.helpers.api import add_token
     from routes.helpers import GOD, OWNER, Requestor
+
     god_requestor = Requestor(-1, GOD)
     user_id = 169401247374376960  # change accordingly.
     private_token = "private_key"  # change accordingly.
-    await add_token(requestor=god_requestor, user_id=user_id, unhashed_token=private_token, access_id=OWNER.id)
+    await add_token(
+        requestor=god_requestor,
+        user_id=user_id,
+        unhashed_token=private_token,
+        access_id=OWNER.id,
+    )
+
 
 # if __name__ == '__main__':
 

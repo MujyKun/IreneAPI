@@ -44,7 +44,9 @@ class Reminders(Resource):
         Use this route to add a reminder.
         """
         requestor = await login(headers=request.headers, data=request.args)
-        return await helper.add_reminder(requestor,
-                                         request.args.get("user_id"),
-                                         request.args.get("reason"),
-                                         request.args.get("date_id"))
+        return await helper.add_reminder(
+            requestor,
+            request.args.get("user_id"),
+            request.args.get("reason"),
+            request.args.get("date_id"),
+        )

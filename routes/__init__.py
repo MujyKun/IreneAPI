@@ -247,5 +247,5 @@ blueprints = [
     noti,
     interactions_blueprint,
     misc,
-    reminders_blueprint
+    reminders_blueprint,
 ]

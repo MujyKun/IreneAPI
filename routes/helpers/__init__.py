@@ -311,10 +311,22 @@ from .misc import get_urban_definitions
 # Helper Functions for routes.
 
 helper_routes = {
-    "reaction_roles/$message_id.POST": {"function": add_reaction_role_message, "params": ["requestor", "message_id"]},
-    "reaction_roles/.GET": {"function": get_reaction_role_messages, "params": ["requestor"]},
-    "reminder/$remind_id.DELETE": {"function": delete_reminder, "params": ["requestor", "remind_id"]},
-    "reminder/.POST": {"function": add_reminder, "params": ["requestor", "user_id", "reason", "date_id"]},
+    "reaction_roles/$message_id.POST": {
+        "function": add_reaction_role_message,
+        "params": ["requestor", "message_id"],
+    },
+    "reaction_roles/.GET": {
+        "function": get_reaction_role_messages,
+        "params": ["requestor"],
+    },
+    "reminder/$remind_id.DELETE": {
+        "function": delete_reminder,
+        "params": ["requestor", "remind_id"],
+    },
+    "reminder/.POST": {
+        "function": add_reminder,
+        "params": ["requestor", "user_id", "reason", "date_id"],
+    },
     "reminder/.GET": {"function": get_reminders, "params": ["requestor"]},
     "affiliation/automedia.GET": {"function": get_auto_media, "params": ["requestor"]},
     "affiliation/automedia.POST": {

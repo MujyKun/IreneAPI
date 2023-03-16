@@ -18,11 +18,15 @@ from models import Requestor
 async def get_working_twitter_acc():
     """Get a working twitter account if one exists."""
     from resources import twitters
+
     for idx, twitter_acc in enumerate(twitters):
         if not twitter_acc.exceeded:
             return twitter_acc
-        elif twitter_acc.exceeded and \
-                datetime.datetime.now() > twitter_acc.last_tried_at + datetime.timedelta(days=1):
+        elif (
+            twitter_acc.exceeded
+            and datetime.datetime.now()
+            > twitter_acc.last_tried_at + datetime.timedelta(days=1)
+        ):
             return twitter_acc
 
 

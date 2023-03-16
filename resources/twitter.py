@@ -12,7 +12,15 @@ class Twitter(PeonyClient):
     Twitter API v2.0 usage.
     """
 
-    def __init__(self, consumer_key, consumer_secret, access_token, access_token_secret, api_version="2", suffix=""):
+    def __init__(
+        self,
+        consumer_key,
+        consumer_secret,
+        access_token,
+        access_token_secret,
+        api_version="2",
+        suffix="",
+    ):
         super(Twitter, self).__init__(
             consumer_key=consumer_key,
             consumer_secret=consumer_secret,
