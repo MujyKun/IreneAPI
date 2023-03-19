@@ -215,6 +215,7 @@ from .notifications import noti
 from .interactions import interactions as interactions_blueprint
 from .misc import misc
 from .reminders import reminders as reminders_blueprint
+from .bot import bot
 
 blueprints = [
     affiliation,
@@ -248,4 +249,5 @@ blueprints = [
     interactions_blueprint,
     misc,
     reminders_blueprint,
+    bot,
 ]

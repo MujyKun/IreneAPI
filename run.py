@@ -97,81 +97,10 @@ async def github_redirect():
 
 @app.route("/commands")
 async def commands():
-    return {
-        "Slash Commands": [
-            {
-                "name": "GroupMembers",
-                "commands": [
-                    {
-                        "name": "/kick",
-                        "description": "Kicks a member from the group.",
-                        "syntax": "/kick (user)",
-                        "permissionsNeeded": "Admin",
-                        "notes": "Can only be used by an admin.",
-                    },
-                    {
-                        "name": "/mute",
-                        "description": "Mutes a member for a certain period of time.",
-                        "syntax": "...",
-                        "permissionsNeeded": "Moderator",
-                        "notes": "Can only be used by a moderator or higher.",
-                    },
-                ],
-            },
-            {
-                "name": "Moderator",
-                "commands": [
-                    {
-                        "name": "/ban",
-                        "description": "Bans a member from the group.",
-                        "syntax": "...",
-                        "permissionsNeeded": "Moderator",
-                        "notes": "Can only be used by a moderator or higher.",
-                    }
-                ],
-            },
-            {
-                "name": "Interactions",
-                "commands": [
-                    {
-                        "name": "/greet",
-                        "description": "Greets a new member when they join the group.",
-                        "syntax": "...",
-                        "permissionsNeeded": "Member",
-                        "notes": "Can only be used by a member.",
-                    }
-                ],
-            },
-        ],
-        "Message Commands": [
-            {
-                "name": "General",
-                "commands": [
-                    {
-                        "name": "!help",
-                        "description": "Displays a list of available commands.",
-                        "syntax": "...",
-                        "permissionsNeeded": "None",
-                        "notes": "Can be used by anyone.",
-                    }
-                ],
-            }
-        ],
-        "Prefix Commands": [
-            {
-                "name": "Moderator",
-                "commands": [
-                    {
-                        "name": "*kick",
-                        "description": "Kicks a member from the group.",
-                        "syntax": "...",
-                        "permissionsNeeded": "Admin",
-                        "notes": "Can only be used by an admin.",
-                    }
-                ],
-            }
-        ],
-    }
+    from routes.helpers.bot import get_commands
+    from routes.helpers import GOD, Requestor
+
+    return await get_commands(Requestor(0, GOD))
 
 
 async def create_first_user_token():

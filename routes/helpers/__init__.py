@@ -8,6 +8,8 @@ token_context = CryptContext(
     pbkdf2_sha256__default_rounds=30000,
 )
 
+COMMANDS_FILE_NAME = "commands.json"
+
 
 def hash_token(token):
     return token_context.hash(token)
@@ -308,9 +310,16 @@ from .reminders import add_reminder, delete_reminder, get_reminders
 from .reactionroles import add_reaction_role_message, get_reaction_role_messages
 from .misc import get_urban_definitions
 
+from .bot import update_commands, get_commands
+
 # Helper Functions for routes.
 
 helper_routes = {
+    "bot/commands.PUT": {
+        "function": update_commands,
+        "params": ["requestor", "commands"],
+    },
+    "bot/commands.GET": {"function": get_commands, "params": ["requestor"]},
     "reaction_roles/$message_id.POST": {
         "function": add_reaction_role_message,
         "params": ["requestor", "message_id"],
