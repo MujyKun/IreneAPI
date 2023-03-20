@@ -1,6 +1,5 @@
 # noinspection PyUnresolvedReferences, PyPackageRequirements
 from asyncio import get_event_loop
-
 from quart import Quart, render_template, Response, make_response, redirect
 from models import PgConnection
 
