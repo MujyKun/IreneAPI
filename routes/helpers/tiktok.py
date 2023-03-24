@@ -48,6 +48,16 @@ async def add_tiktok_account(
 
 
 @check_permission(permission_level=DEVELOPER)
+async def delete_tiktok_account(
+    requestor: Requestor, username: str, channel_id: int) -> dict:
+    """Add a TikTok account to the database."""
+    is_int64(channel_id)
+
+    return await self.db.fetch(
+        "SELECT public.deletetiktok($1, $2)", username, channel_id)
+
+
+@check_permission(permission_level=DEVELOPER)
 async def get_latest_tiktok_video(requestor: Requestor, username) -> dict:
     """Get the latest tiktok video for a user."""
     return await tiktok_obj.get_recent_video_id(username)

@@ -123,7 +123,9 @@ SELECT sp.userid FROM public.superpatron sp
 UNION DISTINCT
 SELECT mod.userid FROM public.mods mod
 ORDER BY userid DESC;CREATE OR REPLACE VIEW groupmembers.gettags AS
-    SELECT tagid, name FROM groupmembers.tag;CREATE OR REPLACE VIEW public.gettwitchchannels AS
+    SELECT tagid, name FROM groupmembers.tag;CREATE OR REPLACE VIEW public.gettiktokchannels AS
+SELECT username, userid, channelid, roleid
+FROM public.tiktokfollowage;CREATE OR REPLACE VIEW public.gettwitchchannels AS
 SELECT username, guildid, c.channelid, posted, roleid
 FROM public.twitchfollowage c LEFT JOIN public.channels ch on c.channelid = ch.channelid;CREATE OR REPLACE VIEW public.gettwitterchannels AS
 SELECT c.accountid, username, guildid, c.channelid, roleid

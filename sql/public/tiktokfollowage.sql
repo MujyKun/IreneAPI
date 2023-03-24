@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS public.tiktokfollowage
     userid bigint,
     channelid bigint,
     roleid bigint,
-    PRIMARY KEY (username, userid)
+    PRIMARY KEY (username, userid, channelid)
 );
 
 ALTER TABLE public.tiktokfollowage

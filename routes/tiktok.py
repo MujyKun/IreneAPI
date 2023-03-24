@@ -42,6 +42,14 @@ class TikTokAccount(Resource):
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.get_tiktok_account(requestor, username)
 
+    async def delete(self, username: str):
+        """delete a TikTok Account.
+
+        Use this route to delete a TikTok Account.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.delete_tiktok_account(requestor, username, request.args.get("channel_id"))
+
 
 @tiktok.route("")
 @tiktok.doc()
