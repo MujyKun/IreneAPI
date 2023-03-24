@@ -23,10 +23,21 @@ async def get_tiktok_accounts(requestor: Requestor) -> dict:
 
 
 @check_permission(permission_level=DEVELOPER)
+async def get_tiktok_account(requestor: Requestor, username) -> dict:
+    """Get a TikTok account."""
+    return await self.db.fetch_row("SELECT * FROM public.gettiktokchannels WHERE username = $1", username)
+
+
+@check_permission(permission_level=DEVELOPER)
 async def add_tiktok_account(
     requestor: Requestor, username: str, user_id: int, channel_id: int, role_id=None
 ) -> dict:
     """Add a TikTok account to the database."""
+    is_int64(user_id)
+    is_int64(channel_id)
+    if role_id:
+        is_int64(role_id)
+
     return await self.db.fetch(
         "SELECT public.addtiktok($1, $2, $3, $4)",
         username,

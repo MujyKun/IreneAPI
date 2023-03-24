@@ -318,13 +318,14 @@ from .misc import get_urban_definitions
 
 from .bot import update_commands, get_commands, update_stats
 
-from .tiktok import get_tiktok_accounts, get_latest_tiktok_video, add_tiktok_account
+from .tiktok import get_tiktok_accounts, get_latest_tiktok_video, add_tiktok_account, get_tiktok_account
 
 
 # Helper Functions for routes.
 
 
 helper_routes = {
+    "tiktok/$username.GET": {"function": get_tiktok_account, "params": ["requestor", "username"]},
     "tiktok/.POST": {
         "function": add_tiktok_account,
         "params": ["requestor", "username", "user_id", "channel_id"],

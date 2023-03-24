@@ -8,7 +8,7 @@ import routes.helpers.api as api_helper
 from models import Requestor
 from .helpers import BadRequest, is_int64, USER, GOD
 
-tiktok = PintBlueprint("twitch", __name__, url_prefix="/tiktok/")
+tiktok = PintBlueprint("tiktok", __name__, url_prefix="/tiktok/")
 
 
 @tiktok.route("latest_video/<string:username>")
@@ -27,9 +27,25 @@ class LatestTiktok(Resource):
         return await helper.get_latest_tiktok_video(requestor, username)
 
 
+@tiktok.route("<string:username>")
+@tiktok.doc(
+    params={
+        "username": "Tiktok username to manage.",
+    }
+)
+class TikTokAccount(Resource):
+    async def get(self, username: str):
+        """Get a TikTok Account.
+
+        Use this route to get a TikTok Account.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.get_tiktok_account(requestor, username)
+
+
 @tiktok.route("")
 @tiktok.doc()
-class TwitchChannels(Resource):
+class TikTokAccounts(Resource):
     async def get(self):
         """Get all accounts.
 
