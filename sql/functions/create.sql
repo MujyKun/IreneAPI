@@ -547,7 +547,18 @@ begin
     VALUES(t_twitter, t_youtube, t_melon, t_instagram, t_vlive, t_spotify, t_fancafe, t_facebook, t_tiktok) returning socialid INTO t_social_id;
     return t_social_id;
 end;
-$$;create or replace function public.addsuperpatron(t_userid bigint)
+$$;create or replace function public.addstats(t_name text, t_value bigint)
+    returns void
+    language plpgsql
+as
+$$
+begin
+
+    INSERT INTO public.stats(name, value)
+    VALUES(t_name, t_value);
+end;
+$$;
+create or replace function public.addsuperpatron(t_userid bigint)
     returns void
     language plpgsql
 as

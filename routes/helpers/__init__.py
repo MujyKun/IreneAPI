@@ -1,3 +1,6 @@
+import asyncio
+from concurrent import futures
+from functools import partial
 from passlib.context import CryptContext
 
 
@@ -109,6 +112,9 @@ def check_permission(permission_level: Access):
         return wrapper
 
     return decorator
+
+
+thread_pool = futures.ThreadPoolExecutor(max_workers=10)
 
 
 from .api import (
@@ -310,11 +316,17 @@ from .reminders import add_reminder, delete_reminder, get_reminders
 from .reactionroles import add_reaction_role_message, get_reaction_role_messages
 from .misc import get_urban_definitions
 
-from .bot import update_commands, get_commands
+from .bot import update_commands, get_commands, update_stats
+
 
 # Helper Functions for routes.
 
+
 helper_routes = {
+    "bot/updatestats.PUT": {
+        "function": update_stats,
+        "params": ["requestor", "key", "value"],
+    },
     "bot/commands.PUT": {
         "function": update_commands,
         "params": ["requestor", "commands"],

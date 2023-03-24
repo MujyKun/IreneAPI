@@ -33,3 +33,17 @@ class Commands(Resource):
         """
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.get_commands(requestor)
+
+
+@bot.route("/updatestats")
+@bot.doc()
+class Stats(Resource):
+    async def put(self):
+        """Update the stats
+
+        Use this route to update the stats of an entity
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.update_stats(
+            requestor, request.args.get("key"), request.args.get("value")
+        )

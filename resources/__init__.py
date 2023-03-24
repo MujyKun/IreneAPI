@@ -5,6 +5,7 @@ from .twitter import Twitter
 from .twitch import Twitch
 from .wolfram import Wolfram
 from .urban import Urban
+from .datadog import DataDog
 
 twitters = []
 
@@ -26,3 +27,4 @@ drive = Drive()
 twitch = Twitch()
 wolfram = Wolfram()
 urban = Urban()
+datadog = DataDog()

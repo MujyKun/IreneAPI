@@ -24,7 +24,7 @@ bias_game_location = os.getenv("BIAS_GAME_LOCATION")
 
 # DataDog - DO NOT CHANGE NAMES OF THESE ENV VARIABLES - https://github.com/DataDog/datadogpy
 datadog_api_key = os.getenv("DATADOG_API_KEY")
-datadog_app_key = "DATADOG_APP_KEY"
+datadog_app_key = os.getenv("DATADOG_APP_KEY")
 
 # BlackJack Card Location
 # CARD_LOCATION="/var/www/images.irenebot/public_html/cards/"

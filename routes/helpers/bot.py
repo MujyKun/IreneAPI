@@ -1,3 +1,5 @@
+import asyncio
+
 from . import (
     self,
     check_permission,
@@ -8,8 +10,10 @@ from . import (
     USER,
     is_int64,
     COMMANDS_FILE_NAME,
+    thread_pool,
 )
 from models import Requestor
+from resources import datadog
 import aiofiles
 import json
 
@@ -29,3 +33,15 @@ async def get_commands(requestor: Requestor):
         json_data = await file.read()
         data = json.loads(json_data)
         return data
+
+
+@check_permission(permission_level=DEVELOPER)
+async def update_stats(requestor: Requestor, key, value):
+    """Update stats to Datadog and the database."""
+    is_int64(value)
+
+    # to db
+    await self.db.execute("SELECT public.addstats($1, $2)", key, value)
+    # to datadog
+    # datadog.send_metric(key, value)
+    thread_pool.submit(datadog.send_metric, key, value)
