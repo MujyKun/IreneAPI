@@ -1,16 +1,19 @@
+from tiktokapipy.async_api import AsyncTikTokAPI
 
 
 class Tiktok:
-    def __init__(self):
-        ...
-
-    async def get_recent_video_id(self, tiktok_username: str):
+    @staticmethod
+    async def get_recent_video_id(tiktok_username: str) -> dict:
         """
-        Check if a twitch account is live.
+        Get the most recent TikTok video of a user.
 
-        :param twitch_username: str
-            The twitch username to check that is live.
-        :returns bool:
-            Whether the account is live.
+        :param tiktok_username: str
+            The TikTok username to check videos for.
+        :returns: int
+            Latest video ID.
         """
         tiktok_username = tiktok_username.replace("@", "")
+        async with AsyncTikTokAPI() as api:
+            user = await api.user(tiktok_username)
+            async for video in user.videos:
+                return {tiktok_username: video.id}

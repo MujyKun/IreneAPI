@@ -216,6 +216,7 @@ from .interactions import interactions as interactions_blueprint
 from .misc import misc
 from .reminders import reminders as reminders_blueprint
 from .bot import bot
+from .tiktok import tiktok
 
 blueprints = [
     affiliation,
@@ -250,4 +251,5 @@ blueprints = [
     misc,
     reminders_blueprint,
     bot,
+    tiktok,
 ]
