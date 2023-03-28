@@ -60,4 +60,9 @@ async def delete_tiktok_account(
 @check_permission(permission_level=DEVELOPER)
 async def get_latest_tiktok_video(requestor: Requestor, username) -> dict:
     """Get the latest tiktok video for a user."""
-    return await tiktok_obj.get_recent_video_id(username)
+    try:
+        video_dict = await tiktok_obj.get_recent_video_id(username)
+        return video_dict
+    except UserWarning:
+        return {"error": "User does not exist."}
+

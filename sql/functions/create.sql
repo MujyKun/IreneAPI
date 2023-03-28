@@ -1021,6 +1021,15 @@ begin
     DELETE FROM groupmembers.tag WHERE tagid = t_tag_id;
 end;
 $$;
+create or replace function public.deletetiktok(t_username text, t_channel_id bigint)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM public.tiktokfollowage WHERE username = t_username AND channelid = t_channel_id;
+end;
+$$;
 create or replace function public.deletetoken(t_userid bigint)
     returns void
     language plpgsql
