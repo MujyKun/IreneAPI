@@ -38,6 +38,9 @@ async def add_tiktok_account(
     if role_id:
         is_int64(role_id)
 
+    if not await tiktok_obj.get_user_exists(username):
+        return {"status": f"User does not exist. -> {username}"}
+
     return await self.db.fetch(
         "SELECT public.addtiktok($1, $2, $3, $4)",
         username,
@@ -64,5 +67,5 @@ async def get_latest_tiktok_video(requestor: Requestor, username) -> dict:
         video_dict = await tiktok_obj.get_recent_video_id(username)
         return video_dict
     except UserWarning:
-        return {"error": "User does not exist."}
+        return {"status": "User does not exist."}
 

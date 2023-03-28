@@ -24,11 +24,14 @@ class Tiktok:
                 if not await self.get_user_exists(tiktok_username):
                     raise UserWarning
                 user = await api.user(tiktok_username)
-                async for video in user.videos:
-                    return {tiktok_username: video.id}
+                try:
+                    async for video in user.videos:
+                        return {tiktok_username: video.id}
+                except StopAsyncIteration:  # no videos.
+                    return {tiktok_username: None}
         except Exception as e:
             print(f"TikTok Search Failed -> {e}")
-        return {tiktok_username: video.id}
+        return {tiktok_username: None}
 
     async def get_user_exists(self, tiktok_username: str) -> bool:
         """
