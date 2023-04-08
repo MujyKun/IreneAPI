@@ -13,7 +13,6 @@ from .helpers import BadRequest, is_int64, USER, GOD
 
 ban_phrases = PintBlueprint("banphrases", __name__, url_prefix="/banphrases/")
 
-
 @ban_phrases.route("<int:phrase_id>")
 @ban_phrases.doc(
     params={

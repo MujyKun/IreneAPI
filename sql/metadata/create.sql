@@ -658,6 +658,9 @@ INSERT INTO public.languagepacks(languageid, label, message) VALUES
 (8, 'role_removed', 'You no longer have the role!'),
 (8, 'role_added', 'You now have the role!'),
 (8, 'role_not_found', 'That role was not found! Contact a server moderator.'),
+(8, 'ban_phrase_added', 'A new ban phrase has been added.'),
+(8, 'ban_phrase_exists', 'That ban phrase already exists.'),
+(8, 'ban_phrase_removed', 'That ban phrase has been removed.'),
 (8, 'no_permissions', 'I am lacking permissions to do that!'),
 (8,'8ball_response','**Question:** :1$PROMPT$1:\n**Answer:** :2$ANSWER$2:') ON CONFLICT DO NOTHING;
 

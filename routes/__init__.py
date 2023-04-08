@@ -253,5 +253,5 @@ blueprints = [
     reminders_blueprint,
     bot,
     tiktok,
-    banphrases
+    ban_phrases
 ]
