@@ -37,6 +37,17 @@ begin
     INSERT INTO groupmembers.automedia(channelid, affiliationid, hoursafter)
     VALUES(t_channel_id, t_aff_id, t_hours_after) ON CONFLICT DO NOTHING;
 end;
+$$;create or replace function public.addbanphrase(t_guildid bigint,
+                                t_logchannelid bigint, t_phrase text, t_punishment text)
+    returns void
+    language plpgsql
+as
+$$
+begin
+
+    INSERT INTO public.banphrases(guildid, logchannelid, phrase, punishment)
+    VALUES(t_guildid, t_logchannelid, t_phrase, t_punishment);
+end;
 $$;create or replace function groupmembers.addbloodtype(t_name text)
     returns integer
     language plpgsql
@@ -758,6 +769,14 @@ as
 $$
 begin
     DELETE FROM groupmembers.automedia WHERE channelid = t_channel_id AND affiliationid = t_aff_id;
+end;
+$$;create or replace function public.deletebanphrase(t_phraseid integer)
+    returns void
+    language plpgsql
+as
+$$
+begin
+    DELETE FROM public.banphrases WHERE phraseid = t_phraseid;
 end;
 $$;create or replace function groupmembers.deletebloodtype(t_blood_id integer)
     returns void

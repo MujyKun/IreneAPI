@@ -217,6 +217,7 @@ from .misc import misc
 from .reminders import reminders as reminders_blueprint
 from .bot import bot
 from .tiktok import tiktok
+from .banphrases import ban_phrases
 
 blueprints = [
     affiliation,
@@ -252,4 +253,5 @@ blueprints = [
     reminders_blueprint,
     bot,
     tiktok,
+    banphrases
 ]

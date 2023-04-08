@@ -322,10 +322,17 @@ from .tiktok import get_tiktok_accounts, get_latest_tiktok_video, add_tiktok_acc
     delete_tiktok_account
 
 
+from .banphrases import get_ban_phrase, add_ban_phrase, delete_ban_phrase, get_ban_phrases
+
 # Helper Functions for routes.
 
 
 helper_routes = {
+    "banphrases/$phrase_id.GET": {"function": get_ban_phrase, "params": ["requestor", "phrase_id"]},
+    "banphrases/$phrase_id.DELETE": {"function": delete_ban_phrase, "params": ["requestor", "phrase_id"]},
+    "banphrases/.GET": {"function": get_ban_phrases, "params": ["requestor"]},
+    "banphrases/.POST": {"function": add_ban_phrase, "params": ["requestor", "guild_id", "log_channel_id", "phrase",
+                                                                "punishment"]},
     "tiktok/$username.DELETE": {"function": delete_tiktok_account, "params": ["requestor", "username", "channel_id"]},
     "tiktok/$username.GET": {"function": get_tiktok_account, "params": ["requestor", "username"]},
     "tiktok/.POST": {

@@ -1,6 +1,7 @@
 CREATE OR REPLACE VIEW groupmembers.getaffiliations AS
     SELECT affiliationid, personid, groupid, positionids, stagename FROM groupmembers.affiliation;CREATE OR REPLACE VIEW groupmembers.getautomedia AS
-    SELECT channelid, affiliationid, hoursafter FROM groupmembers.automedia;CREATE OR REPLACE VIEW biasgame.getbgwinners AS
+    SELECT channelid, affiliationid, hoursafter FROM groupmembers.automedia;CREATE OR REPLACE VIEW public.getbanphrases AS
+    SELECT phraseid, guildid, logchannelid, phrase, punishment FROM public.banphrases;CREATE OR REPLACE VIEW biasgame.getbgwinners AS
     SELECT personid, userid, wins from biasgame.winners;CREATE OR REPLACE VIEW groupmembers.getbloodtypes AS
     SELECT bloodid, name FROM groupmembers.bloodtypes;CREATE OR REPLACE VIEW public.getchannels AS
 SELECT channelid, guildid
