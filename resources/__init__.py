@@ -7,6 +7,7 @@ from .wolfram import Wolfram
 from .urban import Urban
 from .datadog import DataDog
 from .tiktok import Tiktok
+from .theysaidso import TheySaidSo
 
 twitters = []
 
@@ -30,3 +31,4 @@ wolfram = Wolfram()
 urban = Urban()
 datadog = DataDog()
 tiktok = Tiktok()
+theysaidso = TheySaidSo()

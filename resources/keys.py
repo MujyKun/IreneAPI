@@ -66,5 +66,7 @@ twitch_client_secret = os.getenv("TWITCH_CLIENT_SECRET")
 
 wolfram_app_id = os.getenv("WOLFRAM_APP_ID")
 
+theysaidso_api_key = os.getenv("THEYSAIDSO_API_KEY")
+
 # db_conn = psycopg2.connect(**postgres_options)
 # c = db_conn.cursor()

@@ -47,3 +47,16 @@ class Stats(Resource):
         return await helper.update_stats(
             requestor, request.args.get("key"), request.args.get("value")
         )
+
+
+@bot.route("/dailystatus")
+@bot.doc()
+class DailyStatus(Resource):
+    async def get(self):
+        """
+        Get daily status.
+
+        Use this route to get the daily status.
+        """
+        requestor = await login(headers=request.headers, data=request.args)
+        return await helper.get_daily_status(requestor)
