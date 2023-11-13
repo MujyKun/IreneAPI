@@ -156,17 +156,6 @@ from .user import (
     upsert_gg_filter_persons,
 )
 
-from .twitter import (
-    add_twitter_subscription,
-    delete_twitter_subscription,
-    get_and_add_twitter_id,
-    get_subscriptions as get_twitter_subscriptions,
-    get_timeline as get_twitter_timeline,
-    get_all_subscriptions as get_all_twitter_subscriptions,
-    username_exists as twitter_username_exists,
-    get_twitter_channels_by_guild,
-)
-
 from .channel import add_channel, delete_channel, get_channel, get_channels
 
 from .groupmembers import (
@@ -466,39 +455,6 @@ helper_routes = {
     "guild/prefix/$guild_id.DELETE": {
         "function": delete_prefix,
         "params": ["requestor", "guild_id", "prefix"],
-    },
-    "twitter/$twitter_id.GET": {
-        "function": get_twitter_timeline,
-        "params": ["requestor", "twitter_id"],
-    },
-    "twitter/account/$username.POST": {
-        "function": get_and_add_twitter_id,
-        "params": ["requestor", "username"],
-    },
-    "twitter/.GET": {
-        "function": get_all_twitter_subscriptions,
-        "params": ["requestor"],
-    },
-    "twitter/$username.GET": {
-        "function": get_twitter_subscriptions,
-        "params": ["requestor", "username"],
-    },
-    "twitter/modify/$twitter_id.DELETE": {
-        "function": delete_twitter_subscription,
-        "params": ["requestor", "twitter_id", "channel_id"],
-    },
-    "twitter/modify/$twitter_id.POST": {
-        "function": add_twitter_subscription,
-        "params": ["requestor", "twitter_id", "channel_id"],
-        "optional": ["role_id"],
-    },
-    "twitter/exists/$username.GET": {
-        "function": twitter_username_exists,
-        "params": ["requestor", "username"],
-    },
-    "twitter/filter/$guild_id.GET": {
-        "function": get_twitter_channels_by_guild,
-        "params": ["requestor", "guild_id"],
     },
     "twitch/already_posted/$username.GET": {
         "function": get_posted,

@@ -28,7 +28,6 @@ black = "22.6.0"
 pre-commit = "2.19.0"
 quart-openapi = {version = "1.7.2", extras = ["doc"]}
 aiogoogle = "^4.3.0"
-peony-twitter = {extras = ["all"], version = "^2.1.2"}
 xmltodict = "^0.13.0"
 aiofiles = "^0.8.0"
 Pillow = "^9.2.0"
@@ -41,6 +40,7 @@ aiohttp = "^3.8.3"
 datadog = "^0.45.0"
 tiktokapipy = "^0.1.11"
 playwright = "^1.31.1"
+curl-cffi = "^0.5.6"
 
 [tool.poetry.dev-dependencies]
 

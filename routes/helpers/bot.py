@@ -13,7 +13,7 @@ from . import (
     thread_pool,
 )
 from models import Requestor
-from resources import datadog, theysaidso
+from resources import datadog
 import aiofiles
 import json
 
@@ -33,12 +33,6 @@ async def get_commands(requestor: Requestor):
         json_data = await file.read()
         data = json.loads(json_data)
         return data
-
-
-@check_permission(permission_level=USER)
-async def get_daily_status(requestor: Requestor):
-    """Get daily status."""
-    return {"results": await theysaidso.get_quote_of_day()}
 
 
 @check_permission(permission_level=DEVELOPER)

@@ -54,19 +54,10 @@ patreon_url = os.getenv("PATREON_LINK")
 
 urban_key = os.getenv("URBAN_KEY")
 
-twitter_account_ids = os.getenv("TWITTER_ACCOUNT_IDS").split(",")
-twitter_usernames = os.getenv("TWITTER_USERNAMES").split(",")
-twitter_consumer_keys = os.getenv("TWITTER_CONSUMER_KEYS").split(",")
-twitter_consumer_secrets = os.getenv("TWITTER_CONSUMER_SECRETS").split(",")
-twitter_access_keys = os.getenv("TWITTER_ACCESS_KEYS").split(",")
-twitter_access_secrets = os.getenv("TWITTER_ACCESS_SECRETS").split(",")
-
 twitch_client_id = os.getenv("TWITCH_CLIENT_ID")
 twitch_client_secret = os.getenv("TWITCH_CLIENT_SECRET")
 
 wolfram_app_id = os.getenv("WOLFRAM_APP_ID")
-
-theysaidso_api_key = os.getenv("THEYSAIDSO_API_KEY")
 
 # db_conn = psycopg2.connect(**postgres_options)
 # c = db_conn.cursor()

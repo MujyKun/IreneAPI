@@ -201,7 +201,6 @@ from .personalias import personalias
 from .position import position
 from .social import social
 from .tag import tag
-from .twitter import twitter
 from .channel import channel
 from .userstatus import status as user_status
 from .user import user
@@ -237,7 +236,6 @@ blueprints = [
     position,
     social,
     tag,
-    twitter,
     channel,
     user,
     guessinggame,

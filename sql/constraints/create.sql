@@ -153,14 +153,9 @@ ALTER TABLE public.commandusage ADD CONSTRAINT commandusage_sessionid FOREIGN KE
 ALTER TABLE public.selfassignroles DROP CONSTRAINT IF EXISTS selfassignroles_channelid;
 ALTER TABLE public.tempchannels DROP CONSTRAINT IF EXISTS tempchannels_channelid;
 ALTER TABLE public.twitchfollowage DROP CONSTRAINT IF EXISTS twitchfollowage_channelid;
-ALTER TABLE public.twitterfollowage DROP CONSTRAINT IF EXISTS twitterfollowage_channelid;
 ALTER TABLE public.selfassignroles ADD CONSTRAINT selfassignroles_channelid FOREIGN KEY (channelid) REFERENCES public.channels(channelid) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE public.tempchannels ADD CONSTRAINT tempchannels_channelid FOREIGN KEY (channelid) REFERENCES public.channels(channelid) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE public.twitchfollowage ADD CONSTRAINT twitchfollowage_channelid FOREIGN KEY (channelid) REFERENCES public.channels(channelid) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE public.twitterfollowage ADD CONSTRAINT twitterfollowage_channelid FOREIGN KEY (channelid) REFERENCES public.channels(channelid) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE public.twitteruploadedmedia DROP CONSTRAINT IF EXISTS twitteruploadedmedia_mediaid;
-ALTER TABLE public.twitteruploadedmedia ADD CONSTRAINT twitteruploadedmedia_mediaid FOREIGN KEY (mediaid) REFERENCES groupmembers.media(mediaid) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE public.users DROP CONSTRAINT IF EXISTS users_timezone;
 ALTER TABLE public.users ADD CONSTRAINT users_timezone FOREIGN KEY (timezoneid) REFERENCES public.timezones(id) ON DELETE SET NULL ON UPDATE CASCADE;
