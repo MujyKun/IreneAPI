@@ -305,7 +305,7 @@ from .reminders import add_reminder, delete_reminder, get_reminders
 from .reactionroles import add_reaction_role_message, get_reaction_role_messages
 from .misc import get_urban_definitions
 
-from .bot import update_commands, get_commands, update_stats, get_daily_status
+from .bot import update_commands, get_commands, update_stats
 
 from .tiktok import get_tiktok_accounts, get_latest_tiktok_video, add_tiktok_account, get_tiktok_account, \
     delete_tiktok_account
@@ -333,10 +333,6 @@ helper_routes = {
     "tiktok/latest_video/$username.GET": {
         "function": get_latest_tiktok_video,
         "params": ["requestor", "username"],
-    },
-    "bot/dailystatus.GET": {
-        "function": get_daily_status,
-        "params": ["requestor"],
     },
     "bot/updatestats.PUT": {
         "function": update_stats,
