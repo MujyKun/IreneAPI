@@ -1,5 +1,4 @@
 import concurrent.futures
-from typing import List
 
 from . import (
     self,
@@ -16,6 +15,7 @@ from models import Requestor
 from resources import drive
 from resources.keys import person_folder, image_host
 from datetime import datetime
+from pathlib import Path
 
 
 DIR_FILE_LIMIT = 250000
@@ -172,38 +172,54 @@ def blocking_remove_oldest_files():
 
 async def download_and_get_image_host_url(media_info):
     """
-    Download and get the image host's url.
+    Download and get the image host's URL.
     """
-    if not media_info["results"]:
+    results = media_info.get("results", {})
+    if not results:
         return media_info
 
-    media_id = media_info["results"]["mediaid"]
-    file_type = media_info["results"]["filetype"]
-    if file_type and file_type in ["jpeg", "png", "jpg", "webp"]:
-        file_path = f"{person_folder}{media_id}.webp"
-    else:
-        file_path = f"{person_folder}{media_id}.{file_type}"
-    g_drive_id = drive.get_id_from_url(media_info["results"]["link"])
+    media_id = results.get("mediaid")
+    file_type = results.get("filetype")
+
+    if not media_id or not file_type:
+        return media_info
+
+    file_path = determine_file_path(person_folder, media_id, file_type)
+    g_drive_id = drive.get_id_from_url(results.get("link"))
+
     await drive.download_file(g_drive_id, file_path)
+    await drive.convert_to_webp(file_path, file_path)
 
-    # https://images.irenebot.com/$media_id
-    if file_type == "gif":
-        media_info["results"][
-            "host"
-        ] = f"{image_host}idol/{media_info['results']['mediaid']}.gif"
-    else:
-        media_info["results"][
-            "host"
-        ] = f"{image_host}{media_info['results']['mediaid']}"
+    # Set the host URL based on file type
+    media_info["results"]["host"] = generate_host_url(image_host, media_id, file_type)
 
-    # check every 50% of the dir file limit as we remove half.
+    # Check file limit and remove oldest files if necessary
     global _new_photo_counter
     if _new_photo_counter > DIR_FILE_LIMIT * 0.5:
         _new_photo_counter = 0
         with concurrent.futures.ThreadPoolExecutor() as pool:
             future = pool.submit(blocking_remove_oldest_files)
+
     _new_photo_counter += 1
     return media_info
+
+
+def determine_file_path(folder, media_id, file_type):
+    """
+    Determine the file path based on media information.
+    """
+    file_extension = ".webp" if file_type in ["jpeg", "png", "jpg", "webp"] else f".{file_type}"
+    return str(Path(folder) / f"{media_id}{file_extension}")
+
+
+def generate_host_url(base_url, media_id, file_type):
+    """
+    Generate the host URL based on media information.
+    """
+    if file_type == "gif":
+        return f"{base_url}idol/{media_id}.gif"
+    return f"{base_url}{media_id}"
+
 
 
 @check_permission(permission_level=SUPER_PATRON)

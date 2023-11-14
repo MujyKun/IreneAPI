@@ -42,17 +42,14 @@ class PgConnection(DbConnection):
         if isinstance(records, asyncpg.Record):
             return {"results": self.record_to_dict(records)}
 
-        final_dict = {"results": {}}
-        for count, record in enumerate(records):
-            final_dict["results"][count] = self.record_to_dict(record)
+        final_dict = {"results": {count: self.record_to_dict(record) for count, record in enumerate(records)}}
+
         return final_dict
 
-    def record_to_dict(self, record: asyncpg.Record) -> dict:
+    @staticmethod
+    def record_to_dict(record: asyncpg.Record) -> dict:
         """Convert a record to a dict."""
-        final_dict = {}
-        for key, value in record.items():
-            final_dict[key] = value
-        return final_dict
+        return dict(record.items())
 
     async def fetch(self, query: str, *args, **kwargs) -> dict:
         if not query:

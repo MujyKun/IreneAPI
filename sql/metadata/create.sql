@@ -665,3 +665,7 @@ SELECT setval('public.eightball_responseid_seq', (SELECT MAX(responseid) FROM pu
 SELECT setval('public.apiaccess_accessid_seq', (SELECT MAX(accessid) FROM public.apiaccess)+1);
 SELECT setval('public.modes_modeid_seq', (SELECT MAX(modeid) FROM public.modes)+1);
 SELECT setval('public.difficulty_difficultyid_seq', (SELECT MAX(difficultyid) FROM public.difficulty)+1);
+
+CREATE INDEX IF NOT EXISTS idx_affiliationid ON groupmembers.media(affiliationid);
+CREATE INDEX IF NOT EXISTS idx_mediaid ON guessinggame.difficulty(mediaid);
+

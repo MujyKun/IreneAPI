@@ -8,7 +8,10 @@ from aiogoogle import Aiogoogle
 from aiogoogle.auth.creds import ServiceAccountCreds
 import json
 import aiofiles
+import io
 from dataclasses import dataclass
+from PIL import Image
+
 
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 
@@ -182,6 +185,31 @@ class Drive:
                 results = await self.get_results((google.as_service_account(requests)))
             else:
                 results = await google.as_service_account(requests)
+
+    async def convert_to_webp(self, input_path, output_path):
+        # we save all image files as .webp regardless of their actual type.
+        if '.webp' not in input_path:
+            return
+
+        try:
+            async with aiofiles.open(input_path, "rb") as file:
+                image_data = await file.read()
+
+            img = Image.open(io.BytesIO(image_data))
+            # Convert the image to WebP format
+            webp_data = img.convert("RGB")
+            image_buffer = io.BytesIO()
+            webp_data.save(image_buffer, format="WEBP", quality=75)
+            img.close()
+            await self.save_image(output_path, image_buffer.getbuffer())
+        except Exception as e:
+            print(f"Error converting to WebP: {e}")
+
+    @staticmethod
+    async def save_image(path: str, image: memoryview):
+        # to be used instead of Image.save
+        async with aiofiles.open(path, "wb") as file:
+            await file.write(image)
 
     async def upload_file(self, path):
         """Upload a file to google drive."""
