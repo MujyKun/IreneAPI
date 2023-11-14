@@ -18,7 +18,7 @@ from datetime import datetime
 from pathlib import Path
 
 
-DIR_FILE_LIMIT = 250000
+DIR_FILE_LIMIT = 1000000
 _new_photo_counter = 0
 
 
