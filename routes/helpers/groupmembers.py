@@ -208,7 +208,7 @@ def determine_file_path(folder, media_id, file_type):
     """
     Determine the file path based on media information.
     """
-    file_extension = ".webp" if file_type in ["jpeg", "png", "jpg", "webp"] else f".{file_type}"
+    file_extension = ".webp" if file_type in ["jpeg", "png", "jpg", "jfif", "webp"] else f".{file_type}"
     return str(Path(folder) / f"{media_id}{file_extension}")
 
 
