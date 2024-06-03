@@ -50,7 +50,7 @@ class DbConnection:
         try:
             async with aiofiles.open(file_path, mode="r") as file:
                 data = await file.read()
-                if "functions" in file_path.lower() or "views" in file_path.lower():
+                if "functions" in file_path.lower() or "views" in file_path.lower() :
                     return data
 
                 for query in data.split(";"):
@@ -152,6 +152,8 @@ class DbConnection:
         await self.execute_sql_file(
             f"{sql_folder_name}/views/{create_file_name}", use_terminal=use_terminal
         )
+
+        # functions need to be run manually
         # await self.execute_sql_file(f"{sql_folder_name}/functions/{create_file_name}", use_terminal=True)
 
     async def get_connection(self):
