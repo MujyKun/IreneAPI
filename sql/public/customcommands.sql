@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS public.customcommands
     guildid bigint,
     name text,
     content text,
-    PRIMARY KEY (commandid)
+    PRIMARY KEY (commandid),
+    CONSTRAINT customcommands_guildid FOREIGN KEY (guildid) REFERENCES public.guilds(guildid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 ALTER TABLE public.customcommands

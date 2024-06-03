@@ -9,7 +9,7 @@ $$
 
 begin
     RETURN QUERY SELECT tagid
-                 FROM groupmembers.tag
+                 FROM groupmembers.tags
                  WHERE name = t_tagname;
 end;
 $$;

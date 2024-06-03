@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW groupmembers.getgroups AS
+CREATE OR REPLACE VIEW groupmembers.groups_full AS
 SELECT
        g.groupid,
        g.name,

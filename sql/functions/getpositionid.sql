@@ -9,7 +9,7 @@ $$
 
 begin
     RETURN QUERY SELECT positionid
-                 FROM groupmembers.position
+                 FROM groupmembers.positions
                  WHERE name = t_positionname;
 end;
 $$;

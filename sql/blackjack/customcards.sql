@@ -4,7 +4,9 @@ CREATE TABLE IF NOT EXISTS blackjack.customcards
     valueid integer,
     personid integer,
     filename text,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    CONSTRAINT customcards_valueid FOREIGN KEY (valueid) REFERENCES blackjack.cardvalues(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT customcards_personid FOREIGN KEY (personid) REFERENCES groupmembers.persons(personid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 ALTER TABLE blackjack.customcards

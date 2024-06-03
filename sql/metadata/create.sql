@@ -1,7 +1,4 @@
-INSERT INTO groupmembers.bloodtypes(name)
-VALUES ('O'), ('A'), ('B'), ('AB') ON CONFLICT DO NOTHING;
-
-INSERT INTO groupmembers.position(name)
+INSERT INTO groupmembers.positions(name)
 VALUES ('Leader'), ('Vocalist'), ('Lead Vocalist'), ('Main Vocalist'), ('Dancer'), ('Main Dancer'), ('Lead Dancer'),
        ('Sub Vocalist'), ('Former'), ('Rapper'), ('Lead Rapper'), ('Main Rapper') ON CONFLICT DO NOTHING;
 
@@ -606,8 +603,6 @@ INSERT INTO public.languagepacks(languageid, label, message) VALUES
 (8, 'noti_added', 'That phrase is now one of your notification phrases.'),
 (8, 'noti_removed', 'That phrase has been removed from your notification phrases if it existed.'),
 (8, 'noti_list', 'This is a list of your notification phrases in this server:\n:1$PHRASES$1: '),
-(8, 'noti_list', 'This is a list of your notification phrases in this server:\n:1$PHRASES$1: '),
-(8, 'noti_list', 'This is a list of your notification phrases in this server:\n:1$PHRASES$1: '),
 (8, 'interaction_type_exists', 'That interaction type already exists.'),
 (8, 'interaction_type_does_not_exist', 'That interaction type does not exist.'),
 (8, 'interaction_type_added', 'That interaction type has been added.'),
@@ -685,36 +680,36 @@ CREATE INDEX IF NOT EXISTS idx_userstatus_statusid ON public.userstatus (statusi
 CREATE INDEX IF NOT EXISTS idx_winners_personid_userid ON biasgame.winners (personid, userid);
 CREATE INDEX IF NOT EXISTS idx_filtered_userid ON guessinggame.filtered (userid);
 CREATE INDEX IF NOT EXISTS idx_difficulty_mediaid ON guessinggame.difficulty (mediaid);
-CREATE INDEX IF NOT EXISTS idx_affiliation_affiliationid ON groupmembers.affiliation (affiliationid);
+CREATE INDEX IF NOT EXISTS idx_affiliation_affiliationid ON groupmembers.affiliations (affiliationid);
 CREATE INDEX IF NOT EXISTS idx_automedia_affiliationid ON groupmembers.automedia (affiliationid);
 CREATE INDEX IF NOT EXISTS idx_banphrases_guildid ON public.banphrases (guildid);
 CREATE INDEX IF NOT EXISTS idx_channels_guildid ON public.channels (guildid);
-CREATE INDEX IF NOT EXISTS idx_company_companyid ON groupmembers.company (companyid);
-CREATE INDEX IF NOT EXISTS idx_display_displayid ON groupmembers.display (displayid);
+CREATE INDEX IF NOT EXISTS idx_company_companyid ON groupmembers.companies (companyid);
+CREATE INDEX IF NOT EXISTS idx_display_displayid ON groupmembers.displays (displayid);
 CREATE INDEX IF NOT EXISTS idx_grouptags_groupid ON groupmembers.grouptags (groupid);
 CREATE INDEX IF NOT EXISTS idx_groupaliases_groupid ON groupmembers.groupaliases (groupid);
 CREATE INDEX IF NOT EXISTS idx_groups_groupid ON groupmembers.groups (groupid);
 CREATE INDEX IF NOT EXISTS idx_guilds_guildid ON public.guilds (guildid);
 CREATE INDEX IF NOT EXISTS idx_languages_languageid ON public.languages (languageid);
-CREATE INDEX IF NOT EXISTS idx_location_locationid ON groupmembers.location (locationid);
 CREATE INDEX IF NOT EXISTS idx_media_mediaid ON groupmembers.media (mediaid);
-CREATE INDEX IF NOT EXISTS idx_name_nameid ON groupmembers.name (nameid);
+CREATE INDEX IF NOT EXISTS idx_name_nameid ON groupmembers.names (nameid);
 CREATE INDEX IF NOT EXISTS idx_notifications_guildid_userid ON public.notifications (guildid, userid);
 CREATE INDEX IF NOT EXISTS idx_patron_userid ON public.patron (userid);
 CREATE INDEX IF NOT EXISTS idx_superpatron_userid ON public.superpatron (userid);
 CREATE INDEX IF NOT EXISTS idx_personaliases_personid ON groupmembers.personaliases (personid);
-CREATE INDEX IF NOT EXISTS idx_person_personid ON groupmembers.person (personid);
+CREATE INDEX IF NOT EXISTS idx_person_personid ON groupmembers.persons (personid);
 CREATE INDEX IF NOT EXISTS idx_persontags_personid ON groupmembers.persontags (personid);
-CREATE INDEX IF NOT EXISTS idx_position_positionid ON groupmembers.position (positionid);
+CREATE INDEX IF NOT EXISTS idx_position_positionid ON groupmembers.positions (positionid);
 CREATE INDEX IF NOT EXISTS idx_guildprefixes_guildid ON public.guildprefixes (guildid);
 CREATE INDEX IF NOT EXISTS idx_reactionroles_messageid ON public.reactionroles (messageid);
 CREATE INDEX IF NOT EXISTS idx_reminders_id ON public.reminders (id);
 CREATE INDEX IF NOT EXISTS idx_socialmedia_socialid ON groupmembers.socialmedia (socialid);
-CREATE INDEX IF NOT EXISTS idx_tag_tagid ON groupmembers.tag (tagid);
+CREATE INDEX IF NOT EXISTS idx_tag_tagid ON groupmembers.tags (tagid);
 CREATE INDEX IF NOT EXISTS idx_tiktokfollowage_username ON public.tiktokfollowage (username);
 CREATE INDEX IF NOT EXISTS idx_twitchfollowage_username ON public.twitchfollowage (username);
 CREATE INDEX IF NOT EXISTS idx_apitokens_userid ON public.apitokens (userid);
 CREATE INDEX IF NOT EXISTS idx_lastfm_userid ON public.lastfm (userid);
 CREATE INDEX IF NOT EXISTS idx_timezones_id ON public.timezones (id);
 CREATE INDEX IF NOT EXISTS idx_levels_userid ON public.levels (userid);
+CREATE INDEX IF NOT EXISTS idx_affiliationid ON groupmembers.affiliation_positions (affiliationid);
 

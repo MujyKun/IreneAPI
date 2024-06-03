@@ -396,7 +396,7 @@ class Group(BaseEntity):
     def create_company(self):
         if self.company:
             n_cursor.execute(
-                "SELECT companyid FROM groupmembers.company WHERE name = %s",
+                "SELECT companyid FROM groupmembers.companies WHERE name = %s",
                 (self.company.upper(),),
             )
             company = n_cursor.fetchone()
@@ -414,36 +414,36 @@ class Group(BaseEntity):
 def full_reset():
     """Reset Sequences and Tables"""
     sql_queries = [
-        "DELETE FROM groupmembers.name;",
+        "DELETE FROM groupmembers.names;",
         "DELETE FROM groupmembers.dates;",
         "DELETE FROM groupmembers.socialmedia;",
-        "DELETE FROM groupmembers.display;",
-        "DELETE FROM groupmembers.location;",
-        "DELETE FROM groupmembers.person;",
+        "DELETE FROM groupmembers.displays;",
+        "DELETE FROM groupmembers.locations;",
+        "DELETE FROM groupmembers.persons;",
         "DELETE FROM groupmembers.tag;",
         "DELETE FROM groupmembers.persontags;",
-        "DELETE FROM groupmembers.company;",
+        "DELETE FROM groupmembers.companies;",
         "DELETE FROM groupmembers.groups;",
         "DELETE FROM groupmembers.grouptags;",
         "DELETE FROM groupmembers.personaliases;",
         "DELETE FROM groupmembers.groupaliases;",
-        "DELETE FROM groupmembers.affiliation;",
+        "DELETE FROM groupmembers.affiliations;",
         "DELETE FROM groupmembers.media;",
         "DELETE FROM groupmembers.fandom;",
         "DELETE FROM interactions.media;",
         "DELETE FROM interactions.interactiontypes;",
-        "ALTER SEQUENCE groupmembers.name_nameid_seq RESTART;",
+        "ALTER SEQUENCE groupmembers.names_nameid_seq RESTART;",
         "ALTER SEQUENCE groupmembers.dates_dateid_seq RESTART;",
         "ALTER SEQUENCE groupmembers.socialmedia_socialid_seq RESTART;",
-        "ALTER SEQUENCE groupmembers.display_displayid_seq RESTART;",
-        "ALTER SEQUENCE groupmembers.location_locationid_seq RESTART;",
-        "ALTER SEQUENCE groupmembers.person_personid_seq RESTART;",
+        "ALTER SEQUENCE groupmembers.displays_displayid_seq RESTART;",
+        "ALTER SEQUENCE groupmembers.locations_locationid_seq RESTART;",
+        "ALTER SEQUENCE groupmembers.persons_personid_seq RESTART;",
         "ALTER SEQUENCE groupmembers.tag_tagid_seq RESTART;",
         "ALTER SEQUENCE groupmembers.groups_groupid_seq RESTART;",
-        "ALTER SEQUENCE groupmembers.company_companyid_seq RESTART;",
+        "ALTER SEQUENCE groupmembers.companies_companyid_seq RESTART;",
         "ALTER SEQUENCE groupmembers.personaliases_aliasid_seq RESTART;",
         "ALTER SEQUENCE groupmembers.groupaliases_aliasid_seq RESTART;",
-        "ALTER SEQUENCE groupmembers.affiliation_affiliationid_seq RESTART;",
+        "ALTER SEQUENCE groupmembers.affiliations_affiliationid_seq RESTART;",
         "ALTER SEQUENCE groupmembers.media_mediaid_seq RESTART;",
         "ALTER SEQUENCE interactions.interactiontypes_typeid_seq RESTART;",
     ]
@@ -530,10 +530,10 @@ def handle_avatars_and_banners(groups=False):
     make_avatar_and_banner_folders()
     if not groups:
         folder_name = "person"
-        sql_ = "SELECT p.personid, d.avatar, d.banner, d.displayid FROM groupmembers.person p LEFT JOIN groupmembers.display d ON d.displayid = p.displayid WHERE AVATAR IS NOT NULL OR BANNER IS NOT NULL"
+        sql_ = "SELECT p.personid, d.avatar, d.banner, d.displayid FROM groupmembers.person p LEFT JOIN groupmembers.displays d ON d.displayid = p.displayid WHERE AVATAR IS NOT NULL OR BANNER IS NOT NULL"
     else:
         folder_name = "group"
-        sql_ = "SELECT g.groupid, d.avatar, d.banner, d.displayid FROM groupmembers.groups g LEFT JOIN groupmembers.display d ON d.displayid = g.displayid WHERE AVATAR IS NOT NULL OR BANNER IS NOT NULL"
+        sql_ = "SELECT g.groupid, d.avatar, d.banner, d.displayid FROM groupmembers.groups g LEFT JOIN groupmembers.displays d ON d.displayid = g.displayid WHERE AVATAR IS NOT NULL OR BANNER IS NOT NULL"
 
     n_cursor.execute(sql_)
     display_data = n_cursor.fetchall()
@@ -546,7 +546,7 @@ def handle_avatars_and_banners(groups=False):
             avatar_url = f"{image_host}avatar/{folder_name}/{file_name}"
             copy_file(f"{avatar_location}/{original_file_name}", new_avatar_loc)
             n_cursor.execute(
-                "UPDATE groupmembers.display SET avatar = %s WHERE displayid = %s",
+                "UPDATE groupmembers.displays SET avatar = %s WHERE displayid = %s",
                 (avatar_url, display_id),
             )
         if banner_url:
@@ -556,7 +556,7 @@ def handle_avatars_and_banners(groups=False):
             banner_url = f"{image_host}banner/{folder_name}/{file_name}"
             copy_file(f"{banner_location}/{original_file_name}", new_banner_loc)
             n_cursor.execute(
-                "UPDATE groupmembers.display SET banner = %s WHERE displayid = %s",
+                "UPDATE groupmembers.displays SET banner = %s WHERE displayid = %s",
                 (banner_url, display_id),
             )
     new_db.commit()

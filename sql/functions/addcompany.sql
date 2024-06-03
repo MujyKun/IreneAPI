@@ -7,7 +7,7 @@ declare
     t_company_id integer;
 begin
 
-    INSERT INTO groupmembers.company(name, description, dateid)
+    INSERT INTO groupmembers.companies(name, description, dateid)
     VALUES(t_name, t_description, t_dateid) returning companyid INTO t_company_id;
     return t_company_id;
 end;

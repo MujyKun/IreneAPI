@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS groupmembers.dates
     dateid serial,
     startdate timestamp,
     enddate timestamp,
-    PRIMARY KEY (dateid)
+    PRIMARY KEY (dateid),
+    CONSTRAINT unique_dates UNIQUE (startdate, enddate)
 );
 
 ALTER TABLE groupmembers.dates

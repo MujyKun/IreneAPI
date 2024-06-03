@@ -2,7 +2,8 @@ CREATE TABLE IF NOT EXISTS public.lastfm
 (
     userid bigint,
     username text,
-    PRIMARY KEY (userid)
+    PRIMARY KEY (userid),
+    CONSTRAINT lastfm_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 ALTER TABLE public.lastfm

@@ -4,6 +4,6 @@ create or replace function groupmembers.deletecompany(t_company_id integer)
 as
 $$
 begin
-    DELETE FROM groupmembers.company WHERE companyid = t_company_id;
+    DELETE FROM groupmembers.companies WHERE companyid = t_company_id;
 end;
 $$;

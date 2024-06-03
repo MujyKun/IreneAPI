@@ -8,7 +8,7 @@ declare
     t_affiliation_id integer;
 begin
 
-    INSERT INTO groupmembers.affiliation(personid, groupid, positionids, stagename)
+    INSERT INTO groupmembers.affiliations(personid, groupid, positionids, stagename)
     VALUES(t_personid, t_groupid, t_position_ids, t_stagename) returning affiliationid INTO t_affiliation_id;
     return t_affiliation_id;
 end;

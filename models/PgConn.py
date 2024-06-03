@@ -1,3 +1,5 @@
+import logging
+
 import asyncpg
 from . import DbConnection
 from typing import Optional

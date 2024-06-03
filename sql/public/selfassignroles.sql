@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS public.selfassignroles
     roleid bigint,
     channelid bigint,
     name text,
-    PRIMARY KEY (roleid)
+    PRIMARY KEY (roleid),
+    CONSTRAINT selfassignroles_channelid FOREIGN KEY (channelid) REFERENCES public.channels(channelid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 ALTER TABLE public.selfassignroles

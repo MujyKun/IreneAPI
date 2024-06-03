@@ -3,7 +3,9 @@ CREATE TABLE IF NOT EXISTS groupmembers.automedia
     channelid bigint,
     affiliationid integer,
     hoursafter integer,
-    PRIMARY KEY (channelid, affiliationid)
+    PRIMARY KEY (channelid, affiliationid),
+    CONSTRAINT automedia_channelid FOREIGN KEY (channelid) REFERENCES public.channels(channelid) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT automedia_affid FOREIGN KEY (affiliationid) REFERENCES groupmembers.affiliations(affiliationid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 ALTER TABLE groupmembers.automedia

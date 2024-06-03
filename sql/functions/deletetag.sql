@@ -4,6 +4,6 @@ create or replace function groupmembers.deletetag(t_tag_id integer)
 as
 $$
 begin
-    DELETE FROM groupmembers.tag WHERE tagid = t_tag_id;
+    DELETE FROM groupmembers.tags WHERE tagid = t_tag_id;
 end;
 $$;

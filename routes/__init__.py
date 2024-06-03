@@ -185,7 +185,6 @@ async def login(
 
 
 from .affiliation import affiliation
-from .bloodtype import bloodtype
 from .company import company
 from .date import date
 from .display import display
@@ -220,7 +219,6 @@ from .banphrases import ban_phrases
 
 blueprints = [
     affiliation,
-    bloodtype,
     company,
     date,
     display,

@@ -7,7 +7,7 @@ declare
     t_name_id integer;
 begin
 
-    INSERT INTO groupmembers.name(firstname, lastname)
+    INSERT INTO groupmembers.names(firstname, lastname)
     VALUES(t_firstname, t_lastname) returning nameid INTO t_name_id;
     return t_name_id;
 end;

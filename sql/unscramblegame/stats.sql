@@ -4,7 +4,9 @@ CREATE TABLE IF NOT EXISTS unscramblegame.stats
     modeid integer,
     difficultyid integer,
     value integer,
-    PRIMARY KEY (value)
+    PRIMARY KEY (value),
+    CONSTRAINT us_stats_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT us_stats_modeid FOREIGN KEY (modeid) REFERENCES modes(modeid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 ALTER TABLE unscramblegame.stats

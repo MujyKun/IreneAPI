@@ -1,5 +1,5 @@
 from os import listdir
-from os.path import isdir
+from os.path import isdir, exists
 import aiofiles
 import asyncpg.exceptions
 
@@ -89,13 +89,23 @@ class DbConnection:
         :param login_payload: The login payload to pass into the concrete class.
         """
 
-    async def update_db_structure(self, use_terminal=True):
-        """Attempt to create/update the DB structure."""
+    async def update_db_structure(self, use_terminal=True, use_ddl=True):
+        """
+        Attempt to create/update the DB structure.
+
+        :param use_terminal: Whether to use the terminal to run the sql scripts
+        :param use_ddl: Whether to also use ddl scripts to create the database at the start.
+        """
         sql_folder_name = "sql"
         create_file_name = "create.sql"
+        ddl_file_name = "database.ddl"
         inexecutable_function_queries = ""
         inexecutable_view_queries = ""
         execute_later = ["metadata", "constraints"]
+        ddl_file_path = f"{sql_folder_name}/{ddl_file_name}"
+        if use_ddl and exists(ddl_file_path):
+            await self.execute_sql_file(ddl_file_path, use_terminal=use_terminal)
+
         for file in listdir(sql_folder_name):
             if file in execute_later:
                 continue
@@ -134,13 +144,13 @@ class DbConnection:
             await manual_file.write(inexecutable_view_queries)
 
         await self.execute_sql_file(
-            f"{sql_folder_name}/metadata/{create_file_name}", use_terminal=True
+            f"{sql_folder_name}/metadata/{create_file_name}", use_terminal=use_terminal
         )
         await self.execute_sql_file(
-            f"{sql_folder_name}/constraints/{create_file_name}", use_terminal=True
+            f"{sql_folder_name}/constraints/{create_file_name}", use_terminal=use_terminal
         )
         await self.execute_sql_file(
-            f"{sql_folder_name}/views/{create_file_name}", use_terminal=True
+            f"{sql_folder_name}/views/{create_file_name}", use_terminal=use_terminal
         )
         # await self.execute_sql_file(f"{sql_folder_name}/functions/{create_file_name}", use_terminal=True)
 
