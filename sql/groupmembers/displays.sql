@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS groupmembers.displays
     avatar text,
     banner text,
     PRIMARY KEY (displayid),
-    CONSTRAINT unique_display UNIQUE (avatar, banner)
+    UNIQUE (avatar, banner)
 );
 
 ALTER TABLE groupmembers.displays

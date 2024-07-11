@@ -18,7 +18,7 @@ from models import Requestor
 async def get_noti(requestor: Requestor, noti_id: int):
     is_int64(noti_id)
     return await self.db.fetch_row(
-        "SELECT * FROM public.getnotifications WHERE notiid = $1", noti_id
+        "SELECT * FROM public.notifications WHERE notiid = $1", noti_id
     )
 
 
@@ -30,7 +30,7 @@ async def delete_noti(requestor: Requestor, noti_id: int):
 
 @check_permission(permission_level=DEVELOPER)
 async def get_notifications(requestor: Requestor):
-    return await self.db.fetch("SELECT * FROM public.getnotifications")
+    return await self.db.fetch("SELECT * FROM public.notifications")
 
 
 @check_permission(permission_level=DEVELOPER)

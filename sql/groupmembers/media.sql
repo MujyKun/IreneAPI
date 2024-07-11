@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS groupmembers.media
     enabled boolean,
     nsfw boolean,
     PRIMARY KEY (mediaid),
-    CONSTRAINT media_affiliationid FOREIGN KEY (affiliationid) REFERENCES groupmembers.affiliations(affiliationid) ON DELETE CASCADE ON UPDATE CASCADE,
     UNIQUE (link, affiliationid)
 );
 

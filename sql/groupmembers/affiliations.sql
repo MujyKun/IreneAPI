@@ -5,9 +5,7 @@ CREATE TABLE IF NOT EXISTS groupmembers.affiliations
     groupid integer NOT NULL,
     stagename text,
     active boolean DEFAULT true,
-    PRIMARY KEY (affiliationid, personid, groupid),
-    CONSTRAINT affiliation_groupid FOREIGN KEY (groupid) REFERENCES groupmembers.groups(groupid) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT affiliation_personid FOREIGN KEY (personid) REFERENCES groupmembers.persons(personid) ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY (affiliationid, personid, groupid)
 );
 
 ALTER TABLE groupmembers.affiliations

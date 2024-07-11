@@ -72,7 +72,7 @@ class GeneralUnscrambleGame(Resource):
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.add_us(
             requestor,
-            date_id=request.args.get("date_id"),
+            start_date=request.args.get("start_date"),
             status_ids=request.args.get("status_ids"),
             mode_id=request.args.get("mode_id"),
             difficulty_id=request.args.get("difficulty_id"),

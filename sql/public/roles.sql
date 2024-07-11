@@ -3,8 +3,7 @@ CREATE TABLE IF NOT EXISTS public.roles
     roleid bigint,
     typeids integer[],
     guildid bigint,
-    PRIMARY KEY (roleid),
-    CONSTRAINT roles_guildid FOREIGN KEY (guildid) REFERENCES public.guilds(guildid) ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY (roleid)
 );
 
 ALTER TABLE public.roles

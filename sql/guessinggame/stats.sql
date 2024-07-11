@@ -4,8 +4,7 @@ CREATE TABLE IF NOT EXISTS guessinggame.stats
     modeid integer,
     difficultyid integer,
     value integer,
-    PRIMARY KEY (userid),
-    CONSTRAINT gg_stats_modeid FOREIGN KEY (modeid) REFERENCES modes(modeid) ON DELETE SET NULL ON UPDATE CASCADE
+    PRIMARY KEY (userid)
 );
 
 ALTER TABLE guessinggame.stats

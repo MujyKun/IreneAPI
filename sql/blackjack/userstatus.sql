@@ -5,8 +5,7 @@ CREATE TABLE IF NOT EXISTS blackjack.userstatus
     stand boolean,
     cards integer[],
     bid text,
-    PRIMARY KEY (statusid, userid),
-    CONSTRAINT bj_userstatus_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY (statusid, userid)
 );
 
 ALTER TABLE blackjack.userstatus

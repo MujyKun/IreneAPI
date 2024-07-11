@@ -1,7 +1,8 @@
 CREATE OR REPLACE VIEW groupmembers.persons_full AS
     SELECT
     p.personid,
-    p.dateid,
+    p.birthdate,
+    p.deathdate,
     p.nameid,
     p.formernameid,
     p.displayid,

@@ -5,8 +5,7 @@ CREATE TABLE IF NOT EXISTS public.levels
     daily integer,
     beg integer,
     profile integer,
-    PRIMARY KEY (userid),
-    CONSTRAINT levels_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY (userid)
 );
 
 ALTER TABLE public.levels

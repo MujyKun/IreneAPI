@@ -18,7 +18,7 @@ from models import Requestor
 async def get_ban_phrase(requestor: Requestor, phrase_id: int):
     is_int64(phrase_id)
     return await self.db.fetch_row(
-        "SELECT * FROM public.getbanphrases WHERE phraseid = $1", phrase_id
+        "SELECT * FROM public.banphrases WHERE phraseid = $1", phrase_id
     )
 
 
@@ -30,7 +30,7 @@ async def delete_ban_phrase(requestor: Requestor, phrase_id: int):
 
 @check_permission(permission_level=DEVELOPER)
 async def get_ban_phrases(requestor: Requestor):
-    return await self.db.fetch("SELECT * FROM public.getbanphrases")
+    return await self.db.fetch("SELECT * FROM public.banphrases")
 
 
 @check_permission(permission_level=DEVELOPER)

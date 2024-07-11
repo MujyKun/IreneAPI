@@ -3,10 +3,10 @@ CREATE TABLE IF NOT EXISTS groupmembers.companies
     companyid serial,
     name text,
     description text,
-    dateid integer,
+    startdate timestamp,
+    enddate timestamp,
     PRIMARY KEY (companyid),
-    CONSTRAINT unique_company_name UNIQUE (name),
-    CONSTRAINT company_dateid FOREIGN KEY (dateid) REFERENCES groupmembers.dates(dateid) ON DELETE SET NULL ON UPDATE CASCADE
+    UNIQUE (name)
 );
 
 ALTER TABLE groupmembers.companies

@@ -4,8 +4,7 @@ CREATE TABLE IF NOT EXISTS blackjack.games
     channelid bigint,
     statusids integer[],
     active boolean,
-    PRIMARY KEY (gameid),
-    CONSTRAINT games_channelid FOREIGN KEY (channelid) REFERENCES public.channels(channelid) ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY (gameid)
 );
 
 ALTER TABLE blackjack.games

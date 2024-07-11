@@ -2,8 +2,7 @@ CREATE TABLE IF NOT EXISTS public.tempchannels
 (
     channelid bigint,
     delay integer,
-    PRIMARY KEY (channelid),
-    CONSTRAINT tempchannels_channelid FOREIGN KEY (channelid) REFERENCES public.channels(channelid) ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY (channelid)
 );
 
 ALTER TABLE public.tempchannels

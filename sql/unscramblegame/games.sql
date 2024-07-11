@@ -1,13 +1,12 @@
 CREATE TABLE IF NOT EXISTS unscramblegame.games
 (
     gameid serial,
-    dateid integer,
     statusids integer[],
     modeid integer,
     difficultyid integer,
-    PRIMARY KEY (gameid),
-    CONSTRAINT us_games_dateid FOREIGN KEY (dateid) REFERENCES groupmembers.dates(dateid) ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT us_games_modeid FOREIGN KEY (modeid) REFERENCES modes(modeid) ON DELETE CASCADE ON UPDATE CASCADE
+    startdate timestamp,
+    enddate timestamp,
+    PRIMARY KEY (gameid)
 );
 
 ALTER TABLE unscramblegame.games

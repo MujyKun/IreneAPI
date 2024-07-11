@@ -28,7 +28,7 @@ async def process_active_ws(wss):
 
 @websocket_blueprint.websocket("/ws_site")
 async def ws_site():
-    """Some frameworks (such as axios or fetch) cannot add extra headers,
+    """Some methods in web frameworks (such as axios or fetch) cannot add extra headers,
     so a workaround is created by accepting the websocket connection early."""
     await websocket.accept()
     login_data = await websocket.receive_json()
@@ -113,7 +113,7 @@ async def process_ws_data(socket: WebSocketSession, data: dict) -> dict:
         result["callback_id"] = callback_id
         return result
     except Exception as e:
-        print(e)
+        print(f"Error: {e} -> {data}")
         response["error"] = f"{e}"
         response["results"] = None
 

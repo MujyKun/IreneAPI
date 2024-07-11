@@ -1,8 +1,7 @@
 CREATE TABLE IF NOT EXISTS public.datamods
 (
     userid bigint,
-    PRIMARY KEY (userid),
-    CONSTRAINT datamods_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY (userid)
 );
 
 ALTER TABLE public.datamods

@@ -3,8 +3,7 @@ CREATE TABLE IF NOT EXISTS guessinggame.filtered
     userid bigint,
     groupids integer[],
     personids integer[],
-    PRIMARY KEY (userid),
-    CONSTRAINT filteredgroups_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY (userid)
 );
 
 ALTER TABLE guessinggame.filtered

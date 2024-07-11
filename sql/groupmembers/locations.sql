@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS groupmembers.locations
     country text,
     city text,
     PRIMARY KEY (locationid),
-    CONSTRAINT ensure_country_or_city CHECK (country IS NOT NULL AND city IS NOT NULL),
     UNIQUE (country, city)
 );
 

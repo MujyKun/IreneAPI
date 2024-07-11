@@ -1,4 +1,5 @@
 import concurrent.futures
+from typing import Literal
 
 from . import (
     self,
@@ -10,6 +11,7 @@ from . import (
     SUPER_PATRON,
     FRIEND,
     USER,
+    convert_to_date
 )
 from models import Requestor
 from resources import drive
@@ -72,7 +74,7 @@ async def delete_person(requestor: Requestor, person_id: int) -> dict:
     )
 
 
-async def _get_media_info(object_id: int, object_id_type="person") -> dict:
+async def _get_media_info(object_id: int, object_id_type: Literal['person', 'affiliation', 'group', 'media'] = "person") -> dict:
     """
     Get the media information for a person, group, or affiliation.
 
@@ -82,6 +84,7 @@ async def _get_media_info(object_id: int, object_id_type="person") -> dict:
     NOTE: object_id_type can also support the input of "media", but is suited for "person", "affiliation", or "group".
     """
     is_int64(object_id)
+    assert object_id_type in ['person', 'affiliation', 'group', 'media'], f"Unknown Media Type - {object_id_type}"
     return await self.db.fetch(
         f"SELECT * FROM groupmembers.media_full WHERE {object_id_type}id = $1", object_id
     )
@@ -221,7 +224,6 @@ def generate_host_url(base_url, media_id, file_type):
     return f"{base_url}{media_id}"
 
 
-
 @check_permission(permission_level=SUPER_PATRON)
 async def generate_media_person(
     requestor: Requestor,
@@ -307,25 +309,28 @@ async def get_group(requestor: Requestor, group_id: int) -> dict:
 async def add_group(
     requestor: Requestor,
     group_name,
-    date_id,
     description,
     company_id,
     display_id,
     website,
     social_id,
     tag_ids,
+    debut_date,
+    disband_date
 ) -> dict:
     """Add a group."""
+
     results = await self.db.fetch_row(
-        "SELECT * FROM groupmembers.addgroup($1, $2, $3, $4, $5, $6, $7, $8)",
+        "SELECT * FROM groupmembers.addgroup($1, $2, $3, $4, $5, $6, $7, $8, $9)",
         group_name,
-        date_id,
         description,
         company_id,
         display_id,
         website,
         social_id,
         tag_ids,
+        convert_to_date(debut_date),
+        convert_to_date(disband_date)
     )
     if results:
         t_results = results.get("results")
@@ -339,7 +344,6 @@ async def add_group(
 @check_permission(permission_level=DEVELOPER)
 async def add_person(
     requestor: Requestor,
-    date_id,
     name_id,
     former_name_id,
     gender,
@@ -351,11 +355,12 @@ async def add_person(
     tag_ids,
     blood_type,
     call_count,
+    birth_date,
+    death_date,
 ) -> dict:
     """Add a person."""
     results = await self.db.fetch_row(
-        "SELECT * FROM groupmembers.addperson($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
-        date_id,
+        "SELECT * FROM groupmembers.addperson($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
         name_id,
         former_name_id,
         gender,
@@ -366,6 +371,8 @@ async def add_person(
         location_id,
         blood_type,
         call_count,
+        convert_to_date(birth_date),
+        convert_to_date(death_date),
     )
     if results:
         t_results = results.get("results")
@@ -432,82 +439,6 @@ async def delete_tag(requestor: Requestor, tag_id) -> dict:
 
 
 @check_permission(permission_level=USER)
-async def get_date(requestor: Requestor, date_id: int) -> dict:
-    """Get a date's information."""
-    is_int64(date_id)
-    data = await self.db.fetch_row(
-        "SELECT * FROM groupmembers.dates WHERE dateid = $1", date_id
-    )
-
-    return await fix_dates(data, fetch_row=True)
-
-
-async def fix_dates(fetched_results, fetch_row=False):
-    """Fix the dates that are sent over the network."""
-
-    # There is a weird middleman conversion issue when being sent across the network that causes
-    # python to assume the timestamp is actually in the local timezone and not by default GMT.
-    # So on the wrapper, it would attempt to automatically convert from the local timezone to GMT,
-    # when it is in fact already in GMT. This may be due to the fact that we are passing in a datetime object that
-    # was created by the database wrapper. To fix this, we reiterate through the results and convert the timestamps
-    # to a string to avoid the built-in datetime automatic conversions when sent across the network.
-    final_dates = {"results": dict()}
-    results_generator = (
-        fetched_results.get("results").values()
-        if not fetch_row
-        else [fetched_results.get("results")]
-    )
-    for idx, row in enumerate(results_generator):
-        date_id = row["dateid"]
-        start_date = row["startdate"]
-        end_date = row["enddate"]
-        str_start_date = str(start_date) if start_date else None
-        str_end_date = str(end_date) if end_date else None
-        finalized_row = {
-            "dateid": date_id,
-            "startdate": str_start_date,
-            "enddate": str_end_date,
-        }
-        if not fetch_row:
-            final_dates["results"].update({idx: finalized_row})
-        else:
-            final_dates["results"] = finalized_row
-    return final_dates
-
-
-@check_permission(permission_level=USER)
-async def get_dates(requestor: Requestor) -> dict:
-    """Get all date information."""
-    return await fix_dates(await self.db.fetch("SELECT * FROM groupmembers.dates"))
-
-
-@check_permission(permission_level=DEVELOPER)
-async def add_date(requestor: Requestor, start_date: str, end_date: str) -> dict:
-    """Add date information."""
-    start_date = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S.%f")
-    if end_date:
-        end_date = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S.%f")
-    return await self.db.fetch_row(
-        "SELECT * FROM groupmembers.adddate($1, $2)", start_date, end_date
-    )
-
-
-@check_permission(permission_level=DEVELOPER)
-async def update_date(requestor: Requestor, date_id: int, end_date: str) -> dict:
-    """Update the end date."""
-    end_date = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S.%f")
-    return await self.db.fetch_row(
-        "SELECT * FROM groupmembers.updatedate($1, $2)", date_id, end_date
-    )
-
-
-@check_permission(permission_level=DEVELOPER)
-async def delete_date(requestor: Requestor, date_id) -> dict:
-    """Delete date information."""
-    return await self.db.execute("SELECT * FROM groupmembers.deletedate($1)", date_id)
-
-
-@check_permission(permission_level=USER)
 async def get_name(requestor: Requestor, name_id: int) -> dict:
     """Get a name's information."""
     is_int64(name_id)
@@ -552,10 +483,11 @@ async def get_companies(requestor: Requestor) -> dict:
 
 
 @check_permission(permission_level=DEVELOPER)
-async def add_company(requestor: Requestor, name: str, description: str, date_id: int):
+async def add_company(requestor: Requestor, name: str, description: str, start_date: str, end_date: str):
     """Add a company."""
     return await self.db.execute(
-        "SELECT groupmembers.addcompany($1, $2, $3)", name, description, date_id
+        "SELECT groupmembers.addcompany($1, $2, $3, $4)", name, description, convert_to_date(start_date),
+        convert_to_date(end_date)
     )
 
 

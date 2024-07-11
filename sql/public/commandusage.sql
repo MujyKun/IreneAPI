@@ -3,8 +3,7 @@ CREATE TABLE IF NOT EXISTS public.commandusage
     sessionid integer,
     commandname text,
     count integer,
-    PRIMARY KEY (sessionid, commandname),
-    CONSTRAINT commandusage_sessionid FOREIGN KEY (sessionid) REFERENCES public.sessions(sessionid) ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY (sessionid, commandname)
 );
 
 ALTER TABLE public.commandusage

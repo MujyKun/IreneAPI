@@ -4,10 +4,10 @@ CREATE TABLE IF NOT EXISTS groupmembers.names
     firstname text,
     lastname text,
     PRIMARY KEY (nameid),
-    CONSTRAINT unique_name UNIQUE (firstname, lastname)
+    CONSTRAINT names_firstname_lastname_not_null CHECK (firstname IS NOT NULL AND lastname IS NOT NULL)
 );
 
 ALTER TABLE groupmembers.names
     OWNER to postgres;
 COMMENT ON TABLE groupmembers.names
-    IS 'Contains a first and last name. Useful for people with several names. ';
+    IS 'Contains a first and last name. Useful for persons with several names.';

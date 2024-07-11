@@ -2,7 +2,8 @@ CREATE OR REPLACE VIEW groupmembers.groups_full AS
 SELECT
        g.groupid,
        g.name,
-       g.dateid,
+       g.debutdate,
+       g.disbanddate,
        g.description,
        g.companyid,
        g.displayid,

@@ -4,8 +4,7 @@ CREATE TABLE IF NOT EXISTS public.logging
     channelids bigint[],
     active boolean,
     sendall boolean,
-    PRIMARY KEY (guildid),
-    CONSTRAINT logging_guildid FOREIGN KEY (guildid) REFERENCES public.guilds(guildid) ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY (guildid)
 );
 
 ALTER TABLE public.logging

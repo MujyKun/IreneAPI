@@ -4,8 +4,7 @@ CREATE TABLE IF NOT EXISTS public.twitchfollowage
     channelid bigint,
     posted boolean,
     roleid bigint,
-    PRIMARY KEY (username, channelid),
-    CONSTRAINT twitchfollowage_channelid FOREIGN KEY (channelid) REFERENCES public.channels(channelid) ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY (username, channelid)
 );
 
 ALTER TABLE public.twitchfollowage

@@ -6,8 +6,7 @@ CREATE TABLE IF NOT EXISTS public.apiusage
     response text,
     args text,
     kwargs text,
-    PRIMARY KEY (time, func, userid),
-    CONSTRAINT usage_userid FOREIGN KEY (userid) REFERENCES public.users(userid) ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY (time, func, userid)
 );
 
 ALTER TABLE public.apiusage
