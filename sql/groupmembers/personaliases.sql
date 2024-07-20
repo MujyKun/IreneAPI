@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS groupmembers.personaliases
     alias text,
     personid integer,
     guildid bigint,
-    PRIMARY KEY (aliasid)
+    PRIMARY KEY (aliasid),
+    UNIQUE (alias, personid, guildid)
 );
 
 ALTER TABLE groupmembers.personaliases

@@ -19,13 +19,13 @@ from resources import tiktok as tiktok_obj
 @check_permission(permission_level=DEVELOPER)
 async def get_tiktok_accounts(requestor: Requestor) -> dict:
     """Get all TikTok accounts."""
-    return await self.db.fetch("SELECT * FROM public.gettiktokchannels")
+    return await self.db.fetch("SELECT * FROM public.tiktokfollowage")
 
 
 @check_permission(permission_level=DEVELOPER)
 async def get_tiktok_account(requestor: Requestor, username) -> dict:
     """Get a TikTok account."""
-    return await self.db.fetch_row("SELECT * FROM public.gettiktokchannels WHERE username = $1", username)
+    return await self.db.fetch_row("SELECT * FROM public.tiktokfollowage WHERE username = $1", username)
 
 
 @check_permission(permission_level=DEVELOPER)

@@ -1,13 +1,14 @@
-CREATE OR REPLACE VIEW groupmembers.getpersons AS
+CREATE OR REPLACE VIEW groupmembers.persons_full AS
     SELECT
     p.personid,
-    p.dateid,
+    p.birthdate,
+    p.deathdate,
     p.nameid,
     p.formernameid,
     p.displayid,
     p.socialid,
     p.locationid,
-    p.bloodid,
+    p.bloodtype,
     gender,
     description,
     height,
@@ -19,4 +20,4 @@ CREATE OR REPLACE VIEW groupmembers.getpersons AS
         FROM groupmembers.personaliases pa
         WHERE pa.personid = p.personid),
    coalesce(media.mediacount, 0) AS mediacount
-   FROM groupmembers.person p LEFT OUTER JOIN groupmembers.getpersonmediacount media ON p.personid = media.personid;
+   FROM groupmembers.persons p LEFT OUTER JOIN groupmembers.getpersonmediacount media ON p.personid = media.personid;

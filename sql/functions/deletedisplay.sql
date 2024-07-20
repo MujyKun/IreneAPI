@@ -4,6 +4,6 @@ create or replace function groupmembers.deletedisplay(t_display_id integer)
 as
 $$
 begin
-    DELETE FROM groupmembers.display WHERE displayid = t_display_id;
+    DELETE FROM groupmembers.displays WHERE displayid = t_display_id;
 end;
 $$;

@@ -1,7 +1,6 @@
-CREATE TABLE IF NOT EXISTS groupmembers.person
+CREATE TABLE IF NOT EXISTS groupmembers.persons
 (
     personid serial,
-    dateid integer,
     nameid integer,
     formernameid integer,
     gender character(1),
@@ -10,12 +9,14 @@ CREATE TABLE IF NOT EXISTS groupmembers.person
     displayid integer,
     socialid integer,
     locationid integer,
-    bloodid integer,
     callcount integer,
+    birthdate date,
+    deathdate date,
+    bloodtype bloodtypes,
     PRIMARY KEY (personid)
 );
 
-ALTER TABLE groupmembers.person
+ALTER TABLE groupmembers.persons
     OWNER to postgres;
-COMMENT ON TABLE groupmembers.person
+COMMENT ON TABLE groupmembers.persons
     IS 'A general person';

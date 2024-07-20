@@ -75,7 +75,7 @@ class GeneralGuessingGame(Resource):
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.add_gg(
             requestor,
-            date_id=request.args.get("date_id"),
+            start_date=request.args.get("start_date"),
             media_ids=request.args.get("media_ids"),
             status_ids=request.args.get("status_ids"),
             mode_id=request.args.get("mode_id"),

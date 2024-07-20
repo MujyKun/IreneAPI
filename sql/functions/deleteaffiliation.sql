@@ -4,6 +4,6 @@ create or replace function groupmembers.deleteaffiliation(t_affiliation_id integ
 as
 $$
 begin
-    DELETE FROM groupmembers.affiliation WHERE affiliationid = t_affiliation_id;
+    DELETE FROM groupmembers.affiliations WHERE affiliationid = t_affiliation_id;
 end;
 $$;

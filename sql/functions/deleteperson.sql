@@ -4,6 +4,6 @@ create or replace function groupmembers.deleteperson(t_person_id integer)
 as
 $$
 begin
-    DELETE FROM groupmembers.person WHERE personid  = t_person_id;
+    DELETE FROM groupmembers.persons WHERE personid  = t_person_id;
 end;
 $$;

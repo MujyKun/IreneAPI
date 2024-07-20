@@ -1,12 +1,13 @@
 CREATE TABLE IF NOT EXISTS guessinggame.games
 (
     gameid serial,
-    dateid integer,
     mediaids integer[],
     statusids integer[],
     modeid integer,
     difficultyid integer,
     isnsfw bool,
+    startdate timestamp,
+    enddate timestamp,
     PRIMARY KEY (gameid)
 );
 

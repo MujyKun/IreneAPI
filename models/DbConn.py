@@ -1,7 +1,10 @@
-from os import listdir
-from os.path import isdir
+from os import listdir, environ
+from os.path import isdir, exists
+from typing import Optional
+
 import aiofiles
 import asyncpg.exceptions
+import subprocess
 
 
 class DbConnection:
@@ -21,23 +24,24 @@ class DbConnection:
         self._db_user = db_user
         self._db_port = db_port
         self.__db_pass = db_pass
+        self.__db_kwargs = {
+            "host": self._db_host,
+            "database": self._db_name,
+            "user": self._db_user,
+            "password": self.__db_pass,
+            "port": self._db_port,
+        }
 
     async def connect(self):
         """Connect to the PostgreSQL Database."""
 
         await self._create_pool(
-            **{
-                "host": self._db_host,
-                "database": self._db_name,
-                "user": self._db_user,
-                "password": self.__db_pass,
-                "port": self._db_port,
-            }
+            **self.__db_kwargs
         )
-        await self.update_db_structure()
+        await self.update_db_structure(use_terminal=True)
         print(f"Connected to Database {self._db_name} as {self._db_user}.")
 
-    async def execute_sql_file(self, file_path: str, use_terminal=False) -> str:
+    async def execute_sql_file(self, file_path: str, use_terminal=False) -> Optional[str]:
         """Read and execute the queries in a SQL file.
 
         :param file_path: str
@@ -47,6 +51,21 @@ class DbConnection:
         :returns str:
             Code that cannot be executed.
         """
+        if use_terminal:
+            command = [
+                'psql',
+                f'--dbname={self._db_name}',
+                f'--username={self._db_user}',
+                f'--host={self._db_host}',
+                f'--port={self._db_port}',
+                '--file', file_path
+            ]
+            env = {'PGPASSWORD': self.__db_pass,
+                   **dict(environ)}
+
+            subprocess.run(command, env=env)
+            return
+
         try:
             async with aiofiles.open(file_path, mode="r") as file:
                 data = await file.read()
@@ -90,59 +109,32 @@ class DbConnection:
         """
 
     async def update_db_structure(self, use_terminal=True):
-        """Attempt to create/update the DB structure."""
+        """
+        Attempt to create/update the DB structure.
+
+        :param use_terminal: Whether to use the terminal to run the sql scripts
+        """
         sql_folder_name = "sql"
         create_file_name = "create.sql"
-        inexecutable_function_queries = ""
-        inexecutable_view_queries = ""
-        execute_later = ["metadata", "constraints"]
-        for file in listdir(sql_folder_name):
-            if file in execute_later:
-                continue
 
-            if isdir(f"{sql_folder_name}/{file}"):
-                # run the create files first.
-                if file not in ["functions", "views"]:
-                    create_file = f"{sql_folder_name}/{file}/{create_file_name}"
-                    inexecutable_function_queries += await self.execute_sql_file(
-                        create_file
-                    )
+        folder_names = ["types", "biasgame", "blackjack", "groupmembers", "guessinggame", "interactions", "public",
+                        "unscramblegame", "views", "functions", "metadata", "constraints"]
 
-                for t_file in listdir(f"{sql_folder_name}/{file}"):
-                    if t_file != create_file_name:
-                        data = await self.execute_sql_file(
-                            f"{sql_folder_name}/{file}/{t_file}"
-                        )
-                        if file == "functions":
-                            inexecutable_function_queries += data
-                        elif file == "views":
-                            inexecutable_view_queries += data
-            else:
-                if file != create_file_name:
-                    inexecutable_function_queries += await self.execute_sql_file(
-                        f"{sql_folder_name}/{file}"
-                    )
+        for folder in folder_names:
+            folder_path = f"{sql_folder_name}/{folder}"
 
-        async with aiofiles.open(
-            f"{sql_folder_name}/functions/{create_file_name}", "w"
-        ) as manual_file:
-            await manual_file.write(inexecutable_function_queries)
+            # run the create files in every folder first.
+            create_file_path = f"{sql_folder_name}/{folder}/{create_file_name}"
+            if exists(create_file_path):
+                print(create_file_path)
+                await self.execute_sql_file(create_file_path, use_terminal=use_terminal)
 
-        async with aiofiles.open(
-            f"{sql_folder_name}/views/{create_file_name}", "w"
-        ) as manual_file:
-            await manual_file.write(inexecutable_view_queries)
+            for file in listdir(folder_path):
+                if file == create_file_name:
+                    continue
 
-        await self.execute_sql_file(
-            f"{sql_folder_name}/metadata/{create_file_name}", use_terminal=True
-        )
-        await self.execute_sql_file(
-            f"{sql_folder_name}/constraints/{create_file_name}", use_terminal=True
-        )
-        await self.execute_sql_file(
-            f"{sql_folder_name}/views/{create_file_name}", use_terminal=True
-        )
-        # await self.execute_sql_file(f"{sql_folder_name}/functions/{create_file_name}", use_terminal=True)
+                file_path = f"{folder_path}/{file}"
+                await self.execute_sql_file(file_path, use_terminal=use_terminal)
 
     async def get_connection(self):
         """Get a new pool connection.

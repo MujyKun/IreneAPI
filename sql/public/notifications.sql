@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS public.notifications
 (
-    noti_id serial,
+    notiid serial,
     guildid bigint NOT NULL,
     userid bigint NOT NULL,
     phrase text,
-    PRIMARY KEY (noti_id)
+    PRIMARY KEY (notiid)
 );
 
 ALTER TABLE public.notifications
