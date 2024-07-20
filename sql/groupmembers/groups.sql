@@ -2,12 +2,13 @@ CREATE TABLE IF NOT EXISTS groupmembers.groups
 (
     groupid serial,
     name text,
-    dateid integer,
     description text,
     companyid integer,
     displayid integer,
     website text,
     socialid integer,
+    debutdate date,
+    disbanddate date,
     PRIMARY KEY (groupid)
 );
 

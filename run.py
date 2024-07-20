@@ -19,7 +19,7 @@ from routes import blueprints as _blueprints, cors_handler
 from routes.helpers.errors import BaseError
 from quart_openapi import Swagger
 from quart_cors import cors
-from models import Pint
+from quart_openapi import Pint
 
 app = Pint(__name__, title="IreneAPI", contact_email="mujy@irenebot.com", version="2.0")
 app = cors(app)
@@ -105,10 +105,11 @@ async def commands():
 async def create_first_user_token():
     """create first user token for usage."""
     from routes.helpers.api import add_token
-    from routes.helpers import GOD, OWNER, Requestor
+    from routes.helpers import GOD, OWNER, Requestor, add_user
 
     god_requestor = Requestor(-1, GOD)
     user_id = 169401247374376960  # change accordingly.
+    await add_user(requestor=god_requestor, user_id=user_id)
     private_token = "private_key"  # change accordingly.
     await add_token(
         requestor=god_requestor,
@@ -135,14 +136,14 @@ try:
 
     # loop.run_until_complete(create_first_user_token())
 
-    # loop.run_until_complete(app.run_task(port=api_port))
+    loop.run_until_complete(app.run_task(port=api_port))
 
-    from hypercorn.config import Config
-    from hypercorn.asyncio import serve
-
-    config = Config()
-    config.bind = f"127.0.0.1:{api_port}"
-    loop.run_until_complete(serve(app, config))
+    # from hypercorn.config import Config
+    # from hypercorn.asyncio import serve
+    #
+    # config = Config()
+    # config.bind = f"127.0.0.1:{api_port}"
+    # loop.run_until_complete(serve(app, config))
 except KeyboardInterrupt:
     # cancel all tasks lingering
     ...

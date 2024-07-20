@@ -1,5 +1,5 @@
 import concurrent.futures
-from typing import List
+from typing import Literal
 
 from . import (
     self,
@@ -11,14 +11,16 @@ from . import (
     SUPER_PATRON,
     FRIEND,
     USER,
+    convert_to_date
 )
 from models import Requestor
 from resources import drive
 from resources.keys import person_folder, image_host
 from datetime import datetime
+from pathlib import Path
 
 
-DIR_FILE_LIMIT = 250000
+DIR_FILE_LIMIT = 1000000
 _new_photo_counter = 0
 
 
@@ -51,7 +53,7 @@ async def remove_auto_media(requestor: Requestor, channel_id: int, affiliation_i
 @check_permission(permission_level=DEVELOPER)
 async def get_auto_media(requestor: Requestor):
     """Get all auto media."""
-    return await self.db.fetch("SELECT * FROM groupmembers.getautomedia")
+    return await self.db.fetch("SELECT * FROM groupmembers.automedia")
 
 
 @check_permission(permission_level=SUPER_PATRON)
@@ -59,7 +61,7 @@ async def get_person(requestor: Requestor, person_id: int) -> dict:
     """Get a person's information if they exist."""
     is_int64(person_id)
     return await self.db.fetch_row(
-        "SELECT * FROM groupmembers.getpersons WHERE personid = $1", person_id
+        "SELECT * FROM groupmembers.persons_full WHERE personid = $1", person_id
     )
 
 
@@ -72,7 +74,7 @@ async def delete_person(requestor: Requestor, person_id: int) -> dict:
     )
 
 
-async def _get_media_info(object_id: int, object_id_type="person") -> dict:
+async def _get_media_info(object_id: int, object_id_type: Literal['person', 'affiliation', 'group', 'media'] = "person") -> dict:
     """
     Get the media information for a person, group, or affiliation.
 
@@ -82,8 +84,9 @@ async def _get_media_info(object_id: int, object_id_type="person") -> dict:
     NOTE: object_id_type can also support the input of "media", but is suited for "person", "affiliation", or "group".
     """
     is_int64(object_id)
+    assert object_id_type in ['person', 'affiliation', 'group', 'media'], f"Unknown Media Type - {object_id_type}"
     return await self.db.fetch(
-        f"SELECT * FROM groupmembers.getmedia WHERE {object_id_type}id = $1", object_id
+        f"SELECT * FROM groupmembers.media_full WHERE {object_id_type}id = $1", object_id
     )
 
 
@@ -129,7 +132,7 @@ async def _generate_media(
 
     args: tuple = (object_id, min_faces, max_faces, nsfw, enabled)
     query = (
-        f"SELECT * FROM groupmembers.getmedia WHERE {object_id_type}id = $1 AND faces > $2 AND faces < $3 "
+        f"SELECT * FROM groupmembers.media_full WHERE {object_id_type}id = $1 AND faces > $2 AND faces < $3 "
         "AND nsfw = $4 AND enabled = $5"
     )
     if file_type:
@@ -144,7 +147,7 @@ async def _generate_media(
 async def get_image_host_url(requestor: Requestor, media_id: int):
     is_int64(media_id)
     media_info = await self.db.fetch_row(
-        "SELECT * FROM groupmembers.getmedia WHERE mediaid = $1", media_id
+        "SELECT * FROM groupmembers.media_full WHERE mediaid = $1", media_id
     )
     return await download_and_get_image_host_url(media_info)
 
@@ -172,38 +175,53 @@ def blocking_remove_oldest_files():
 
 async def download_and_get_image_host_url(media_info):
     """
-    Download and get the image host's url.
+    Download and get the image host's URL.
     """
-    if not media_info["results"]:
+    results = media_info.get("results", {})
+    if not results:
         return media_info
 
-    media_id = media_info["results"]["mediaid"]
-    file_type = media_info["results"]["filetype"]
-    if file_type and file_type in ["jpeg", "png", "jpg", "webp"]:
-        file_path = f"{person_folder}{media_id}.webp"
-    else:
-        file_path = f"{person_folder}{media_id}.{file_type}"
-    g_drive_id = drive.get_id_from_url(media_info["results"]["link"])
+    media_id = results.get("mediaid")
+    file_type = results.get("filetype")
+
+    if not media_id or not file_type:
+        return media_info
+
+    file_path = determine_file_path(person_folder, media_id, file_type)
+    g_drive_id = drive.get_id_from_url(results.get("link"))
+
     await drive.download_file(g_drive_id, file_path)
+    await drive.convert_to_webp(file_path, file_path)
 
-    # https://images.irenebot.com/$media_id
-    if file_type == "gif":
-        media_info["results"][
-            "host"
-        ] = f"{image_host}idol/{media_info['results']['mediaid']}.gif"
-    else:
-        media_info["results"][
-            "host"
-        ] = f"{image_host}{media_info['results']['mediaid']}"
+    # Set the host URL based on file type
+    media_info["results"]["host"] = generate_host_url(image_host, media_id, file_type)
 
-    # check every 50% of the dir file limit as we remove half.
+    # Check file limit and remove oldest files if necessary
     global _new_photo_counter
     if _new_photo_counter > DIR_FILE_LIMIT * 0.5:
         _new_photo_counter = 0
         with concurrent.futures.ThreadPoolExecutor() as pool:
             future = pool.submit(blocking_remove_oldest_files)
+
     _new_photo_counter += 1
     return media_info
+
+
+def determine_file_path(folder, media_id, file_type):
+    """
+    Determine the file path based on media information.
+    """
+    file_extension = ".webp" if file_type in ["jpeg", "png", "jpg", "jfif", "webp"] else f".{file_type}"
+    return str(Path(folder) / f"{media_id}{file_extension}")
+
+
+def generate_host_url(base_url, media_id, file_type):
+    """
+    Generate the host URL based on media information.
+    """
+    if file_type == "gif":
+        return f"{base_url}idol/{media_id}.gif"
+    return f"{base_url}{media_id}"
 
 
 @check_permission(permission_level=SUPER_PATRON)
@@ -275,7 +293,7 @@ async def generate_media_affiliation(
 @check_permission(permission_level=SUPER_PATRON)
 async def get_persons(requestor: Requestor) -> dict:
     """Get all person information."""
-    return await self.db.fetch("SELECT * FROM groupmembers.getpersons")
+    return await self.db.fetch("SELECT * FROM groupmembers.persons_full")
 
 
 @check_permission(permission_level=SUPER_PATRON)
@@ -283,7 +301,7 @@ async def get_group(requestor: Requestor, group_id: int) -> dict:
     """Get a group's information if they exist."""
     is_int64(group_id)
     return await self.db.fetch_row(
-        "SELECT * FROM groupmembers.getgroups WHERE groupid = $1", group_id
+        "SELECT * FROM groupmembers.groups_full WHERE groupid = $1", group_id
     )
 
 
@@ -291,25 +309,28 @@ async def get_group(requestor: Requestor, group_id: int) -> dict:
 async def add_group(
     requestor: Requestor,
     group_name,
-    date_id,
     description,
     company_id,
     display_id,
     website,
     social_id,
     tag_ids,
+    debut_date,
+    disband_date
 ) -> dict:
     """Add a group."""
+
     results = await self.db.fetch_row(
-        "SELECT * FROM groupmembers.addgroup($1, $2, $3, $4, $5, $6, $7, $8)",
+        "SELECT * FROM groupmembers.addgroup($1, $2, $3, $4, $5, $6, $7, $8, $9)",
         group_name,
-        date_id,
         description,
         company_id,
         display_id,
         website,
         social_id,
         tag_ids,
+        convert_to_date(debut_date),
+        convert_to_date(disband_date)
     )
     if results:
         t_results = results.get("results")
@@ -323,7 +344,6 @@ async def add_group(
 @check_permission(permission_level=DEVELOPER)
 async def add_person(
     requestor: Requestor,
-    date_id,
     name_id,
     former_name_id,
     gender,
@@ -333,13 +353,14 @@ async def add_person(
     social_id,
     location_id,
     tag_ids,
-    blood_id,
+    blood_type,
     call_count,
+    birth_date,
+    death_date,
 ) -> dict:
     """Add a person."""
     results = await self.db.fetch_row(
-        "SELECT * FROM groupmembers.addperson($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
-        date_id,
+        "SELECT * FROM groupmembers.addperson($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
         name_id,
         former_name_id,
         gender,
@@ -348,8 +369,10 @@ async def add_person(
         display_id,
         social_id,
         location_id,
-        blood_id,
+        blood_type,
         call_count,
+        convert_to_date(birth_date),
+        convert_to_date(death_date),
     )
     if results:
         t_results = results.get("results")
@@ -377,7 +400,7 @@ async def add_group_tag(requestor: Requestor, tag_id, group_id):
 @check_permission(permission_level=SUPER_PATRON)
 async def get_groups(requestor: Requestor) -> dict:
     """Get all group information."""
-    return await self.db.fetch("SELECT * FROM groupmembers.getgroups")
+    return await self.db.fetch("SELECT * FROM groupmembers.groups_full")
 
 
 @check_permission(permission_level=DEVELOPER)
@@ -392,14 +415,14 @@ async def get_tag(requestor: Requestor, tag_id: int) -> dict:
     """Get a tag's information."""
     is_int64(tag_id)
     return await self.db.fetch_row(
-        "SELECT * FROM groupmembers.gettags WHERE tagid = $1", tag_id
+        "SELECT * FROM groupmembers.tags WHERE tagid = $1", tag_id
     )
 
 
 @check_permission(permission_level=USER)
 async def get_tags(requestor: Requestor) -> dict:
     """Get all tag information."""
-    return await self.db.fetch("SELECT * FROM groupmembers.gettags")
+    return await self.db.fetch("SELECT * FROM groupmembers.tags")
 
 
 @check_permission(permission_level=DEVELOPER)
@@ -416,87 +439,11 @@ async def delete_tag(requestor: Requestor, tag_id) -> dict:
 
 
 @check_permission(permission_level=USER)
-async def get_date(requestor: Requestor, date_id: int) -> dict:
-    """Get a date's information."""
-    is_int64(date_id)
-    data = await self.db.fetch_row(
-        "SELECT * FROM groupmembers.getdates WHERE dateid = $1", date_id
-    )
-
-    return await fix_dates(data, fetch_row=True)
-
-
-async def fix_dates(fetched_results, fetch_row=False):
-    """Fix the dates that are sent over the network."""
-
-    # There is a weird middleman conversion issue when being sent across the network that causes
-    # python to assume the timestamp is actually in the local timezone and not by default GMT.
-    # So on the wrapper, it would attempt to automatically convert from the local timezone to GMT,
-    # when it is in fact already in GMT. This may be due to the fact that we are passing in a datetime object that
-    # was created by the database wrapper. To fix this, we reiterate through the results and convert the timestamps
-    # to a string to avoid the built-in datetime automatic conversions when sent across the network.
-    final_dates = {"results": dict()}
-    results_generator = (
-        fetched_results.get("results").values()
-        if not fetch_row
-        else [fetched_results.get("results")]
-    )
-    for idx, row in enumerate(results_generator):
-        date_id = row["dateid"]
-        start_date = row["startdate"]
-        end_date = row["enddate"]
-        str_start_date = str(start_date) if start_date else None
-        str_end_date = str(end_date) if end_date else None
-        finalized_row = {
-            "dateid": date_id,
-            "startdate": str_start_date,
-            "enddate": str_end_date,
-        }
-        if not fetch_row:
-            final_dates["results"].update({idx: finalized_row})
-        else:
-            final_dates["results"] = finalized_row
-    return final_dates
-
-
-@check_permission(permission_level=USER)
-async def get_dates(requestor: Requestor) -> dict:
-    """Get all date information."""
-    return await fix_dates(await self.db.fetch("SELECT * FROM groupmembers.getdates"))
-
-
-@check_permission(permission_level=DEVELOPER)
-async def add_date(requestor: Requestor, start_date: str, end_date: str) -> dict:
-    """Add date information."""
-    start_date = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S.%f")
-    if end_date:
-        end_date = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S.%f")
-    return await self.db.fetch_row(
-        "SELECT * FROM groupmembers.adddate($1, $2)", start_date, end_date
-    )
-
-
-@check_permission(permission_level=DEVELOPER)
-async def update_date(requestor: Requestor, date_id: int, end_date: str) -> dict:
-    """Update the end date."""
-    end_date = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S.%f")
-    return await self.db.fetch_row(
-        "SELECT * FROM groupmembers.updatedate($1, $2)", date_id, end_date
-    )
-
-
-@check_permission(permission_level=DEVELOPER)
-async def delete_date(requestor: Requestor, date_id) -> dict:
-    """Delete date information."""
-    return await self.db.execute("SELECT * FROM groupmembers.deletedate($1)", date_id)
-
-
-@check_permission(permission_level=USER)
 async def get_name(requestor: Requestor, name_id: int) -> dict:
     """Get a name's information."""
     is_int64(name_id)
     return await self.db.fetch_row(
-        "SELECT * FROM groupmembers.getnames WHERE nameid = $1", name_id
+        "SELECT * FROM groupmembers.names WHERE nameid = $1", name_id
     )
 
 
@@ -517,7 +464,7 @@ async def delete_name(requestor: Requestor, name_id) -> dict:
 @check_permission(permission_level=USER)
 async def get_names(requestor: Requestor) -> dict:
     """Get all name information."""
-    return await self.db.fetch("SELECT * FROM groupmembers.getnames")
+    return await self.db.fetch("SELECT * FROM groupmembers.names")
 
 
 @check_permission(permission_level=USER)
@@ -525,21 +472,22 @@ async def get_company(requestor: Requestor, company_id: int) -> dict:
     """Get a company's information."""
     is_int64(company_id)
     return await self.db.fetch_row(
-        "SELECT * FROM groupmembers.getcompanies WHERE companyid = $1", company_id
+        "SELECT * FROM groupmembers.companies WHERE companyid = $1", company_id
     )
 
 
 @check_permission(permission_level=USER)
 async def get_companies(requestor: Requestor) -> dict:
     """Get all company information."""
-    return await self.db.fetch("SELECT * FROM groupmembers.getcompanies")
+    return await self.db.fetch("SELECT * FROM groupmembers.companies")
 
 
 @check_permission(permission_level=DEVELOPER)
-async def add_company(requestor: Requestor, name: str, description: str, date_id: int):
+async def add_company(requestor: Requestor, name: str, description: str, start_date: str, end_date: str):
     """Add a company."""
     return await self.db.execute(
-        "SELECT groupmembers.addcompany($1, $2, $3)", name, description, date_id
+        "SELECT groupmembers.addcompany($1, $2, $3, $4)", name, description, convert_to_date(start_date),
+        convert_to_date(end_date)
     )
 
 
@@ -554,14 +502,14 @@ async def get_display(requestor: Requestor, display_id: int) -> dict:
     """Get a display's information."""
     is_int64(display_id)
     return await self.db.fetch_row(
-        "SELECT * FROM groupmembers.getdisplays WHERE displayid = $1", display_id
+        "SELECT * FROM groupmembers.displays WHERE displayid = $1", display_id
     )
 
 
 @check_permission(permission_level=USER)
 async def get_displays(requestor: Requestor) -> dict:
     """Get all display information."""
-    return await self.db.fetch("SELECT * FROM groupmembers.getdisplays")
+    return await self.db.fetch("SELECT * FROM groupmembers.displays")
 
 
 @check_permission(permission_level=DEVELOPER)
@@ -583,14 +531,14 @@ async def get_location(requestor: Requestor, location_id: int) -> dict:
     """Get a location's information."""
     is_int64(location_id)
     return await self.db.fetch_row(
-        "SELECT * FROM groupmembers.getlocations WHERE locationid = $1", location_id
+        "SELECT * FROM groupmembers.locations WHERE locationid = $1", location_id
     )
 
 
 @check_permission(permission_level=USER)
 async def get_locations(requestor: Requestor) -> dict:
     """Get all location information."""
-    return await self.db.fetch("SELECT * FROM groupmembers.getlocations")
+    return await self.db.fetch("SELECT * FROM groupmembers.locations")
 
 
 @check_permission(permission_level=DEVELOPER)
@@ -612,14 +560,14 @@ async def get_media(requestor: Requestor, media_id: int) -> dict:
     """Get media information."""
     is_int64(media_id)
     return await self.db.fetch_row(
-        "SELECT * FROM groupmembers.getmedia WHERE mediaid = $1", media_id
+        "SELECT * FROM groupmembers.media_full WHERE mediaid = $1", media_id
     )
 
 
 @check_permission(permission_level=DEVELOPER)
 async def get_all_media(requestor: Requestor) -> dict:
     """Get all media information."""
-    return await self.db.fetch("SELECT * FROM groupmembers.getmedia")
+    return await self.db.fetch("SELECT * FROM groupmembers.media_full")
 
 
 @check_permission(permission_level=DEVELOPER)
@@ -632,7 +580,7 @@ async def get_media_by_affiliations(
         return_val = f"COUNT({return_val})"
 
     return await self.db.fetch(
-        f"SELECT {return_val} FROM groupmembers.getmedia WHERE affiliationid = any($1) ORDER BY RANDOM() LIMIT $2",
+        f"SELECT {return_val} FROM groupmembers.media_full WHERE affiliationid = any($1) ORDER BY RANDOM() LIMIT $2",
         affiliation_ids,
         limit,
     )
@@ -678,14 +626,14 @@ async def get_person_alias(requestor: Requestor, alias_id: int) -> dict:
     """Get person alias information."""
     is_int64(alias_id)
     return await self.db.fetch_row(
-        "SELECT * FROM groupmembers.getpersonaliases WHERE aliasid = $1", alias_id
+        "SELECT * FROM groupmembers.personaliases WHERE aliasid = $1", alias_id
     )
 
 
 @check_permission(permission_level=USER)
 async def get_person_aliases(requestor: Requestor) -> dict:
     """Get all person alias information."""
-    return await self.db.fetch("SELECT * FROM groupmembers.getpersonaliases")
+    return await self.db.fetch("SELECT * FROM groupmembers.personaliases")
 
 
 @check_permission(permission_level=DEVELOPER)
@@ -715,14 +663,14 @@ async def get_group_alias(requestor: Requestor, alias_id: int) -> dict:
     """Get group alias information."""
     is_int64(alias_id)
     return await self.db.fetch_row(
-        "SELECT * FROM groupmembers.getgroupaliases WHERE aliasid = $1", alias_id
+        "SELECT * FROM groupmembers.groupaliases WHERE aliasid = $1", alias_id
     )
 
 
 @check_permission(permission_level=USER)
 async def get_group_aliases(requestor: Requestor) -> dict:
     """Get all group alias information."""
-    return await self.db.fetch("SELECT * FROM groupmembers.getgroupaliases")
+    return await self.db.fetch("SELECT * FROM groupmembers.groupaliases")
 
 
 @check_permission(permission_level=DEVELOPER)
@@ -750,7 +698,7 @@ async def get_social(requestor: Requestor, social_id: int) -> dict:
     """Get social information."""
     is_int64(social_id)
     return await self.db.fetch_row(
-        "SELECT * FROM groupmembers.getsocials WHERE socialid = $1", social_id
+        "SELECT * FROM groupmembers.socialmedia WHERE socialid = $1", social_id
     )
 
 
@@ -792,7 +740,7 @@ async def delete_social(requestor: Requestor, social_id) -> dict:
 @check_permission(permission_level=USER)
 async def get_socials(requestor: Requestor) -> dict:
     """Get all social information."""
-    return await self.db.fetch("SELECT * FROM groupmembers.getsocials")
+    return await self.db.fetch("SELECT * FROM groupmembers.socialmedia")
 
 
 @check_permission(permission_level=USER)
@@ -800,7 +748,7 @@ async def get_position(requestor: Requestor, position_id: int) -> dict:
     """Get position information."""
     is_int64(position_id)
     return await self.db.fetch_row(
-        "SELECT * FROM groupmembers.getpositions WHERE positionid = $1", position_id
+        "SELECT * FROM groupmembers.positions WHERE positionid = $1", position_id
     )
 
 
@@ -824,7 +772,7 @@ async def delete_position(requestor: Requestor, position_id) -> dict:
 @check_permission(permission_level=USER)
 async def get_positions(requestor: Requestor) -> dict:
     """Get all position information."""
-    return await self.db.fetch("SELECT * FROM groupmembers.getpositions")
+    return await self.db.fetch("SELECT * FROM groupmembers.positions")
 
 
 @check_permission(permission_level=DEVELOPER)
@@ -848,14 +796,14 @@ async def get_fandoms_by_group(requestor: Requestor, group_id: int) -> dict:
     """Get all fandoms belonging to a group."""
     is_int64(group_id)
     return await self.db.fetch(
-        "SELECT * FROM groupmembers.getfandoms WHERE groupid = $1", group_id
+        "SELECT * FROM groupmembers.fandoms WHERE groupid = $1", group_id
     )
 
 
 @check_permission(permission_level=USER)
 async def get_fandoms(requestor: Requestor) -> dict:
     """Get all fandom information."""
-    return await self.db.fetch("SELECT * FROM groupmembers.getfandoms")
+    return await self.db.fetch("SELECT * FROM groupmembers.fandoms")
 
 
 @check_permission(permission_level=USER)
@@ -863,7 +811,7 @@ async def get_affiliation(requestor: Requestor, affiliation_id: int) -> dict:
     """Get affiliation information."""
     is_int64(affiliation_id)
     return await self.db.fetch_row(
-        "SELECT * FROM groupmembers.getaffiliations WHERE affiliationid = $1",
+        "SELECT * FROM groupmembers.affiliations WHERE affiliationid = $1",
         affiliation_id,
     )
 
@@ -893,37 +841,7 @@ async def delete_affiliation(requestor: Requestor, affiliation_id) -> dict:
 @check_permission(permission_level=USER)
 async def get_affiliations(requestor: Requestor) -> dict:
     """Get all affiliation information."""
-    return await self.db.fetch("SELECT * FROM groupmembers.getaffiliations")
-
-
-@check_permission(permission_level=USER)
-async def get_blood_type(requestor: Requestor, blood_id: int) -> dict:
-    """Get blood type information."""
-    is_int64(blood_id)
-    return await self.db.fetch_row(
-        "SELECT * FROM groupmembers.getbloodtypes WHERE bloodid = $1", blood_id
-    )
-
-
-@check_permission(permission_level=DEVELOPER)
-async def add_blood_type(requestor: Requestor, name: str) -> dict:
-    """Add a blood type."""
-    return await self.db.fetch_row("SELECT * FROM groupmembers.addbloodtype($1)", name)
-
-
-@check_permission(permission_level=DEVELOPER)
-async def delete_blood_type(requestor: Requestor, blood_id: int) -> dict:
-    """Delete a blood type."""
-    is_int64(blood_id)
-    return await self.db.execute(
-        "SELECT * FROM groupmembers.deletebloodtype($1)", blood_id
-    )
-
-
-@check_permission(permission_level=USER)
-async def get_blood_types(requestor: Requestor) -> dict:
-    """Get all blood type information."""
-    return await self.db.fetch("SELECT * FROM groupmembers.getbloodtypes")
+    return await self.db.fetch("SELECT * FROM groupmembers.affiliations")
 
 
 def get_media_kwargs(requestor, user_args):

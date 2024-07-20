@@ -7,7 +7,7 @@ declare
     t_display_id integer;
 begin
 
-    INSERT INTO groupmembers.display(avatar, banner)
+    INSERT INTO groupmembers.displays(avatar, banner)
     VALUES(t_avatar, t_banner) returning displayid INTO t_display_id;
     return t_display_id;
 end;

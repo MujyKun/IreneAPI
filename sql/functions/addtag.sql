@@ -7,7 +7,7 @@ declare
     t_tag_id integer;
 begin
 
-    INSERT INTO groupmembers.tag(name)
+    INSERT INTO groupmembers.tags(name)
     VALUES(t_name) returning tagid INTO t_tag_id;
     return t_tag_id;
 end;

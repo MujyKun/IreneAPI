@@ -7,7 +7,7 @@ declare
     t_location_id integer;
 begin
 
-    INSERT INTO groupmembers.location(country, city)
+    INSERT INTO groupmembers.locations(country, city)
     VALUES(t_country, t_city) returning locationid INTO t_location_id;
     return t_location_id;
 end;

@@ -1,10 +1,11 @@
 CREATE TABLE IF NOT EXISTS unscramblegame.games
 (
     gameid serial,
-    dateid integer,
     statusids integer[],
     modeid integer,
     difficultyid integer,
+    startdate timestamp,
+    enddate timestamp,
     PRIMARY KEY (gameid)
 );
 

@@ -11,6 +11,17 @@ CREATE TABLE IF NOT EXISTS groupmembers.socialmedia
     facebook text,
     tiktok text,
     PRIMARY KEY (socialid)
+--     CONSTRAINT unique_social_media UNIQUE (twitter, youtube, melon, instagram, vlive, spotify, fancafe, facebook, tiktok),
+--     CONSTRAINT non_empty_columns CHECK (
+--         twitter <> '' AND
+--         youtube <> '' AND
+--         melon <> '' AND
+--         instagram <> '' AND
+--         vlive <> '' AND
+--         spotify <> '' AND
+--         fancafe <> '' AND
+--         facebook <> '' AND
+--         tiktok <> '')
 );
 
 ALTER TABLE groupmembers.socialmedia

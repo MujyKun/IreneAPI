@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS public.reminders
     id serial,
     userid bigint,
     reason text,
-    dateid integer,
+    startdate timestamp DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'UTC'),
+    notifydate timestamp,
     PRIMARY KEY (id)
 );
 

@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS groupmembers.media
     affiliationid integer,
     enabled boolean,
     nsfw boolean,
-    PRIMARY KEY (mediaid)
+    PRIMARY KEY (mediaid),
+    UNIQUE (link, affiliationid)
 );
 
 ALTER TABLE groupmembers.media

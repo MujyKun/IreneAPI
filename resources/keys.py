@@ -24,7 +24,7 @@ bias_game_location = os.getenv("BIAS_GAME_LOCATION")
 
 # DataDog - DO NOT CHANGE NAMES OF THESE ENV VARIABLES - https://github.com/DataDog/datadogpy
 datadog_api_key = os.getenv("DATADOG_API_KEY")
-datadog_app_key = "DATADOG_APP_KEY"
+datadog_app_key = os.getenv("DATADOG_APP_KEY")
 
 # BlackJack Card Location
 # CARD_LOCATION="/var/www/images.irenebot/public_html/cards/"
@@ -53,13 +53,6 @@ top_gg_webhook_key = os.getenv("TOP_GG_WEBHOOK")
 patreon_url = os.getenv("PATREON_LINK")
 
 urban_key = os.getenv("URBAN_KEY")
-
-twitter_account_ids = os.getenv("TWITTER_ACCOUNT_IDS").split(",")
-twitter_usernames = os.getenv("TWITTER_USERNAMES").split(",")
-twitter_consumer_keys = os.getenv("TWITTER_CONSUMER_KEYS").split(",")
-twitter_consumer_secrets = os.getenv("TWITTER_CONSUMER_SECRETS").split(",")
-twitter_access_keys = os.getenv("TWITTER_ACCESS_KEYS").split(",")
-twitter_access_secrets = os.getenv("TWITTER_ACCESS_SECRETS").split(",")
 
 twitch_client_id = os.getenv("TWITCH_CLIENT_ID")
 twitch_client_secret = os.getenv("TWITCH_CLIENT_SECRET")

@@ -1,5 +1,7 @@
+import asyncio
+from concurrent import futures
+from functools import partial
 from passlib.context import CryptContext
-
 
 # API Tokens are hashed in the DB and should at no point ever be read as plain text.
 token_context = CryptContext(
@@ -19,10 +21,34 @@ def check_hashed_token(token, hashed):
     return token_context.verify(token, hashed)
 
 
-from typing import Optional
 from models import Requestor, DbConnection, Access
 from functools import wraps
 from .errors import LackingPermissions, BadRequest
+from datetime import date, datetime
+from typing import Optional
+
+COMMON_TIMESTAMP_FORMAT = '%a, %d %b %Y %H:%M:%S %Z'
+COMMON_DATE_FORMAT = "%Y-%m-%d"
+
+
+def convert_to_timestamp(date_string: str) -> Optional[datetime]:
+    """
+    Convert a string to a timestamp.
+
+    :param date_string: str
+    :return: Optional[date]
+    """
+    return datetime.strptime(date_string, COMMON_TIMESTAMP_FORMAT) if date_string else None
+
+
+def convert_to_date(date_string: str) -> Optional[date]:
+    """
+    Convert a string to a date.
+
+    :param date_string: str
+    :return: Optional[date]
+    """
+    return datetime.strptime(date_string, COMMON_DATE_FORMAT) if date_string else None
 
 
 def is_int64(value: int):
@@ -111,6 +137,8 @@ def check_permission(permission_level: Access):
     return decorator
 
 
+thread_pool = futures.ThreadPoolExecutor(max_workers=10)
+
 from .api import (
     add_token,
     get_token,
@@ -150,17 +178,6 @@ from .user import (
     upsert_gg_filter_persons,
 )
 
-from .twitter import (
-    add_twitter_subscription,
-    delete_twitter_subscription,
-    get_and_add_twitter_id,
-    get_subscriptions as get_twitter_subscriptions,
-    get_timeline as get_twitter_timeline,
-    get_all_subscriptions as get_all_twitter_subscriptions,
-    username_exists as twitter_username_exists,
-    get_twitter_channels_by_guild,
-)
-
 from .channel import add_channel, delete_channel, get_channel, get_channels
 
 from .groupmembers import (
@@ -170,8 +187,6 @@ from .groupmembers import (
     get_groups,
     get_tag,
     get_tags,
-    get_date,
-    get_dates,
     get_name,
     get_names,
     get_company,
@@ -195,8 +210,6 @@ from .groupmembers import (
     get_fandoms_by_group,
     get_affiliation,
     get_affiliations,
-    get_blood_type,
-    get_blood_types,
     add_company,
     add_display,
     add_location,
@@ -221,13 +234,8 @@ from .groupmembers import (
     delete_fandom,
     delete_affiliation,
     add_affiliation,
-    add_blood_type,
-    delete_blood_type,
     add_name,
     delete_name,
-    add_date,
-    update_date,
-    delete_date,
     add_tag,
     delete_tag,
     get_person_media_info,
@@ -252,6 +260,7 @@ from .userstatus import (
 )
 
 from .guessinggame import (
+    update_gg_end_time,
     add_gg,
     delete_gg,
     get_gg,
@@ -259,6 +268,7 @@ from .guessinggame import (
     update_media_and_status,
 )
 from .unscramblegame import (
+    update_us_end_time,
     add_us,
     delete_us,
     get_us,
@@ -310,11 +320,38 @@ from .reminders import add_reminder, delete_reminder, get_reminders
 from .reactionroles import add_reaction_role_message, get_reaction_role_messages
 from .misc import get_urban_definitions
 
-from .bot import update_commands, get_commands
+from .bot import update_commands, get_commands, update_stats
+
+from .tiktok import get_tiktok_accounts, get_latest_tiktok_video, add_tiktok_account, get_tiktok_account, \
+    delete_tiktok_account
+
+from .banphrases import get_ban_phrase, add_ban_phrase, delete_ban_phrase, get_ban_phrases
 
 # Helper Functions for routes.
 
+
 helper_routes = {
+    "banphrases/$phrase_id.GET": {"function": get_ban_phrase, "params": ["requestor", "phrase_id"]},
+    "banphrases/$phrase_id.DELETE": {"function": delete_ban_phrase, "params": ["requestor", "phrase_id"]},
+    "banphrases/.GET": {"function": get_ban_phrases, "params": ["requestor"]},
+    "banphrases/.POST": {"function": add_ban_phrase, "params": ["requestor", "guild_id", "log_channel_id", "phrase",
+                                                                "punishment"]},
+    "tiktok/$username.DELETE": {"function": delete_tiktok_account, "params": ["requestor", "username", "channel_id"]},
+    "tiktok/$username.GET": {"function": get_tiktok_account, "params": ["requestor", "username"]},
+    "tiktok/.POST": {
+        "function": add_tiktok_account,
+        "params": ["requestor", "username", "user_id", "channel_id"],
+        "optional": ["role_id"],
+    },
+    "tiktok/.GET": {"function": get_tiktok_accounts, "params": ["requestor"]},
+    "tiktok/latest_video/$username.GET": {
+        "function": get_latest_tiktok_video,
+        "params": ["requestor", "username"],
+    },
+    "bot/updatestats.PUT": {
+        "function": update_stats,
+        "params": ["requestor", "key", "value"],
+    },
     "bot/commands.PUT": {
         "function": update_commands,
         "params": ["requestor", "commands"],
@@ -334,7 +371,7 @@ helper_routes = {
     },
     "reminder/.POST": {
         "function": add_reminder,
-        "params": ["requestor", "user_id", "reason", "date_id"],
+        "params": ["requestor", "user_id", "reason", "notify_date"],
     },
     "reminder/.GET": {"function": get_reminders, "params": ["requestor"]},
     "affiliation/automedia.GET": {"function": get_auto_media, "params": ["requestor"]},
@@ -429,39 +466,6 @@ helper_routes = {
         "function": delete_prefix,
         "params": ["requestor", "guild_id", "prefix"],
     },
-    "twitter/$twitter_id.GET": {
-        "function": get_twitter_timeline,
-        "params": ["requestor", "twitter_id"],
-    },
-    "twitter/account/$username.POST": {
-        "function": get_and_add_twitter_id,
-        "params": ["requestor", "username"],
-    },
-    "twitter/.GET": {
-        "function": get_all_twitter_subscriptions,
-        "params": ["requestor"],
-    },
-    "twitter/$username.GET": {
-        "function": get_twitter_subscriptions,
-        "params": ["requestor", "username"],
-    },
-    "twitter/modify/$twitter_id.DELETE": {
-        "function": delete_twitter_subscription,
-        "params": ["requestor", "twitter_id", "channel_id"],
-    },
-    "twitter/modify/$twitter_id.POST": {
-        "function": add_twitter_subscription,
-        "params": ["requestor", "twitter_id", "channel_id"],
-        "optional": ["role_id"],
-    },
-    "twitter/exists/$username.GET": {
-        "function": twitter_username_exists,
-        "params": ["requestor", "username"],
-    },
-    "twitter/filter/$guild_id.GET": {
-        "function": get_twitter_channels_by_guild,
-        "params": ["requestor", "guild_id"],
-    },
     "twitch/already_posted/$username.GET": {
         "function": get_posted,
         "params": ["requestor", "username"],
@@ -504,6 +508,10 @@ helper_routes = {
         "function": update_us_status,
         "params": ["requestor", "game_id", "status_ids"],
     },
+    "unscramblegame/$us_id.POST": {
+        "function": update_us_end_time,
+        "params": ["requestor", "game_id", "end_time"],
+    },
     "unscramblegame/$us_id.DELETE": {
         "function": delete_us,
         "params": ["requestor", "game_id"],
@@ -513,7 +521,7 @@ helper_routes = {
         "function": add_us,
         "params": [
             "requestor",
-            "date_id",
+            "start_date",
             "status_ids",
             "mode_id",
             "difficulty_id",
@@ -541,6 +549,10 @@ helper_routes = {
         "function": update_media_and_status,
         "params": ["requestor", "game_id", "media_ids", "status_ids"],
     },
+    "guessinggame/$gg_id.POST": {
+        "function": update_gg_end_time,
+        "params": ["requestor", "game_id", "end_time"],
+    },
     "guessinggame/$gg_id.DELETE": {
         "function": delete_gg,
         "params": ["requestor", "game_id"],
@@ -550,7 +562,7 @@ helper_routes = {
         "function": add_gg,
         "params": [
             "requestor",
-            "date_id",
+            "start_date",
             "media_ids",
             "status_ids",
             "mode_id",
@@ -601,7 +613,7 @@ helper_routes = {
     },
     "company/.POST": {
         "function": add_company,
-        "params": ["requestor", "name", "description", "date_id"],
+        "params": ["requestor", "name", "description", "start_date", "end_date"],
     },
     "company/$company_id.DELETE": {
         "function": delete_company,
@@ -760,16 +772,6 @@ helper_routes = {
         "function": delete_affiliation,
         "params": ["requestor", "affiliation_id"],
     },
-    "bloodtype/.GET": {"function": get_blood_types, "params": ["requestor"]},
-    "bloodtype/.POST": {"function": add_blood_type, "params": ["requestor", "name"]},
-    "bloodtype/$blood_id.GET": {
-        "function": get_blood_type,
-        "params": ["requestor", "blood_id"],
-    },
-    "bloodtype/$blood_id.DELETE": {
-        "function": delete_blood_type,
-        "params": ["requestor", "blood_id"],
-    },
     "name/.GET": {"function": get_names, "params": ["requestor"]},
     "name/.POST": {
         "function": add_name,
@@ -779,20 +781,6 @@ helper_routes = {
     "name/$name_id.DELETE": {
         "function": delete_name,
         "params": ["requestor", "name_id"],
-    },
-    "date/.GET": {"function": get_dates, "params": ["requestor"]},
-    "date/.POST": {
-        "function": add_date,
-        "params": ["requestor", "start_date", "end_date"],
-    },
-    "date/$date_id.GET": {"function": get_date, "params": ["requestor", "date_id"]},
-    "date/$date_id.PUT": {
-        "function": update_date,
-        "params": ["requestor", "date_id", "end_date"],
-    },
-    "date/$date_id.DELETE": {
-        "function": delete_date,
-        "params": ["requestor", "date_id"],
     },
     "tag/.GET": {"function": get_tags, "params": ["requestor"]},
     "tag/.POST": {"function": add_tag, "params": ["requestor", "name"]},
@@ -812,7 +800,6 @@ helper_routes = {
         "function": add_person,
         "params": [
             "requestor",
-            "date_id",
             "name_id",
             "former_name_id",
             "gender",
@@ -822,8 +809,10 @@ helper_routes = {
             "social_id",
             "location_id",
             "tag_ids",
-            "blood_id",
+            "blood_type",
             "call_count",
+            "birth_date",
+            "death_date"
         ],
     },
     "person/$person_id.GET": {
@@ -849,13 +838,14 @@ helper_routes = {
         "params": [
             "requestor",
             "group_name",
-            "date_id",
             "description",
             "company_id",
             "display_id",
             "website",
             "social_id",
             "tag_ids",
+            "debut_date",
+            "disband_date"
         ],
     },
     "group/$group_id.GET": {

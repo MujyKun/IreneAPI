@@ -68,21 +68,10 @@ def crossdomain(
     if isinstance(max_age, timedelta):
         max_age = max_age.total_seconds()
 
-    async def get_methods():
-        if methods is not None:
-            return methods
-
-        options_resp = await current_app.make_default_options_response(
-            overwritten=False
-        )
-        return options_resp.headers["allow"]
-
     def decorator(func):
         async def wrapped_function(*args, **kwargs):
             if automatic_options and request.method == "OPTIONS":
-                resp = await current_app.make_default_options_response(
-                    overwritten=False
-                )
+                resp = await current_app.make_default_options_response()
             else:
                 resp = await make_response(await func(*args, **kwargs))
             if not attach_to_all and request.method != "OPTIONS":
@@ -91,7 +80,7 @@ def crossdomain(
             hdrs = resp.headers
 
             hdrs["Access-Control-Allow-Origin"] = origin
-            hdrs["Access-Control-Allow-Methods"] = await get_methods()
+            hdrs["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
             hdrs["Access-Control-Max-Age"] = str(max_age)
             if credentials:
                 hdrs["Access-Control-Allow-Credentials"] = "true"
@@ -185,9 +174,7 @@ async def login(
 
 
 from .affiliation import affiliation
-from .bloodtype import bloodtype
 from .company import company
-from .date import date
 from .display import display
 from .fandom import fandom
 from .group import group
@@ -201,7 +188,6 @@ from .personalias import personalias
 from .position import position
 from .social import social
 from .tag import tag
-from .twitter import twitter
 from .channel import channel
 from .userstatus import status as user_status
 from .user import user
@@ -216,12 +202,12 @@ from .interactions import interactions as interactions_blueprint
 from .misc import misc
 from .reminders import reminders as reminders_blueprint
 from .bot import bot
+from .tiktok import tiktok
+from .banphrases import ban_phrases
 
 blueprints = [
     affiliation,
-    bloodtype,
     company,
-    date,
     display,
     fandom,
     group,
@@ -235,7 +221,6 @@ blueprints = [
     position,
     social,
     tag,
-    twitter,
     channel,
     user,
     guessinggame,
@@ -250,4 +235,6 @@ blueprints = [
     misc,
     reminders_blueprint,
     bot,
+    tiktok,
+    ban_phrases
 ]

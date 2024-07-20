@@ -29,7 +29,7 @@ class Noti(Resource):
         requestor = await login(headers=request.headers, data=request.args)
         return await helper.get_noti(requestor, noti_id)
 
-    async def delete(self, display_id: int):
+    async def delete(self, noti_id: int):
         """Delete a noti.
 
         Use this route to delete a noti. This will cascade all objects dependent on the display and is not reversible.

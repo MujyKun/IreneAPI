@@ -45,14 +45,14 @@ async def get_status(requestor: Requestor, status_id: int) -> dict:
     """Get a status's information."""
     is_int64(status_id)
     return await self.db.fetch_row(
-        "SELECT * FROM getuserstatuses WHERE statusid = $1", status_id
+        "SELECT * FROM userstatus WHERE statusid = $1", status_id
     )
 
 
 @check_permission(permission_level=USER)
 async def get_statuses(requestor: Requestor) -> dict:
     """Get all status information."""
-    return await self.db.fetch("SELECT * FROM getuserstatuses")
+    return await self.db.fetch("SELECT * FROM public.userstatus")
 
 
 @check_permission(permission_level=DEVELOPER)
