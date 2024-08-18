@@ -2,7 +2,6 @@
 from asyncio import get_event_loop
 
 from quart import render_template, make_response, redirect, session
-from models import PgConnection
 
 # noinspection PyUnresolvedReferences, PyPackageRequirements
 from resources.keys import (
@@ -136,6 +135,7 @@ async def create_first_user_token():
 loop = get_event_loop()
 try:
     # instantiate db
+    from models import PgConnection
     db = PgConnection(**postgres_options)
 
     # instantiate google drive
