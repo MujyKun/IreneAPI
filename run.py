@@ -1,6 +1,7 @@
 # noinspection PyUnresolvedReferences, PyPackageRequirements
 from asyncio import get_event_loop
-from quart import Quart, render_template, Response, make_response, redirect
+
+from quart import render_template, make_response, redirect, session
 from models import PgConnection
 
 # noinspection PyUnresolvedReferences, PyPackageRequirements
@@ -11,15 +12,16 @@ from resources.keys import (
     bot_invite_link,
     patreon_url,
     github_url,
+    signing_key
 )
 from resources import drive
 
 from ws import websocket_blueprint
 from routes import blueprints as _blueprints, cors_handler
 from routes.helpers.errors import BaseError
-from quart_openapi import Swagger
+from quart_openapi import Swagger, Pint
 from quart_cors import cors
-from quart_openapi import Pint
+
 
 app = Pint(__name__, title="IreneAPI", contact_email="mujy@irenebot.com", version="2.0")
 app = cors(app)
@@ -30,6 +32,8 @@ blueprints = _blueprints + [websocket_blueprint]  # do not override.
 # app.config['SERVER_NAME'] = "api.irenebot.com"
 for blueprint in blueprints:
     app.register_blueprint(blueprint)
+
+app.secret_key = signing_key
 
 db = PgConnection(**postgres_options)
 
@@ -70,8 +74,13 @@ async def docs():
 
 @app.route("/")
 async def index():
-    handler = await cors_handler(render_template)
-    return await handler("index.html")
+    from routes.discord import Login, helper
+    access_token = await helper.get_access_token()
+    if not access_token:
+        return await Login().get()
+    else:
+        handler = await cors_handler(render_template)
+        return await handler("index.html")
 
 
 @app.route("/discord")
@@ -92,6 +101,11 @@ async def patreon_redirect():
 @app.route("/github")
 async def github_redirect():
     return redirect(github_url)
+
+
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
 
 
 @app.route("/commands")

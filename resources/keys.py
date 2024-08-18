@@ -42,11 +42,18 @@ person_folder = os.getenv("FOLDER_LOCATION")
 main_site_port = os.getenv("SITE_PORT")
 
 bot_invite_link = os.getenv("BOT_INVITE_LINK")
+discord_auth_url = os.getenv("DISCORD_AUTH_URL")
+discord_client_id = os.getenv("DISCORD_CLIENT_ID")
+discord_client_secret = os.getenv("DISCORD_CLIENT_SECRET")
+discord_redirect_uri = os.getenv("DISCORD_REDIRECT_URI")
+signing_key = os.getenv("COOKIE_SIGNING_KEY")
 support_server_id = os.getenv("SUPPORT_SERVER_ID")
 support_server_link = os.getenv("SUPPORT_SERVER_LINK")
 bot_website = os.getenv("BOT_WEBSITE")
 image_host = os.getenv("IMAGE_HOST")
 github_url = os.getenv("GITHUB_LINK")
+
+encryption_key = os.getenv("ENCRYPTION_KEY")
 
 top_gg_webhook_key = os.getenv("TOP_GG_WEBHOOK")
 
