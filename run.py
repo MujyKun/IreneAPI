@@ -35,8 +35,6 @@ for blueprint in blueprints:
 
 app.secret_key = signing_key
 
-db = PgConnection(**postgres_options)
-
 
 @app.errorhandler(BaseError)
 # @crossdomain(origin=individual_route_cross_domain_origin)
@@ -137,6 +135,9 @@ async def create_first_user_token():
 
 loop = get_event_loop()
 try:
+    # instantiate db
+    db = PgConnection(**postgres_options)
+
     # instantiate google drive
     loop.run_until_complete(drive.create())
 
