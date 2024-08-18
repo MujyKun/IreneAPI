@@ -6,6 +6,7 @@ from .wolfram import Wolfram
 from .urban import Urban
 from .datadog import DataDog
 from .tiktok import Tiktok
+from .discord import Discord
 
 
 drive = Drive()
@@ -14,3 +15,4 @@ wolfram = Wolfram()
 urban = Urban()
 datadog = DataDog()
 tiktok = Tiktok()
+discord = Discord()

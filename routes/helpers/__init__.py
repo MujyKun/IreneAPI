@@ -1,7 +1,11 @@
 import asyncio
+from secrets import token_urlsafe
 from concurrent import futures
 from functools import partial
 from passlib.context import CryptContext
+from resources.keys import encryption_key
+from cryptography.fernet import Fernet
+from typing import Optional
 
 # API Tokens are hashed in the DB and should at no point ever be read as plain text.
 token_context = CryptContext(
@@ -11,6 +15,32 @@ token_context = CryptContext(
 )
 
 COMMANDS_FILE_NAME = "commands.json"
+cipher_suite = Fernet(encryption_key)
+
+
+def generate_cookie():
+    """Generate a url-safe cookie."""
+    return token_urlsafe(32)
+
+
+def encrypt_data(data: str) -> Optional[str]:
+    """Encrypt Data"""
+    if not data:
+        return None
+
+    data_bytes = data.encode('utf-8')
+    encrypted_data = cipher_suite.encrypt(data_bytes)
+    return encrypted_data.decode('utf-8')
+
+
+def decrypt_data(data: str) -> Optional[str]:
+    """Decrypt encrypted data."""
+    if not data:
+        return None
+
+    encrypted_data_bytes = data.encode('utf-8')
+    decrypted_data = cipher_suite.decrypt(encrypted_data_bytes)
+    return decrypted_data.decode('utf-8')
 
 
 def hash_token(token):
@@ -25,7 +55,6 @@ from models import Requestor, DbConnection, Access
 from functools import wraps
 from .errors import LackingPermissions, BadRequest
 from datetime import date, datetime
-from typing import Optional
 
 COMMON_TIMESTAMP_FORMAT = '%a, %d %b %Y %H:%M:%S %Z'
 COMMON_DATE_FORMAT = "%Y-%m-%d"

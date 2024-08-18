@@ -73,7 +73,8 @@ def crossdomain(
             if automatic_options and request.method == "OPTIONS":
                 resp = await current_app.make_default_options_response()
             else:
-                resp = await make_response(await func(*args, **kwargs))
+                results = await func(*args, **kwargs) or {}
+                resp = await make_response(results)
             if not attach_to_all and request.method != "OPTIONS":
                 return resp
 
@@ -204,6 +205,7 @@ from .reminders import reminders as reminders_blueprint
 from .bot import bot
 from .tiktok import tiktok
 from .banphrases import ban_phrases
+from .discord import discord
 
 blueprints = [
     affiliation,
@@ -236,5 +238,6 @@ blueprints = [
     reminders_blueprint,
     bot,
     tiktok,
-    ban_phrases
+    ban_phrases,
+    discord
 ]
