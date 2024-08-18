@@ -1,9 +1,6 @@
-import asyncio
 from secrets import token_urlsafe
 from concurrent import futures
-from functools import partial
 from passlib.context import CryptContext
-from resources.keys import encryption_key
 from cryptography.fernet import Fernet
 from typing import Optional
 
@@ -15,12 +12,27 @@ token_context = CryptContext(
 )
 
 COMMANDS_FILE_NAME = "commands.json"
-cipher_suite = Fernet(encryption_key)
 
 
 def generate_cookie():
     """Generate a url-safe cookie."""
     return token_urlsafe(32)
+
+
+cipher_suite = None
+
+
+def get_cipher_suite() -> Fernet:
+    """
+    Get the cipher suite.
+
+    Intentionally designed this way to prevent issues with event loop not being initialized on import.
+    """
+    global cipher_suite
+    if not cipher_suite:
+        from resources.keys import encryption_key
+        cipher_suite = Fernet(encryption_key)
+    return cipher_suite
 
 
 def encrypt_data(data: str) -> Optional[str]:
@@ -29,7 +41,8 @@ def encrypt_data(data: str) -> Optional[str]:
         return None
 
     data_bytes = data.encode('utf-8')
-    encrypted_data = cipher_suite.encrypt(data_bytes)
+
+    encrypted_data = get_cipher_suite().encrypt(data_bytes)
     return encrypted_data.decode('utf-8')
 
 
@@ -39,7 +52,7 @@ def decrypt_data(data: str) -> Optional[str]:
         return None
 
     encrypted_data_bytes = data.encode('utf-8')
-    decrypted_data = cipher_suite.decrypt(encrypted_data_bytes)
+    decrypted_data = get_cipher_suite().decrypt(encrypted_data_bytes)
     return decrypted_data.decode('utf-8')
 
 
