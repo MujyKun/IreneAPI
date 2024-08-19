@@ -48,3 +48,14 @@ class InfoAboutMe(Resource):
         return await helper.get_user_info()
 
 
+@discord.route("status")
+class LoginStatus(Resource):
+    async def get(self):
+        """
+        Whether the user is logged in.
+
+        Use this route to find out if a user is logged in.
+        """
+        return jsonify({
+            "logged_in": await helper.is_logged_in()
+        })

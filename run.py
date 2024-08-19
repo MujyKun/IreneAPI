@@ -1,7 +1,7 @@
 # noinspection PyUnresolvedReferences, PyPackageRequirements
 from asyncio import get_event_loop
 
-from quart import render_template, make_response, redirect, session
+from quart import render_template, make_response, redirect, session, jsonify
 from models import PgConnection
 
 # noinspection PyUnresolvedReferences, PyPackageRequirements
@@ -12,40 +12,44 @@ from resources.keys import (
     bot_invite_link,
     patreon_url,
     github_url,
-    signing_key
+    signing_key,
+    bot_website
 )
 from resources import drive
 
 from ws import websocket_blueprint
-from routes import blueprints as _blueprints, cors_handler
+from routes import blueprints as _blueprints
 from routes.helpers.errors import BaseError
 from quart_openapi import Swagger, Pint
 from quart_cors import cors
 
 
 app = Pint(__name__, title="IreneAPI", contact_email="mujy@irenebot.com", version="2.0")
-app = cors(app)
 swagger = Swagger(app)
 blueprints = _blueprints + [websocket_blueprint]  # do not override.
 
-# print(app.config['SERVER_NAME'])
-# app.config['SERVER_NAME'] = "api.irenebot.com"
 for blueprint in blueprints:
     app.register_blueprint(blueprint)
 
+app.config.update(
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax',
+    SESSION_COOKIE_DOMAIN=".irenebot.com"
+)
+
 app.secret_key = signing_key
+
+app = cors(app, allow_origin=[bot_website], allow_credentials=True,
+           allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"])
+
 
 db = PgConnection(**postgres_options)
 
 
 @app.errorhandler(BaseError)
-# @crossdomain(origin=individual_route_cross_domain_origin)
 async def handle_custom(error):
-    # handler = await cors_handler(swagger.as_dict)
-    handler = await cors_handler(make_response)
-    response = await handler(str(error), error.status_code)
-    response.content_type = "application/json"
-    return response
+    return jsonify({"error": str(error)}, error.status_code)
 
 
 @app.route("/docs")
@@ -68,8 +72,7 @@ async def docs():
       - Bearer Token: []
       - User ID: []
     """
-    handler = await cors_handler(swagger.as_dict)
-    return await handler()
+    return jsonify(swagger.as_dict())
 
 
 @app.route("/")
@@ -79,8 +82,7 @@ async def index():
     if not access_token:
         return await Login().get()
     else:
-        handler = await cors_handler(render_template)
-        return await handler("index.html")
+        return await render_template("index.html")
 
 
 @app.route("/discord")

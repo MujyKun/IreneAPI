@@ -6,7 +6,7 @@ from models import WebSocketSession, Requestor, Access
 from .helpers.errors import InvalidLogin, BadRequest
 from .helpers import hash_token, check_hashed_token
 
-from quart_openapi import Resource as NoCorsResource
+from quart_openapi import Resource  # used as a general import from blueprint files
 from quart import request, make_response, Response
 from functools import wraps
 
@@ -15,111 +15,6 @@ from functools import update_wrapper
 from typing import Callable, Iterable, Union
 
 from quart import current_app, make_response, request
-
-
-# pylint: disable=too-many-arguments
-def crossdomain(
-    origin: str = None,
-    methods: Iterable[str] = None,
-    headers: Union[str, Iterable[str]] = None,
-    expose_headers: Union[str, Iterable[str]] = None,
-    max_age: Union[int, timedelta] = 21600,
-    attach_to_all: bool = True,
-    automatic_options: bool = True,
-    credentials: bool = False,
-) -> Callable:
-    """Decorator for `CORS <https://fetch.spec.whatwg.org/#http-cors-protocol>`_ adapted from
-    http://flask.pocoo.org/snippets/56/
-
-    Irene Implementation. Original Implementation found in `from quart_openapi.cors import crossdomain`
-
-    :param origin: value for `Access-Control-Allow-Origin` header
-    :param methods: str or list[str] of HTTP verbs for the `Access-Control-Allow-Methods`, defaults
-                    to 'OPTIONS, HEAD' + any available verb functions on the class
-    :param headers: str or list[str] for the `Access-Control-Allow-Headers` header
-    :param expose_headers: str or list[str] for the `Access-Control-Expose-Headers` header
-    :param max_age: the number of seconds for the `Access-Control-Max-Age` header.
-    :param attach_to_all: if `False`, the CORS headers will only be attached to `OPTIONS` requests
-    :param automatic_options: if `False`, will look for an options function in the resource, otherwise
-                              the default options response will be used for OPTIONS requests,
-                              and the CORS headers will be attached
-    :param credentials: the value of the `Access-Control-Allow-Credentials` header
-
-    This decorator should be used on individual route functions like so:
-
-    .. code-block:: python
-
-          @app.route('/foobar', methods=['GET','OPTIONS'])
-          class CORS(Resource):
-            @crossdomain(origin='*')
-            async def get(self):
-              ...
-
-    This would allow Cross Origin requests to make get requests to '/foobar'.
-    """
-    if methods is not None:
-        methods = ", ".join(sorted(x.upper() for x in methods))
-    if headers is not None and not isinstance(headers, str):
-        headers = ", ".join(x.upper() for x in headers)
-    if expose_headers is not None and not isinstance(expose_headers, str):
-        expose_headers = ", ".join(x.upper() for x in expose_headers)
-    if not isinstance(origin, str):
-        origin = ", ".join(origin)
-    if isinstance(max_age, timedelta):
-        max_age = max_age.total_seconds()
-
-    def decorator(func):
-        async def wrapped_function(*args, **kwargs):
-            if automatic_options and request.method == "OPTIONS":
-                resp = await current_app.make_default_options_response()
-            else:
-                results = await func(*args, **kwargs) or {}
-                resp = await make_response(results)
-            if not attach_to_all and request.method != "OPTIONS":
-                return resp
-
-            hdrs = resp.headers
-
-            hdrs["Access-Control-Allow-Origin"] = origin
-            hdrs["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-            hdrs["Access-Control-Max-Age"] = str(max_age)
-            if credentials:
-                hdrs["Access-Control-Allow-Credentials"] = "true"
-            if headers is not None:
-                hdrs["Access-Control-Allow-Headers"] = headers
-            if expose_headers is not None:
-                hdrs["Access-Control-Expose-Headers"] = expose_headers
-            return resp
-
-        func.provide_automatic_options = False
-        return update_wrapper(wrapped_function, func)
-
-    return decorator
-
-
-async def cors_handler(func):
-    @wraps(func)
-    @crossdomain(origin="*", headers="authorization")
-    async def wrapper(*args, **kwargs):
-        if asyncio.iscoroutinefunction(func):
-            return await func(*args, **kwargs)
-        else:
-            return func(*args, **kwargs)
-
-    return wrapper
-
-
-class Resource(NoCorsResource):
-    def __init__(self, *args, **kwargs):
-        super(NoCorsResource, self).__init__()
-
-    async def dispatch_request(self, *args, **kwargs):
-        """Add Cors to each type of request in the resource."""
-        handler = await cors_handler(getattr(self, request.method.lower(), None))
-        if handler is None and request.method == "HEAD" or request.method == "OPTIONS":
-            handler = getattr(self, "get", None)
-        await self.validate_payload(handler)
-        return await handler(*args, **kwargs)
 
 
 # PASS WITH CAUTION. Should only be used in functions not directly returned to a user

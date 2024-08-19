@@ -66,7 +66,7 @@ async def delete_current_session() -> bool:
     """
     try:
         existing_session_id = session.pop("session_id")
-    except IndexError:
+    except KeyError:
         return False
 
     delete_query = """
@@ -135,3 +135,17 @@ async def get_user_info():
 
     return await discord.get_user(access_token)
 
+
+async def is_logged_in() -> bool:
+    """
+    Get whether the user is logged in.
+
+    Does not check if the access token is still active.
+
+    :return: bool
+        Whether the user is still logged in (a session exists)
+    """
+    return bool(session.get("session_id"))
+
+    # Getting the access token will take longer for verifying and requires a sql operation.
+    # return bool(await get_access_token())
