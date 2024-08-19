@@ -40,7 +40,7 @@ app.config.update(
 
 app.secret_key = signing_key
 
-app = cors(app, allow_origin=[bot_website, "http://127.0.0.1:5173", "localhost"], allow_credentials=True,
+app = cors(app, allow_origin=[bot_website.rstrip('/'), "http://127.0.0.1:5173", "localhost"], allow_credentials=True,
            allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"])
 
 
