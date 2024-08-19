@@ -23,6 +23,7 @@ from routes.helpers.errors import BaseError
 from quart_openapi import Swagger, Pint
 from quart_cors import cors
 
+DEV_MODE = False
 
 app = Pint(__name__, title="IreneAPI", contact_email="mujy@irenebot.com", version="2.0")
 swagger = Swagger(app)
@@ -32,10 +33,10 @@ for blueprint in blueprints:
     app.register_blueprint(blueprint)
 
 app.config.update(
-    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_SECURE=not DEV_MODE,
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE='Lax',
-    SESSION_COOKIE_DOMAIN=".irenebot.com"
+    SESSION_COOKIE_DOMAIN=".irenebot.com" if not DEV_MODE else None
 )
 
 app.secret_key = signing_key
