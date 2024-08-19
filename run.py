@@ -2,6 +2,7 @@
 from asyncio import get_event_loop
 
 from quart import render_template, make_response, redirect, session
+from models import PgConnection
 
 # noinspection PyUnresolvedReferences, PyPackageRequirements
 from resources.keys import (
@@ -33,6 +34,8 @@ for blueprint in blueprints:
     app.register_blueprint(blueprint)
 
 app.secret_key = signing_key
+
+db = PgConnection(**postgres_options)
 
 
 @app.errorhandler(BaseError)
@@ -134,10 +137,6 @@ async def create_first_user_token():
 
 loop = get_event_loop()
 try:
-    # instantiate db
-    from models import PgConnection
-    db = PgConnection(**postgres_options)
-
     # instantiate google drive
     loop.run_until_complete(drive.create())
 

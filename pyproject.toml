@@ -36,7 +36,9 @@ click = "8.1.7"
 jsonschema = "^4.9.1"
 hypercorn = "0.17.3"
 Quart-CORS = "^0.5.0"
-aiohttp = "^3.8.3"
+
+# WARNING: 3.10.4 will make it so that ClientSession() requires an event loop first, breaking the api.
+aiohttp = "3.9.5"
 datadog = "0.49.1"
 tiktokapipy = "0.2.4.post2"
 playwright = "^1.31.1"
